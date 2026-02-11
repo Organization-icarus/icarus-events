@@ -1,0 +1,66 @@
+**CMPUT 301 Team Icarus Meeting Notes 2/5/2026**
+
+### Overview
+
+TA will grade all work
+
+Attendance to all meetings is mandatory, inform TA ahead of time if unavailable
+
+Team members should inform TA about work done within the previous week
+
+Send any question to TA via email (may take 1 - 2 days to reply, follow up after 2 days)
+
+Mimic format of previous projects for each deliverable
+
+TA will check each line of a deliverable to determine mark deductions
+
+### Project Part 2 Discussion
+
+Created Kanban project in repository
+
+#### 1.
+
+All user stories go into the product backlog, create issue for each user story (there are 44, one issue per story)
+Format: UserId, Description, story points, risk factor
+
+story points = how much work a user story will require (assign based on Fibonacci sequence)
+
+Greek number = risk factor (how risky implementing the feature will be/how many bugs it may introduce)
+
+#### 2.
+
+Look at story board sequence example
+
+Start designing UI for the app (based on user stories)
+
+Story board sequence outlines how the app is traversed. FIGMA (recommended)
+
+#### 3.
+
+create CRC cards that outline expected classes for the project
+
+can always make changes if things change during development
+
+#### 4.
+
+Links to all the deliverables will be stored as links in the GitHub
+
+NO EXTERNAL LINKS (NO FIGMA LINK, convert to pdf)
+
+use meeting minutes template provided.
+
+part 2 meeting minutes are used as practice
+part 3 and part 4 meeting minutes will be counted towards grade as 'sprint planning'
+
+if any teammate does not collaborate they may receive a deduction (make sure to distribute work evenly)
+
+peer review forms will be submitted for part 2 to see contribution
+
+git hub commits will be monitored
+
+### Project Part 3 & 4
+
+must finish half of each user story for part 3 and part 4
+
+can select which user stories to do for each part
+
