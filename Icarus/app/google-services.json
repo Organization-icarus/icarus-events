@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1069338863712",
+    "project_id": "icarus-events",
+    "storage_bucket": "icarus-events.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069338863712:android:85ec869a3b2e5de12e3b05",
+        "android_client_info": {
+          "package_name": "com.icarus.events"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqIWNcNwtHMa4GBwtKcZEXmiLJy7u83R0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
