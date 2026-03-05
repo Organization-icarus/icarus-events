@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- For text displayed on a primary background -->
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- The main background color, and the color for text in dark text boxes -->
+    <color name="primary">#FFFFFFFF</color>
+    <!-- A light background color for buttons -->
+    <color name="primary_container">#FFF3EDF7</color>
+    <!-- A darker background color to indicate selection -->
+    <color name="primary_container_highlighted">#FF6750A4</color>
+    <!-- For buttons that require sensitive action (delete, remove, etc)  -->
+    <color name="attention">#FFFF5F57</color>
 </resources>
