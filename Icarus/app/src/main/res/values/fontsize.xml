@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Heading size -->
+    <dimen name="font_heading_size">24sp</dimen>
+    <!-- Subheading size -->
+    <dimen name="font_subheading_size">18sp</dimen>
+    <!-- Body text size -->
+    <dimen name="font_text_size">14sp</dimen>
+</resources>
