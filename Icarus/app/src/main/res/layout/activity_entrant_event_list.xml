@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
+
+    <!-- Title for events page-->
+    <TextView
+        android:id="@+id/entrant_event_list_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="Icarus Events"
+        android:textSize="40dp"
+        android:fontFamily="@font/font"
+        android:textStyle="bold"
+        />
+
+    <!-- Filter buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="12dp" >
+
+        <Button
+            android:id="@+id/entrant_event_list_sports_filter_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="2dp"
+            android:text="Sports"
+            android:textColor="@color/black"
+            android:fontFamily="@font/font"
+            android:backgroundTint="@color/primary_container" />
+
+        <Button
+            android:id="@+id/entrant_event_list_music_filter_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="2dp"
+            android:text="Music"
+            android:textColor="@color/black"
+            android:fontFamily="@font/font"
+            android:backgroundTint="@color/primary_container" />
+
+        <Button
+            android:id="@+id/entrant_event_list_education_filter_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="2dp"
+            android:text="Education"
+            android:textColor="@color/black"
+            android:fontFamily="@font/font"
+            android:backgroundTint="@color/primary_container" />
+
+    </LinearLayout>
+
+    <!-- Message for empty list -->
+    <TextView
+        android:id="@+id/entrant_event_list_empty_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="@string/entrants_event_list_empty_events"
+        android:textSize="20dp"
+        android:fontFamily="@font/font"
+        android:visibility="gone"
+        />
+
+
+    <!-- Event list -->
+    <ListView
+        android:id="@+id/entrant_event_list_view"
+        android:layout_width="300dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>
