@@ -1,0 +1,123 @@
+package com.icarus.events;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+public class AdministratorDashboardActivity extends AppCompatActivity {
+    private ListView eventListView;
+    private ListView userListView;
+    private Button showEventListButton;
+    private Button showUserListButton;
+    private Button showImageListButton;
+    private FirebaseFirestore db;
+    private CollectionReference eventsRef;
+    private CollectionReference usersRef;
+    private ArrayList<Event> eventArrayList;
+    private ArrayAdapter<Event> eventArrayAdapter;
+    private ArrayList<User> userArrayList;
+    private ArrayAdapter<User> userArrayAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_administrator_dashboard);
+
+        // Initialize database reference and collection references
+        db = FirebaseFirestore.getInstance();
+        eventsRef = db.collection("events");
+        usersRef = db.collection("users");
+
+        // Set views
+        eventListView = findViewById(R.id.admin_dashboard_event_list);
+        userListView = findViewById(R.id.admin_dashboard_user_list);
+
+        // Initialize buttons
+        showEventListButton = findViewById(R.id.admin_dashboard_show_event_list_button);
+        showUserListButton = findViewById(R.id.admin_dashboard_show_user_list_button);
+        showImageListButton = findViewById(R.id.admin_dashboard_show_image_list_button);
+
+        // create event & user array
+        eventArrayList = new ArrayList<>();
+        eventArrayAdapter = new AdministratorDashboardEventArrayAdapter(this,
+                eventArrayList);
+        userArrayList = new ArrayList<>();
+        userArrayAdapter = new AdministratorDashboardUserArrayAdapter(this, userArrayList);
+
+        // Get all items in the collection
+        eventsRef.addSnapshotListener((value,error) -> {
+            if (error != null){
+                Log.e("Firestore", error.toString());
+            }
+            if (value != null && !value.isEmpty()) {
+                eventArrayList.clear();
+                for (QueryDocumentSnapshot snapshot : value) {
+                    String id = snapshot.getId();
+                    String name = snapshot.getString("name");
+                    double capacity = snapshot.getDouble("capacity");
+                    Date regOpen = snapshot.getDate("open");
+                    Date regClose = snapshot.getDate("close");
+                    Date date = snapshot.getDate("date");
+
+                    eventArrayList.add(new Event(id, name, capacity, regOpen, regClose, date));
+                }
+                eventArrayAdapter.notifyDataSetChanged();
+            }
+        });
+
+        usersRef.addSnapshotListener((value,error) -> {
+            if (error != null){
+                Log.e("Firestore", error.toString());
+            }
+            if (value != null && !value.isEmpty()) {
+                userArrayList.clear();
+                for (QueryDocumentSnapshot snapshot : value) {
+                    String id = snapshot.getId();
+                    String name = snapshot.getString("name");
+                    String email = snapshot.getString("email");
+                    String phone = snapshot.getString("phone");
+                    Date birthday = snapshot.getDate("birthday");
+
+                    userArrayList.add(new User(id, name, email, phone, birthday));
+                }
+                userArrayAdapter.notifyDataSetChanged();
+            }
+        });
+
+        // Set ListView adapters
+        eventListView.setAdapter(eventArrayAdapter);
+        userListView.setAdapter(userArrayAdapter);
+
+        // Setup buttons on click listeners
+        showEventListButton.setOnClickListener(v -> {
+            eventListView.setVisibility(VISIBLE);
+            userListView.setVisibility(GONE);
+            //imageListView.setVisibility(GONE);
+        });
+        showUserListButton.setOnClickListener(v -> {
+            eventListView.setVisibility(GONE);
+            userListView.setVisibility(VISIBLE);
+            //imageListView.setVisibility(GONE);
+        });
+        showImageListButton.setOnClickListener(v -> {
+            eventListView.setVisibility(GONE);
+            userListView.setVisibility(GONE);
+            //imageListView.setVisibility(VISIBLE);
+        });
+    }
+}
