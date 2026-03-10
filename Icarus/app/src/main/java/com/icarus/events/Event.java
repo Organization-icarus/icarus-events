@@ -2,6 +2,11 @@ package com.icarus.events;
 
 import java.util.Date;
 
+/**
+ * Class for storing event information
+ *
+ * @author Benjamin Hall
+ */
 public class Event {
     private String id;
     private String name;
