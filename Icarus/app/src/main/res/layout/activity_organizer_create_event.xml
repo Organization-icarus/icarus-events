@@ -76,6 +76,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventRegistrationPeriodStart"/>
+        <Button
+            android:id="@+id/OrganizerCreateEventCreateEvent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="64dp"
+            android:text="Create Event"
+            android:textSize="@dimen/font_text_size"
+            android:backgroundTint="@color/primary_container"
+            android:textColor="@color/primary_container_highlighted"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventRegistrationPeriodEnd"/>
+
 
         <include
             android:id="@+id/nav_bar"
