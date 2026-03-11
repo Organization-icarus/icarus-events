@@ -1,11 +1,13 @@
 package com.icarus.events;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -41,13 +43,15 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
                 .findViewById(R.id.admin_dashboard_user_list_user_name);
         Button userDetailsButton = view
                 .findViewById(R.id.admin_dashboard_user_list_user_details_button);
-        Button removeUserButton = view
+        ImageButton removeUserButton = view
                 .findViewById(R.id.admin_dashboard_user_list_remove_user_button);
 
         userName.setText(user.getName());
 
         userDetailsButton.setOnClickListener(v -> {
-            // TODO: Have this navigate to the user details activity for the user
+//            Intent intent = new Intent(context, UserDetailsActivity.class);
+//            intent.putExtra("userId", user.getId());
+//            context.startActivity(intent);
         });
 
         removeUserButton.setOnClickListener(v -> {
