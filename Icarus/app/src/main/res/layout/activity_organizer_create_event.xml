@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/OrganizerCreateEventTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="Create Event"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_heading_size"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/OrganizerCreateEventEventTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:hint="Event Name"
+            android:inputType="textCapWords"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_heading_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventTitle"/>
+
+        <EditText
+            android:id="@+id/OrganizerCreateEventEventLocation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:hint="Event Location"
+            android:inputType="textCapWords"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_heading_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventEventTitle"/>
+
+        <Button
+            android:id="@+id/OrganizerCreateEventUploadPosterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:backgroundTint="@color/primary_container"
+            android:drawablePadding="8dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="Upload Event Image"
+            android:textSize="@dimen/font_text_size"
+            android:textColor="@color/primary_container_highlighted"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/OrganizerCreateEventGeolocationSwitch"
+            app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventEventLocation"
+            app:layout_constraintHorizontal_chainStyle="packed"/>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/OrganizerCreateEventGeolocationSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Geolocation"
+            android:textSize="@dimen/font_subheading_size"
+            app:layout_constraintStart_toEndOf="@+id/OrganizerCreateEventUploadPosterButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/OrganizerCreateEventUploadPosterButton"
+            app:layout_constraintBottom_toBottomOf="@+id/OrganizerCreateEventUploadPosterButton"/>
+
+        <EditText
+            android:id="@+id/OrganizerCreateEventLimitWaitingListLimit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:hint="Enter Number of Participants"
+            android:inputType="numberDecimal"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_heading_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventUploadPosterButton"/>
+
+    <EditText
+        android:id="@+id/OrganizerCreateEventCategory"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Enter Category"
+        android:inputType="textCapWords"
+        android:textColor="@color/black"
+        android:textSize="@dimen/font_heading_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventLimitWaitingListLimit"/>
+        <Button
+            android:id="@+id/OrganizerCreateEventRegistrationPeriodStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Registration Period Start"
+            android:textSize="@dimen/font_text_size"
+            android:backgroundTint="@color/primary_container"
+            android:textColor="@color/primary_container_highlighted"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventCategory"/>
+
+        <Button
+            android:id="@+id/OrganizerCreateEventRegistrationPeriodEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Registration Period End"
+            android:textSize="@dimen/font_text_size"
+            android:backgroundTint="@color/primary_container"
+            android:textColor="@color/primary_container_highlighted"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventRegistrationPeriodStart"/>
+
+        <Button
+            android:id="@+id/OrganizerCreateEventDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Event Date"
+            android:textSize="@dimen/font_text_size"
+            android:backgroundTint="@color/primary_container"
+            android:textColor="@color/primary_container_highlighted"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventRegistrationPeriodEnd"/>
+
+        <Button
+            android:id="@+id/OrganizerCreateEventCreateEvent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Create Event"
+            android:textSize="@dimen/font_text_size"
+            android:backgroundTint="@color/primary_container"
+            android:textColor="@color/primary_container_highlighted"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventDate"/>
+
+        <include
+            android:id="@+id/nav_bar"
+            layout="@layout/nav_bar"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>

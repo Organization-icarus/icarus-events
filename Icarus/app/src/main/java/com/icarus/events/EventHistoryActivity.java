@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -27,46 +28,38 @@ import java.util.HashMap;
 import androidx.appcompat.app.AlertDialog;
 
 
-public class EntrantEventListActivity extends NavigationBarActivity {
+public class EventHistoryActivity extends NavigationBarActivity {
     //Define attributes
-    private ListView eventListView;
+    private ListView eventHistoryListView;
     private EditText searchTextFilter;
     private String currentSearch = "";
-    //Placeholder filter buttons, will replace later.
-    //private Button showSportsFilterButton;
-    //private Button showMusicFilterButton;
-    //private Button showEducationFilterButton;
     private Button filterCategoryButton;
-    private FloatingActionButton addEvent;
-    private ArrayList<Event> eventArrayList;
+    private ArrayList<Event> eventHistoryArrayList;
     private HashMap<String, Boolean> currentFilters;
-    private ArrayList<Event> filteredEventArrayList;
-    private EntrantEventListArrayAdapter eventListArrayAdapter;
+    private ArrayList<Event> filteredEventHistoryArrayList;
+    private EventHistoryListArrayAdapter eventHistoryListArrayAdapter;
     private CollectionReference eventsRef;
+    private User user;
     private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_entrant_event_list);
+        setContentView(R.layout.activity_event_history);
         setupNavBar();
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
         eventsRef = db.collection("events");
+        user = UserSession.getInstance().getCurrentUser();
 
         // Set views
-        eventListView = findViewById(R.id.entrant_event_list_view);
+        eventHistoryListView = findViewById(R.id.event_history_list_view);
 
-        // Initialize buttons
-        //showSportsFilterButton = findViewById(R.id.entrant_event_list_sports_filter_button);
-        //showMusicFilterButton = findViewById(R.id.entrant_event_list_music_filter_button);
-        //showEducationFilterButton = findViewById(R.id.entrant_event_list_education_filter_button);
-        filterCategoryButton = findViewById(R.id.entrant_event_list_filter_button);
-        addEvent = findViewById(R.id.entrant_event_list_add_event_button);
+        filterCategoryButton = findViewById(R.id.event_history_filter_button);
 
         //Initialize text filter
-        searchTextFilter = findViewById(R.id.entrant_event_list_search_filter);
+        searchTextFilter = findViewById(R.id.event_history_search_filter);
         searchTextFilter.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -77,10 +70,10 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         });
 
         // Create normal & filtered event list
-        eventArrayList = new ArrayList<>();
-        filteredEventArrayList = new ArrayList<>();
-        eventListArrayAdapter = new EntrantEventListArrayAdapter(this,
-                filteredEventArrayList);
+        eventHistoryArrayList = new ArrayList<>();
+        filteredEventHistoryArrayList = new ArrayList<>();
+        eventHistoryListArrayAdapter = new EventHistoryListArrayAdapter(this,
+                filteredEventHistoryArrayList);
 
         // Initialize current filters
         currentFilters = new HashMap<>();
@@ -88,76 +81,75 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         currentFilters.put("Music", false);
         currentFilters.put("Education", false);
 
-        // Get all items in the collection
-        eventsRef.addSnapshotListener((value,error) -> {
-            if (error != null){
+        // Generated from Claude AI on March 11, 2026
+        // "I want to only get events that are in the current users event list"
+        // Get the current user's eventIds first, then fetch only those events
+        db.collection("users").document(user.getId()).addSnapshotListener((userSnapshot, error) -> {
+            if (error != null) {
                 Log.e("Firestore", error.toString());
+                return;
             }
-            if (value != null && !value.isEmpty()) {
-                eventArrayList.clear();
-                for (QueryDocumentSnapshot snapshot : value) {
-                    String id = snapshot.getId();
-                    String name = snapshot.getString("name");
-                    String category  = snapshot.getString("category");
-                    Double capacity = snapshot.getDouble("capacity");
-                    Date regOpen = snapshot.getDate("open");
-                    Date regClose = snapshot.getDate("close");
-                    Date date = snapshot.getDate("date");
-                    String location = snapshot.getString("location");
-                    String image = snapshot.getString("image");
-                    String organizer = snapshot.getString("organizer");
+            if (userSnapshot == null || !userSnapshot.exists()) return;
 
-                    eventArrayList.add(
-                            new Event(
-                                    id,
-                                    name,
-                                    category,
-                                    capacity,
-                                    regOpen,
-                                    regClose,
-                                    date,
-                                    location,
-                                    image,
-                                    organizer));
-                }
+            ArrayList<String> eventIds = (ArrayList<String>) userSnapshot.get("events");
+
+            if (eventIds == null || eventIds.isEmpty()) {
+                eventHistoryArrayList.clear();
                 applyFilters();
+                return;
             }
+
+            // Firestore whereIn limit is 30 — take the first 30 if needed
+            ArrayList<String> queryIds = eventIds.size() > 30 ? new ArrayList<>(eventIds.subList(0, 30)) : eventIds;
+
+            eventsRef.whereIn(FieldPath.documentId(), queryIds)
+                    .addSnapshotListener((value, eventsError) -> {
+                        if (eventsError != null) {
+                            Log.e("Firestore", eventsError.toString());
+                            return;
+                        }
+                        if (value != null) {
+                            eventHistoryArrayList.clear();
+                            for (QueryDocumentSnapshot snapshot : value) {
+                                String id = snapshot.getId();
+                                String name = snapshot.getString("name");
+                                String category = snapshot.getString("category");
+                                Double capacity = snapshot.getDouble("capacity");
+                                Date regOpen = snapshot.getDate("open");
+                                Date regClose = snapshot.getDate("close");
+                                Date date = snapshot.getDate("date");
+                                String location = snapshot.getString("location");
+                                String image = snapshot.getString("image");
+                                String organizer = snapshot.getString("organizer");
+
+                                eventHistoryArrayList.add(new Event(
+                                        id, name, category, capacity,
+                                        regOpen, regClose, date, location, image, organizer));
+                            }
+                            applyFilters();
+                        }
+                    });
         });
 
         // Set ListView adapter
-        eventListView.setAdapter(eventListArrayAdapter);
+        eventHistoryListView.setAdapter(eventHistoryListArrayAdapter);
 
         // Set navigation on click listeners
         /**eventListView.setOnItemClickListener((parent, view, position, id) -> {
-            Event selected = filteredEventArrayList.get(position);
-            Intent intent = new Intent(this, EntrantEventDetailActivity.class);
-            intent.putExtra("eventId", selected.getId());
-            startActivity(intent);
-        });**/
+         Event selected = filteredEventArrayList.get(position);
+         Intent intent = new Intent(this, EntrantEventDetailActivity.class);
+         intent.putExtra("eventId", selected.getId());
+         startActivity(intent);
+         });**/
 
-        // Set buttons on click listeners
-
-        addEvent.setOnClickListener(v -> {
-            Intent intent = new Intent(this, OrganizerCreateEventActivity.class);
-            startActivity(intent);
-        });
 
         filterCategoryButton.setOnClickListener(v -> showCategoryFilterDialog());
-//        showSportsFilterButton.setOnClickListener(v -> {
-//            handleFilterEvent("Sports", showSportsFilterButton);
-//        });
-//        showMusicFilterButton.setOnClickListener(v -> {
-//            handleFilterEvent("Music", showMusicFilterButton);
-//        });
-//        showEducationFilterButton.setOnClickListener(v -> {
-//            handleFilterEvent("Education", showEducationFilterButton);
-//        });
 
         // Check if list is empty, if so hide list and show message
         /**if (eventArrayList.isEmpty()) {
-            findViewById(R.id.entrant_event_list_empty_text).setVisibility(VISIBLE);
-            eventListView.setVisibility(GONE);
-        }**/
+         findViewById(R.id.entrant_event_list_empty_text).setVisibility(VISIBLE);
+         eventListView.setVisibility(GONE);
+         }**/
     }
 
     private void handleButtonClick(String filterName, Button button) {
@@ -167,27 +159,27 @@ public class EntrantEventListActivity extends NavigationBarActivity {
             //Set button to be normal colour
             button.setBackgroundColor(
                     androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container
+                            this,
+                            R.color.primary_container
                     )
             );
             button.setTextColor(
                     androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container_highlighted
+                            this,
+                            R.color.primary_container_highlighted
                     )
             );
         } else {
             //Set button to be selected colour
             button.setBackgroundColor(
                     androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container_highlighted
+                            this,
+                            R.color.primary_container_highlighted
                     )
             );
             button.setTextColor(androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container
+                            this,
+                            R.color.primary_container
                     )
             );
         }
@@ -195,11 +187,11 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     }
 
     private void applyFilters() {
-        filteredEventArrayList.clear();
+        filteredEventHistoryArrayList.clear();
         // Checking if any filters are set before proceeding
         boolean noCategoriesSelected = !currentFilters.containsValue(true);
         // If no filters are set, show all events
-        for (Event event : eventArrayList) {
+        for (Event event : eventHistoryArrayList) {
             boolean matchesSearch = currentSearch.isEmpty()
                     || (event.getName() != null
                     && event.getName().toLowerCase().contains(currentSearch));
@@ -207,11 +199,11 @@ public class EntrantEventListActivity extends NavigationBarActivity {
                     || Boolean.TRUE.equals(currentFilters.get(event.getCategory()));
 
             if (matchesSearch && matchesCategory) {
-                filteredEventArrayList.add(event);
+                filteredEventHistoryArrayList.add(event);
             }
         }
         // Update filtered list
-        eventListArrayAdapter.notifyDataSetChanged();
+        eventHistoryListArrayAdapter.notifyDataSetChanged();
     }
 
     // Taken from Claude March 10th 2026, "How can I adapt my current filter buttons to
