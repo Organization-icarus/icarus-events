@@ -21,13 +21,13 @@
         app:layout_constraintVertical_bias="0.309" />
 
     <!-- User text editable sections: name, email, phone -->
-
     <EditText
         android:id="@+id/user_profile_email_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="64dp"
         android:ems="10"
+        android:enabled="false"
         android:hint="Enter your email"
         android:inputType="textEmailAddress"
         app:layout_constraintBottom_toTopOf="@+id/user_profile_phone_edit"
@@ -42,6 +42,7 @@
         android:text="Email"
         android:textColor="@color/primary_container_highlighted"
         android:textSize="@dimen/font_subheading_size"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/user_profile_email_edit"
         app:layout_constraintEnd_toEndOf="@+id/user_profile_email_edit"
         app:layout_constraintHorizontal_bias="0.0"
@@ -53,7 +54,7 @@
         android:id="@+id/user_profile_phone_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="56dp"
+        android:layout_marginBottom="40dp"
         android:ems="10"
         android:hint="Enter your phone number"
         android:inputType="phone"
@@ -69,6 +70,7 @@
         android:text="Phone"
         android:textColor="@color/primary_container_highlighted"
         android:textSize="@dimen/font_subheading_size"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/user_profile_phone_edit"
         app:layout_constraintEnd_toEndOf="@+id/user_profile_phone_edit"
         app:layout_constraintHorizontal_bias="0.0"
@@ -83,6 +85,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="64dp"
         android:ems="10"
+        android:enabled="false"
         android:hint="Enter your name"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/user_profile_email_edit"
@@ -97,6 +100,7 @@
         android:text="Name"
         android:textColor="@color/primary_container_highlighted"
         android:textSize="@dimen/font_subheading_size"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/user_profile_name_edit"
         app:layout_constraintEnd_toEndOf="@+id/user_profile_name_edit"
         app:layout_constraintHorizontal_bias="0.0"
@@ -127,9 +131,10 @@
         android:textColor="@color/primary_container"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.844" />
+        app:layout_constraintVertical_bias="0.847" />
 
     <!-- Profile icon -->
     <ImageView
