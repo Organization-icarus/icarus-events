@@ -25,9 +25,14 @@
 
         <activity android:name=".EntrantEventListActivity" />
 
+        <activity android:name=".OrganizerCreateEventActivity" />
+
         <activity android:name=".UserRegistrationActivity" />
 
         <activity android:name=".AdministratorDashboardActivity" />
+
+        <activity android:name=".UserProfileActivity" />
+
     </application>
 
 </manifest>

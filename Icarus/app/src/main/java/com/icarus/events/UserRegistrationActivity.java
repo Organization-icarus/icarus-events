@@ -76,10 +76,13 @@ public class UserRegistrationActivity extends AppCompatActivity {
             db.collection("users").document(deviceId).set(userData)
                     .addOnSuccessListener(unused -> {
                         // Add information into global session and return user to event list
-                        User user = new User(deviceId, name, null, null, null, role);
+                        User user = new User(deviceId, name, null, null, role, null, null);
                         UserSession.getInstance().setCurrentUser(user);
                         startActivity(new Intent(this, EntrantEventListActivity.class));
                         finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Failed to register", Toast.LENGTH_SHORT).show();
                     });
         });
 

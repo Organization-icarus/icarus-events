@@ -11,21 +11,16 @@ public class Event {
     private String id;
     private String name;
     private String category;
-    private double capacity;
+    private Double capacity;
     private Date regOpen;
     private Date regClose;
     private Date date;
+    private String location;
+    private String image;
+    private String organizer;
 
-    public Event(String id, String name, double capacity, Date regOpen, Date regClose, Date date) {
-        this.id = id;
-        this.name = name;
-        this.capacity = capacity;
-        this.regOpen = regOpen;
-        this.regClose = regClose;
-        this.date = date;
-    }
-    //Added for testing category implementation in EntrantEventListActivity
-    public Event(String id, String name, String category, double capacity, Date regOpen, Date regClose, Date date) {
+    public Event(String id, String name, String category, Double capacity, Date regOpen,
+                 Date regClose, Date date, String location, String image, String organizer) {
         this.id = id;
         this.name = name;
         this.category = category;
@@ -33,6 +28,9 @@ public class Event {
         this.regOpen = regOpen;
         this.regClose = regClose;
         this.date = date;
+        this.location = location;
+        this.image = image;
+        this.organizer = organizer;
     }
 
     public String getId() {
@@ -55,11 +53,11 @@ public class Event {
         this.category = category;
     }
 
-    public double getCapacity() {
+    public Double getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(double capacity) {
+    public void setCapacity(Double capacity) {
         this.capacity = capacity;
     }
 
@@ -85,5 +83,29 @@ public class Event {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(String organizer) {
+        this.organizer = organizer;
     }
 }

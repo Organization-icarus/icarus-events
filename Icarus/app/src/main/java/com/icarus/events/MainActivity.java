@@ -16,6 +16,9 @@ import android.provider.Settings;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,8 +48,9 @@ public class MainActivity extends AppCompatActivity {
                                 snapshot.getString("name"),
                                 snapshot.getString("email"),
                                 snapshot.getString("phone"),
-                                snapshot.getDate("birthday"),
-                                snapshot.getString("role")
+                                snapshot.getString("role"),
+                                (ArrayList<String>) snapshot.get("events"),
+                                (Map<String, Object>) snapshot.get("settings")
                         );
                         UserSession.getInstance().setCurrentUser(user);
                         startActivity(new Intent(this, EntrantEventListActivity.class));
