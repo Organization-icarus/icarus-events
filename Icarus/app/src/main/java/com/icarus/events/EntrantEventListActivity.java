@@ -98,11 +98,13 @@ public class EntrantEventListActivity extends AppCompatActivity {
                     String id = snapshot.getId();
                     String name = snapshot.getString("name");
                     String category  = snapshot.getString("category");
-                    double capacity = snapshot.getDouble("capacity");
+                    Double capacity = snapshot.getDouble("capacity");
                     Date regOpen = snapshot.getDate("open");
                     Date regClose = snapshot.getDate("close");
                     Date date = snapshot.getDate("date");
-
+                    String location = snapshot.getString("location");
+                    String image = snapshot.getString("image");
+                    String organizer = snapshot.getString("organizer");
 
                     eventArrayList.add(
                             new Event(
@@ -112,7 +114,10 @@ public class EntrantEventListActivity extends AppCompatActivity {
                                     capacity,
                                     regOpen,
                                     regClose,
-                                    date));
+                                    date,
+                                    location,
+                                    image,
+                                    organizer));
                 }
                 applyFilters();
             }
