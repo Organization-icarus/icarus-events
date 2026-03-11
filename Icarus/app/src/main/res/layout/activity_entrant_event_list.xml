@@ -73,4 +73,16 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
+    <!-- Spacer to enforce bottom nav bar -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <include
+        android:id="@+id/nav_bar"
+        layout="@layout/nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp" />
+
 </LinearLayout>

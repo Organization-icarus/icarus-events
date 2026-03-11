@@ -11,26 +11,28 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome to Icarus!"
         android:fontFamily="@font/font"
+        android:text="Welcome to Icarus!"
         android:textSize="40dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.271" />
 
-    <Button
-        android:id="@+id/main_go_to_events_button"
+    <TextView
+        android:id="@+id/main_device_id_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Browse Events"
-        android:textColor="@color/black"
-        android:backgroundTint="@color/primary_container"
+        android:layout_margin="12dp"
+        android:textSize="@dimen/font_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:layout_constraintVertical_bias="0.503" />
+        app:layout_constraintVertical_bias="0.307" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
