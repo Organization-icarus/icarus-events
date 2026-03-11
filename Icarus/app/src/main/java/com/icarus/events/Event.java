@@ -40,6 +40,22 @@ public class Event {
         this.date = date;
     }
 
+    // A full constructor
+    public Event(String id, String name, String category, double capacity,
+                 Date regOpen, Date regClose, Date date,
+                 String user_status, int waiting_list_size, String location) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.capacity = capacity;
+        this.regOpen = regOpen;
+        this.regClose = regClose;
+        this.date = date;
+        this.user_status = user_status;
+        this.waiting_list_size = waiting_list_size;
+        this.location = location;
+    }
+
     public String getId() { return id; }
 
     public String getName() { return name; }
