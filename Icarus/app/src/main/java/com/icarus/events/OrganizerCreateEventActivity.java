@@ -80,10 +80,10 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
 
             String name = eventName.getText().toString().trim();
             String category = categoryName.getText().toString().trim();
-            double numberOfPeople = Double.parseDouble(OrganizerCreateEventLimitWaitingListLimit
+            Double numberOfPeople = Double.parseDouble(OrganizerCreateEventLimitWaitingListLimit
                     .getText().toString().trim());
 
-            Event event = new Event("",name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
+            Event event = new Event("",name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate, null, null, null);
             db.collection("events")
                     .add(event)
                     .addOnSuccessListener(documentReference ->{

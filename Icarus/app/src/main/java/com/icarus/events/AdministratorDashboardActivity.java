@@ -97,12 +97,8 @@ public class AdministratorDashboardActivity extends AppCompatActivity {
                 for (QueryDocumentSnapshot snapshot : value) {
                     String id = snapshot.getId();
                     String name = snapshot.getString("name");
-                    double capacity = snapshot.getDouble("capacity");
-                    Date regOpen = snapshot.getDate("open");
-                    Date regClose = snapshot.getDate("close");
-                    Date date = snapshot.getDate("date");
 
-                    eventArrayList.add(new Event(id, name, capacity, regOpen, regClose, date));
+                    eventArrayList.add(new Event(id, name, null, null, null, null, null, null, null, null));
                 }
                 eventArrayAdapter.notifyDataSetChanged();
             }
@@ -117,11 +113,8 @@ public class AdministratorDashboardActivity extends AppCompatActivity {
                 for (QueryDocumentSnapshot snapshot : value) {
                     String id = snapshot.getId();
                     String name = snapshot.getString("name");
-                    String email = snapshot.getString("email");
-                    String phone = snapshot.getString("phone");
-                    Date birthday = snapshot.getDate("birthday");
 
-                    userArrayList.add(new User(id, name, email, phone, birthday));
+                    userArrayList.add(new User(id, name, null, null, null, null, null));
                 }
                 userArrayAdapter.notifyDataSetChanged();
             }
