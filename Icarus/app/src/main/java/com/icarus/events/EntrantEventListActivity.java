@@ -27,7 +27,7 @@ import java.util.HashMap;
 import androidx.appcompat.app.AlertDialog;
 
 
-public class EntrantEventListActivity extends AppCompatActivity {
+public class EntrantEventListActivity extends NavigationBarActivity {
     //Define attributes
     private ListView eventListView;
     private EditText searchTextFilter;
@@ -49,6 +49,7 @@ public class EntrantEventListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entrant_event_list);
+        setupNavBar();
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();

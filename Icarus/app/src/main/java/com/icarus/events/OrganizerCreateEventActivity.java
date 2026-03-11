@@ -22,7 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class OrganizerCreateEventActivity extends AppCompatActivity {
+public class OrganizerCreateEventActivity extends NavigationBarActivity {
     private  FirebaseFirestore db;
     private Button UploadPosterButton;
 
@@ -45,6 +45,8 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_create_event);
+        setupNavBar();
+
         db = FirebaseFirestore.getInstance();
         //Create EditText
         eventName = findViewById(R.id.OrganizerCreateEventEventTitle);

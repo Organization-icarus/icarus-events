@@ -28,7 +28,7 @@ import java.util.Date;
  *
  * @author Benjamin Hall
  */
-public class AdministratorDashboardActivity extends AppCompatActivity {
+public class AdministratorDashboardActivity extends NavigationBarActivity {
     private ListView eventListView;
     private ListView userListView;
     private ListView imageListView;
@@ -57,6 +57,7 @@ public class AdministratorDashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_administrator_dashboard);
+        setupNavBar();
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();

@@ -15,7 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserProfileActivity extends AppCompatActivity {
+public class UserProfileActivity extends NavigationBarActivity {
 
     private EditText nameEditText;
     private EditText phoneEditText;
@@ -31,6 +31,7 @@ public class UserProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
+        setupNavBar();
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
