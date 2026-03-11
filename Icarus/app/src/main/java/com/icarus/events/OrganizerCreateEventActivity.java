@@ -54,6 +54,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
 
         OrganizerCreateEventUploadPosterButton.setOnClickListener(v -> {
             //This needs to allow for upload of a image
+            //Currently don't worry about images
 
         });
         OrganizerCreateEventRegistrationPeriodStart.setOnClickListener(v -> {
@@ -76,14 +77,13 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         });
         OrganizerCreateEventCreateEvent.setOnClickListener(v -> {
             // Confirm creation of event
-            //Event(String id, String name, double capacity, Date regOpen, Date regClose, Date date)
-            //Event(String id, String name, String category, double capacity, Date regOpen, Date regClose, Date date)
+
             String name = eventName.getText().toString().trim();
             String category = categoryName.getText().toString().trim();
             double numberOfPeople = Double.parseDouble(OrganizerCreateEventLimitWaitingListLimit
                     .getText().toString().trim());
 
-            Event event = new Event("",name,category,numberOfPeople,this.startDate,this.endDate,this.eventDate);
+            Event event = new Event("",name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
             db.collection("events")
                     .add(event)
                     .addOnSuccessListener(documentReference ->{
@@ -91,22 +91,19 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
                         documentReference.update("id", generatedId);
                     });
         });
-
     }
     /*
     * This was created by claude AI, March 10, 2026
-    * "How can I create a popup calander with creating a new XML file"*/
+    * "How can I create a popup calendar with creating a new XML file"*/
     private void  showDatePicker(Consumer<Date> onDatePicked){
         CalendarConstraints constraints = new CalendarConstraints.Builder()
                 .setValidator(DateValidatorPointForward.now())
                 .build();
-
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder
                 .datePicker()
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .setCalendarConstraints(constraints)
                 .build();
-
         datePicker.addOnPositiveButtonClickListener(selection -> {
             Date newDate = new Date(selection);
             onDatePicked.accept(newDate);
