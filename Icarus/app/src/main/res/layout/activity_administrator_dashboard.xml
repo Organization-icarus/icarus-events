@@ -18,19 +18,29 @@
             android:id="@+id/admin_dashboard_event_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <ListView
             android:id="@+id/admin_dashboard_user_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <ListView
+            android:id="@+id/admin_dashboard_image_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
     </FrameLayout>
 
     <Button
         android:id="@+id/admin_dashboard_show_event_list_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/primary_container"
         android:text="Events"
+        android:textColor="@color/primary_container_highlighted"
+        android:textSize="@dimen/font_text_size"
         app:layout_constraintBottom_toTopOf="@+id/frameLayout"
         app:layout_constraintEnd_toStartOf="@+id/admin_dashboard_show_user_list_button"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +50,10 @@
         android:id="@+id/admin_dashboard_show_user_list_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/primary_container"
         android:text="Profiles"
+        android:textColor="@color/primary_container_highlighted"
+        android:textSize="@dimen/font_text_size"
         app:layout_constraintBottom_toTopOf="@+id/frameLayout"
         app:layout_constraintEnd_toStartOf="@+id/admin_dashboard_show_image_list_button"
         app:layout_constraintStart_toEndOf="@+id/admin_dashboard_show_event_list_button"
@@ -50,7 +63,10 @@
         android:id="@+id/admin_dashboard_show_image_list_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/primary_container"
         android:text="Images"
+        android:textColor="@color/primary_container_highlighted"
+        android:textSize="@dimen/font_text_size"
         app:layout_constraintBottom_toTopOf="@+id/frameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/admin_dashboard_show_user_list_button"
@@ -67,5 +83,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/nav_bar"
+        layout="@layout/nav_bar"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

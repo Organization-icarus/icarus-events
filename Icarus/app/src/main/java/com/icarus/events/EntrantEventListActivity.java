@@ -4,6 +4,8 @@ import static android.view.View.VISIBLE;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,14 +23,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import androidx.appcompat.app.AlertDialog;
+
+
 public class EntrantEventListActivity extends AppCompatActivity {
     //Define attributes
     private ListView eventListView;
-    //private EditText searchTextFilter; Not Adding Yet
+    private EditText searchTextFilter;
+    private String currentSearch = "";
     //Placeholder filter buttons, will replace later.
-    private Button showSportsFilterButton;
-    private Button showMusicFilterButton;
-    private Button showEducationFilterButton;
+    //private Button showSportsFilterButton;
+    //private Button showMusicFilterButton;
+    //private Button showEducationFilterButton;
+    private Button filterCategoryButton;
     private ArrayList<Event> eventArrayList;
     private HashMap<String, Boolean> currentFilters;
     private ArrayList<Event> filteredEventArrayList;
@@ -49,9 +56,21 @@ public class EntrantEventListActivity extends AppCompatActivity {
         eventListView = findViewById(R.id.entrant_event_list_view);
 
         // Initialize buttons
-        showSportsFilterButton = findViewById(R.id.entrant_event_list_sports_filter_button);
-        showMusicFilterButton = findViewById(R.id.entrant_event_list_music_filter_button);
-        showEducationFilterButton = findViewById(R.id.entrant_event_list_education_filter_button);
+        //showSportsFilterButton = findViewById(R.id.entrant_event_list_sports_filter_button);
+        //showMusicFilterButton = findViewById(R.id.entrant_event_list_music_filter_button);
+        //showEducationFilterButton = findViewById(R.id.entrant_event_list_education_filter_button);
+        filterCategoryButton = findViewById(R.id.entrant_event_list_filter_button);
+
+        //Initialize text filter
+        searchTextFilter = findViewById(R.id.entrant_event_list_search_filter);
+        searchTextFilter.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                currentSearch = s.toString().trim().toLowerCase();
+                applyFilters();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
 
         // Create normal & filtered event list
         eventArrayList = new ArrayList<>();
@@ -104,21 +123,20 @@ public class EntrantEventListActivity extends AppCompatActivity {
             Event selected = filteredEventArrayList.get(position);
             Intent intent = new Intent(this, EntrantEventDetailActivity.class);
             intent.putExtra("eventId", selected.getId());
-            intent.putExtra("eventName", selected.getName());
             startActivity(intent);
         });**/
 
         // Set buttons on click listeners
-        showSportsFilterButton.setOnClickListener(v -> {
-            handleFilterEvent("Sports", showSportsFilterButton);
-        });
-
-        showMusicFilterButton.setOnClickListener(v -> {
-            handleFilterEvent("Music", showMusicFilterButton);
-        });
-        showEducationFilterButton.setOnClickListener(v -> {
-            handleFilterEvent("Education", showEducationFilterButton);
-        });
+        filterCategoryButton.setOnClickListener(v -> showCategoryFilterDialog());
+//        showSportsFilterButton.setOnClickListener(v -> {
+//            handleFilterEvent("Sports", showSportsFilterButton);
+//        });
+//        showMusicFilterButton.setOnClickListener(v -> {
+//            handleFilterEvent("Music", showMusicFilterButton);
+//        });
+//        showEducationFilterButton.setOnClickListener(v -> {
+//            handleFilterEvent("Education", showEducationFilterButton);
+//        });
 
         // Check if list is empty, if so hide list and show message
         /**if (eventArrayList.isEmpty()) {
@@ -127,13 +145,11 @@ public class EntrantEventListActivity extends AppCompatActivity {
         }**/
     }
 
-    private void handleFilterEvent(String filterName, Button button) {
+    private void handleButtonClick(String filterName, Button button) {
         //Check if already true in filter list
         boolean selected = Boolean.TRUE.equals(currentFilters.get(filterName));
         if (selected) {
             //Set button to be normal colour
-            currentFilters.put(filterName, false);
-
             button.setBackgroundColor(
                     androidx.core.content.ContextCompat.getColor(
                         this,
@@ -143,12 +159,11 @@ public class EntrantEventListActivity extends AppCompatActivity {
             button.setTextColor(
                     androidx.core.content.ContextCompat.getColor(
                         this,
-                        R.color.black
+                        R.color.primary_container_highlighted
                     )
             );
         } else {
             //Set button to be selected colour
-            currentFilters.put(filterName, true);
             button.setBackgroundColor(
                     androidx.core.content.ContextCompat.getColor(
                         this,
@@ -157,7 +172,7 @@ public class EntrantEventListActivity extends AppCompatActivity {
             );
             button.setTextColor(androidx.core.content.ContextCompat.getColor(
                         this,
-                        R.color.white
+                        R.color.primary_container
                     )
             );
         }
@@ -167,21 +182,43 @@ public class EntrantEventListActivity extends AppCompatActivity {
     private void applyFilters() {
         filteredEventArrayList.clear();
         // Checking if any filters are set before proceeding
-        boolean noneSelected = !currentFilters.containsValue(true);
+        boolean noCategoriesSelected = !currentFilters.containsValue(true);
         // If no filters are set, show all events
-        if (noneSelected) {
-            filteredEventArrayList.addAll(eventArrayList);
-            eventListArrayAdapter.notifyDataSetChanged();
-            return;
-        }
-        // If filters are set, only show relevant events
         for (Event event : eventArrayList) {
-            if ( Boolean.TRUE.equals(currentFilters.get(event.getCategory())) ) {
+            boolean matchesSearch = currentSearch.isEmpty()
+                    || (event.getName() != null
+                    && event.getName().toLowerCase().contains(currentSearch));
+            boolean matchesCategory = noCategoriesSelected
+                    || Boolean.TRUE.equals(currentFilters.get(event.getCategory()));
+
+            if (matchesSearch && matchesCategory) {
                 filteredEventArrayList.add(event);
             }
         }
         // Update filtered list
         eventListArrayAdapter.notifyDataSetChanged();
+    }
+
+    // Taken from Claude March 10th 2026, "How can I adapt my current filter buttons to
+    // be in an alert dialog?"
+    private void showCategoryFilterDialog() {
+        String[] categories = currentFilters.keySet().toArray(new String[0]);
+        boolean[] checkedItems = new boolean[categories.length];
+        for (int i = 0; i < categories.length; i++) {
+            checkedItems[i] = Boolean.TRUE.equals(currentFilters.get(categories[i]));
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Filter by Category")
+                .setMultiChoiceItems(categories, checkedItems, (dialog, which, isChecked) -> {
+                    currentFilters.put(categories[which], isChecked);
+                })
+                .setPositiveButton("Apply", (dialog, which) -> applyFilters())
+                .setNegativeButton("Clear All", (dialog, which) -> {
+                    currentFilters.replaceAll((c, v) -> false);
+                    applyFilters();
+                })
+                .show();
     }
 
 

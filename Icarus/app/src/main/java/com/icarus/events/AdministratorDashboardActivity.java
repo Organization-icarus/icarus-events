@@ -22,6 +22,7 @@ import java.util.Date;
 public class AdministratorDashboardActivity extends AppCompatActivity {
     private ListView eventListView;
     private ListView userListView;
+    private ListView imageListView;
     private Button showEventListButton;
     private Button showUserListButton;
     private Button showImageListButton;
@@ -46,11 +47,19 @@ public class AdministratorDashboardActivity extends AppCompatActivity {
         // Set views
         eventListView = findViewById(R.id.admin_dashboard_event_list);
         userListView = findViewById(R.id.admin_dashboard_user_list);
+        imageListView = findViewById(R.id.admin_dashboard_image_list);
 
         // Initialize buttons
         showEventListButton = findViewById(R.id.admin_dashboard_show_event_list_button);
         showUserListButton = findViewById(R.id.admin_dashboard_show_user_list_button);
         showImageListButton = findViewById(R.id.admin_dashboard_show_image_list_button);
+
+        selectButton(showEventListButton);
+        deselectButton(showUserListButton);
+        deselectButton(showImageListButton);
+        eventListView.setVisibility(VISIBLE);
+        userListView.setVisibility(GONE);
+        imageListView.setVisibility(GONE);
 
         // create event & user array
         eventArrayList = new ArrayList<>();
@@ -107,17 +116,54 @@ public class AdministratorDashboardActivity extends AppCompatActivity {
         showEventListButton.setOnClickListener(v -> {
             eventListView.setVisibility(VISIBLE);
             userListView.setVisibility(GONE);
-            //imageListView.setVisibility(GONE);
+            imageListView.setVisibility(GONE);
+            selectButton(showEventListButton);
+            deselectButton(showUserListButton);
+            deselectButton(showImageListButton);
         });
         showUserListButton.setOnClickListener(v -> {
             eventListView.setVisibility(GONE);
             userListView.setVisibility(VISIBLE);
-            //imageListView.setVisibility(GONE);
+            imageListView.setVisibility(GONE);
+            deselectButton(showEventListButton);
+            selectButton(showUserListButton);
+            deselectButton(showImageListButton);
         });
         showImageListButton.setOnClickListener(v -> {
             eventListView.setVisibility(GONE);
             userListView.setVisibility(GONE);
-            //imageListView.setVisibility(VISIBLE);
+            imageListView.setVisibility(VISIBLE);
+            deselectButton(showEventListButton);
+            deselectButton(showUserListButton);
+            selectButton(showImageListButton);
         });
+    }
+
+    private void selectButton(Button button) {
+        button.setBackgroundColor(
+                androidx.core.content.ContextCompat.getColor(
+                        this,
+                        R.color.primary_container_highlighted
+                )
+        );
+        button.setTextColor(androidx.core.content.ContextCompat.getColor(
+                        this,
+                        R.color.primary_container
+                )
+        );
+    }
+
+    private void deselectButton(Button button) {
+        button.setBackgroundColor(
+                androidx.core.content.ContextCompat.getColor(
+                        this,
+                        R.color.primary_container
+                )
+        );
+        button.setTextColor(androidx.core.content.ContextCompat.getColor(
+                        this,
+                        R.color.primary_container_highlighted
+                )
+        );
     }
 }
