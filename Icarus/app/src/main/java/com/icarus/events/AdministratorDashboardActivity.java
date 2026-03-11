@@ -19,6 +19,15 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * Provides the administrator dashboard for managing application data.
+ * <p>
+ * Displays lists of events, users, and images, and retrieves event and user data
+ * from Firebase Firestore. Allows administrators to switch between lists and view
+ * the current contents of each collection.
+ *
+ * @author Benjamin Hall
+ */
 public class AdministratorDashboardActivity extends AppCompatActivity {
     private ListView eventListView;
     private ListView userListView;
@@ -34,6 +43,16 @@ public class AdministratorDashboardActivity extends AppCompatActivity {
     private ArrayList<User> userArrayList;
     private ArrayAdapter<User> userArrayAdapter;
 
+    /**
+     * Initializes the administrator dashboard activity.
+     * <p>
+     * Sets the layout, configures Firestore references and snapshot listeners,
+     * initializes event and user adapters, and sets up buttons for switching
+     * between the event, user, and image lists.
+     *
+     * @param savedInstanceState the previously saved activity state, or null if
+     *                           the activity is being created for the first time
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,6 +158,11 @@ public class AdministratorDashboardActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Applies a style to a button to indicate that it is currently selected in the UI.
+     *
+     * @param button the button to apply the 'selected' styling to
+     */
     private void selectButton(Button button) {
         button.setBackgroundColor(
                 androidx.core.content.ContextCompat.getColor(
@@ -153,6 +177,11 @@ public class AdministratorDashboardActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Applies a style to a button to indicate that it is not currently selected in the UI.
+     *
+     * @param button the button to apply the 'deselected' styling to
+     */
     private void deselectButton(Button button) {
         button.setBackgroundColor(
                 androidx.core.content.ContextCompat.getColor(
