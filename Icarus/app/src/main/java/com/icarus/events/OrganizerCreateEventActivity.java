@@ -91,10 +91,25 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
 
             String name = eventName.getText().toString().trim();
             String category = categoryName.getText().toString().trim();
+            String location = locationName.getText().toString().trim();
+
+            // Check if user filled all text fields before proceeding
+            if (name.isEmpty() || category.isEmpty() || location.isEmpty()) {
+                Toast.makeText(this, "Please fill in name, category, and location fields.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Check if user filled in all dates before proceeding
+            if (startDate == null || endDate == null || eventDate == null) {
+                Toast.makeText(this, "Please select all dates", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             //Uppercase first letter and lowercase rest of string
             category = category.substring(0, 1).toUpperCase() + category.substring(1).toLowerCase();
-            double numberOfPeople = Double.parseDouble(EventLimit.getText().toString().trim());
-            String location = locationName.getText().toString().trim();
+            Double numberOfPeople = null;
+            if (!EventLimit.getText().toString().trim().isEmpty()) {
+                numberOfPeople = Double.parseDouble(EventLimit.getText().toString().trim());
+            }
             location = location.substring(0,1).toUpperCase() + location.substring(1).toLowerCase();
 
             Map<String, Object> eventData = new HashMap<>();
@@ -109,13 +124,19 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             eventData.put("geolocation",geolocationSwitch.isChecked());
 
             //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
-            db.collection("events").add(eventData);
-            finish();
+            db.collection("events").add(eventData)
+                    .addOnSuccessListener(unused -> {
+                        finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Failed to create event", Toast.LENGTH_SHORT).show();
+                    });
+
         });
     }
     /*
-    * This was created by claude AI, March 10, 2026
-    * "How can I create a popup calendar with creating a new XML file"*/
+     * This was created by claude AI, March 10, 2026
+     * "How can I create a popup calendar with creating a new XML file"*/
     private void  showDatePicker(Consumer<Date> onDatePicked){
         CalendarConstraints constraints = new CalendarConstraints.Builder()
                 .setValidator(DateValidatorPointForward.now())
