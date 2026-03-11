@@ -25,12 +25,13 @@ public class NavigationBarActivity extends AppCompatActivity {
     protected void setupNavBar() {
         View navBar = findViewById(R.id.nav_bar);
 
+        // Profile will be a class named "UserRegistrationActivity"
         navBar.findViewById(R.id.profile)
-                .setOnClickListener((v -> openActivity(UserRegistrationActivity.class)));
+                .setOnClickListener((v -> openActivity(EntrantEventListActivity.class)));
         navBar.findViewById(R.id.event_details)
                 .setOnClickListener((v -> openActivity(EntrantEventListActivity.class)));
         navBar.findViewById(R.id.registered_events)
-                .setOnClickListener((v -> openActivity(AdministratorDashboardActivity.class)));
+                .setOnClickListener((v -> openActivity(EntrantEventListActivity.class)));
     }
 
     private void openActivity(Class<?> cls) {

@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserRegistrationActivity extends NavigationBarActivity {
+public class UserRegistrationActivity extends AppCompatActivity {
     private EditText nameEditText;
     private RadioGroup roleRadioGroup;
     private Button registerButton;
@@ -32,7 +32,6 @@ public class UserRegistrationActivity extends NavigationBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_registration);
-        setupNavBar();
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
