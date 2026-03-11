@@ -14,52 +14,30 @@
         android:gravity="center"
         android:padding="20dp"
         android:text="Icarus Events"
-        android:textSize="40dp"
-        android:fontFamily="@font/font"
-        android:textStyle="bold"
-        />
+        android:textSize="@dimen/font_super_heading_size"
+        android:textStyle="bold" />
+
+    <!-- Search Filter -->
+    <EditText
+        android:id="@+id/entrant_event_list_search_filter"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:hint="Search events..."
+        android:textSize="@dimen/font_subheading_size"
+        android:inputType="text"
+        android:maxLines="1" />
 
     <!-- Filter buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/entrant_event_list_filter_button"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="12dp" >
-
-        <Button
-            android:id="@+id/entrant_event_list_sports_filter_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="2dp"
-            android:text="Sports"
-            android:textColor="@color/black"
-            android:fontFamily="@font/font"
-            android:backgroundTint="@color/primary_container" />
-
-        <Button
-            android:id="@+id/entrant_event_list_music_filter_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginHorizontal="2dp"
-            android:text="Music"
-            android:textColor="@color/black"
-            android:fontFamily="@font/font"
-            android:backgroundTint="@color/primary_container" />
-
-        <Button
-            android:id="@+id/entrant_event_list_education_filter_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="2dp"
-            android:text="Education"
-            android:textColor="@color/black"
-            android:fontFamily="@font/font"
-            android:backgroundTint="@color/primary_container" />
-
-    </LinearLayout>
+        android:layout_margin="12dp"
+        android:text="Filter Events"
+        android:textSize="@dimen/font_text_size"
+        android:backgroundTint="@color/primary_container_highlighted"
+        android:textColor="@color/primary_container" />
 
     <!-- Message for empty list -->
     <TextView
@@ -69,8 +47,7 @@
         android:gravity="center"
         android:padding="20dp"
         android:text="@string/entrants_event_list_empty_events"
-        android:textSize="20dp"
-        android:fontFamily="@font/font"
+        android:textSize="@dimen/font_subheading_size"
         android:visibility="gone"
         />
 
