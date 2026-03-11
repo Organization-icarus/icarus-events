@@ -10,6 +10,7 @@ import java.util.Date;
 public class Event {
     private String id;
     private String name;
+    private String category;
     private double capacity;
     private Date regOpen;
     private Date regClose;
@@ -18,6 +19,16 @@ public class Event {
     public Event(String id, String name, double capacity, Date regOpen, Date regClose, Date date) {
         this.id = id;
         this.name = name;
+        this.capacity = capacity;
+        this.regOpen = regOpen;
+        this.regClose = regClose;
+        this.date = date;
+    }
+    //Added for testing category implementation in EntrantEventListActivity
+    public Event(String id, String name, String category, double capacity, Date regOpen, Date regClose, Date date) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
         this.capacity = capacity;
         this.regOpen = regOpen;
         this.regClose = regClose;
@@ -34,6 +45,14 @@ public class Event {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public double getCapacity() {

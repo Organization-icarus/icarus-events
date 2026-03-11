@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Icarus</string>
+    <string name="entrant_event_list_missing_date">Date TBD</string>
+    <string name="entrants_event_list_empty_events">No events to show yet!</string>
 </resources>

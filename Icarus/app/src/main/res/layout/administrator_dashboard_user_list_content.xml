@@ -9,6 +9,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -17,21 +18,28 @@
             android:id="@+id/admin_dashboard_user_list_user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Event Name" />
+            android:text="Event Name"
+            android:textSize="@dimen/font_subheading_size" />
 
         <Button
             android:id="@+id/admin_dashboard_user_list_user_details_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="User Details" />
+            android:backgroundTint="@color/primary_container"
+            android:paddingLeft="5dp"
+            android:text="User Details"
+            android:textColor="@color/primary_container_highlighted" />
 
-        <Button
+        <ImageButton
             android:id="@+id/admin_dashboard_user_list_remove_user_button"
-            android:layout_width="wrap_content"
+            android:layout_width="1dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Remove User" />
+            android:backgroundTint="@color/primary"
+            android:contentDescription="remove_user_button"
+            app:srcCompat="@android:drawable/ic_menu_delete"
+            app:tint="@color/primary_container_highlighted" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

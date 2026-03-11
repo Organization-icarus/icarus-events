@@ -2,10 +2,12 @@
 <resources>
     <!-- For text displayed on a primary background -->
     <color name="black">#FF000000</color>
+    <!-- For text displayed on a highlighted background -->
+    <color name="white">#FFFFFFFF</color>
     <!-- The main background color, and the color for text in dark text boxes -->
     <color name="primary">#FFFFFFFF</color>
     <!-- A light background color for buttons -->
-    <color name="primary_container">#FFF3EDF7</color>
+    <color name="primary_container">#FFE8DEF8</color>
     <!-- A darker background color to indicate selection -->
     <color name="primary_container_highlighted">#FF6750A4</color>
     <!-- For buttons that require sensitive action (delete, remove, etc)  -->
