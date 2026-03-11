@@ -55,6 +55,11 @@ public class UserProfileActivity extends NavigationBarActivity {
         if (user.getPhone() != null)phoneEditText.setText(user.getPhone());
 
         // Set buttons on click listeners
+        userSettingsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, UserSettingsActivity.class);
+            startActivity(intent);
+        });
+
         editProfileButton.setOnClickListener(v -> {
             if (editState) {
                 String name = nameEditText.getText().toString().trim();
@@ -89,11 +94,6 @@ public class UserProfileActivity extends NavigationBarActivity {
             } else {
                 changeEditState();
             }
-        });
-
-        userSettingsButton.setOnClickListener(v -> {
-            //Intent intent = new Intent(this, UserSettingsActivity.class);
-            //startActivity(intent);
         });
     }
 
