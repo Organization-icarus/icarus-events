@@ -7,7 +7,7 @@
 
     <!-- Event Name -->
     <TextView
-        android:id="@+id/entrant_event_list_event_name"
+        android:id="@+id/event_history_list_event_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/font_subheading_size"
@@ -22,7 +22,7 @@
 
         <!-- Event Category -->
         <TextView
-            android:id="@+id/entrant_event_list_event_category"
+            android:id="@+id/event_history_list_event_category"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/font_text_size"
@@ -36,7 +36,7 @@
 
         <!-- Event Date -->
         <TextView
-            android:id="@+id/entrant_event_list_event_date"
+            android:id="@+id/event_history_list_event_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/font_text_size"/>

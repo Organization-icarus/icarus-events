@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Create account heading -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:text="Create Account"
+        android:textColor="@color/primary_container_highlighted"
+        android:textSize="@dimen/font_super_heading_size"
+        android:textStyle="bold" />
+
+    <!-- Name field -->
+    <EditText
+        android:id="@+id/user_register_name_field"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:hint="Enter your name"
+        android:inputType="textPersonName" />
+
+    <!-- Role selection textview and radio group -->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Select your role"
+        android:textColor="@color/primary_container_highlighted"
+        android:textSize="@dimen/font_subheading_size"
+        android:textStyle="bold" />
+
+    <RadioGroup
+        android:id="@+id/user_register_role_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:gravity="center">
+
+        <RadioButton
+            android:id="@+id/registration_role_entrant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Entrant" />
+
+        <RadioButton
+            android:id="@+id/registration_role_organizer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Organizer" />
+
+        <RadioButton
+            android:id="@+id/registration_role_administrator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Administrator" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/user_register_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/primary_container_highlighted"
+        android:text="Register"
+        android:textColor="@color/primary_container"
+        android:textSize="@dimen/font_subheading_size" />
+
+</LinearLayout>

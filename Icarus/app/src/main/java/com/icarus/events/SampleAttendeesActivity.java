@@ -26,7 +26,7 @@ import java.util.List;
  * - Event ID is currently hardcoded for testing.
  * - Sampling currently updates Firestore directly from this screen.
  */
-public class SampleAttendeesActivity extends AppCompatActivity {
+public class SampleAttendeesActivity extends NavigationBarActivity {
 
     private static final String TAG = "SampleAttendeesActivity";
     private static final String EVENT_ID = "lw5v5aQ2g4UD5RB7uJHS";
@@ -41,6 +41,7 @@ public class SampleAttendeesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_sample_attendees);
+        setupNavBar();
 
         db = FirebaseFirestore.getInstance();
         eventRef = db.collection("events").document(EVENT_ID);

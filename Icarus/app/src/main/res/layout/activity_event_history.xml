@@ -6,20 +6,20 @@
     android:orientation="vertical"
     android:gravity="center_horizontal">
 
-    <!-- Title for events page-->
+    <!-- Title for event history page-->
     <TextView
-        android:id="@+id/entrant_event_list_title"
+        android:id="@+id/event_history_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="16dp"
-        android:text="Icarus Events"
+        android:text="Registered Events"
         android:textSize="@dimen/font_super_heading_size"
         android:textStyle="bold" />
 
     <!-- Search Filter -->
     <EditText
-        android:id="@+id/entrant_event_list_search_filter"
+        android:id="@+id/event_history_search_filter"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -30,7 +30,7 @@
 
     <!-- Filter buttons -->
     <Button
-        android:id="@+id/entrant_event_list_filter_button"
+        android:id="@+id/event_history_filter_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -41,7 +41,7 @@
 
     <!-- Message for empty list -->
     <TextView
-        android:id="@+id/entrant_event_list_empty_text"
+        android:id="@+id/event_history_list_empty_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -51,28 +51,17 @@
         android:visibility="gone"
         />
 
-    <!-- Add Event button-->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Event list -->
+        <!-- Event History list -->
         <ListView
-            android:id="@+id/entrant_event_list_view"
+            android:id="@+id/event_history_list_view"
             android:layout_width="300dp"
             android:layout_height="match_parent"
-            android:layout_gravity="top|center"
-            android:layout_marginTop="16dp"
-            android:layout_weight="1" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/entrant_event_list_add_event_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="76dp"
-            android:src="@android:drawable/ic_input_add" />
+            android:layout_weight="1"
+            android:layout_gravity="top|center"/>
 
         <include
             android:id="@+id/nav_bar"
@@ -81,7 +70,5 @@
             android:layout_gravity="bottom|center"
             android:layout_height="60dp"/>
     </FrameLayout>
-
-
 
 </LinearLayout>

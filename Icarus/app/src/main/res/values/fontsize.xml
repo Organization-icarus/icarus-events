@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Super Heading size -->
+    <dimen name="font_super_heading_size">40sp</dimen>
     <!-- Heading size -->
     <dimen name="font_heading_size">24sp</dimen>
     <!-- Subheading size -->
