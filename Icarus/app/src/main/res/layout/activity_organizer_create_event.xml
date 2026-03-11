@@ -20,26 +20,42 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/OrganizerCreateEventEventTitle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:hint="Event Name"
-        android:inputType="textCapWords"
-        android:textColor="@color/black"
-        android:textSize="@dimen/font_heading_size"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventTitle"/>
+        <EditText
+            android:id="@+id/OrganizerCreateEventEventTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:hint="Event Name"
+            android:inputType="textCapWords"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_heading_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventTitle"/>
+
+        <EditText
+            android:id="@+id/OrganizerCreateEventEventLocation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:hint="Event Location"
+            android:inputType="textCapWords"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_heading_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventEventTitle"/>
 
         <Button
             android:id="@+id/OrganizerCreateEventUploadPosterButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
             android:backgroundTint="@color/primary_container"
             android:drawablePadding="8dp"
             android:paddingStart="20dp"
@@ -47,15 +63,28 @@
             android:text="Upload Event Image"
             android:textSize="@dimen/font_text_size"
             android:textColor="@color/primary_container_highlighted"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventEventTitle"/>
+            app:layout_constraintEnd_toStartOf="@+id/OrganizerCreateEventGeolocationSwitch"
+            app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventEventLocation"
+            app:layout_constraintHorizontal_chainStyle="packed"/>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/OrganizerCreateEventGeolocationSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Geolocation"
+            android:textSize="@dimen/font_subheading_size"
+            app:layout_constraintStart_toEndOf="@+id/OrganizerCreateEventUploadPosterButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/OrganizerCreateEventUploadPosterButton"
+            app:layout_constraintBottom_toBottomOf="@+id/OrganizerCreateEventUploadPosterButton"/>
 
         <EditText
             android:id="@+id/OrganizerCreateEventLimitWaitingListLimit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:hint="Enter Number of Participants"
@@ -70,7 +99,7 @@
         android:id="@+id/OrganizerCreateEventCategory"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:hint="Enter Category"

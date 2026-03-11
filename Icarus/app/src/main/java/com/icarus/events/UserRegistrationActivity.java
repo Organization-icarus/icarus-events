@@ -80,6 +80,9 @@ public class UserRegistrationActivity extends AppCompatActivity {
                         UserSession.getInstance().setCurrentUser(user);
                         startActivity(new Intent(this, EntrantEventListActivity.class));
                         finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Failed to register", Toast.LENGTH_SHORT).show();
                     });
         });
 

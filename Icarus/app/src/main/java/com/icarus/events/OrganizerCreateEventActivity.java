@@ -1,5 +1,6 @@
 package com.icarus.events;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,29 +11,34 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class OrganizerCreateEventActivity extends AppCompatActivity {
     private  FirebaseFirestore db;
-    private Button OrganizerCreateEventUploadPosterButton;
+    private Button UploadPosterButton;
 
-    private Button OrganizerCreateEventDate;
+    private Button EventDate;
 
-    private Button OrganizerCreateEventRegistrationPeriodStart;
-    private Button OrganizerCreateEventRegistrationPeriodEnd;
-    private Button OrganizerCreateEventCreateEvent;
+    private Button RegistrationPeriodStartButton;
+    private Button RegistrationPeriodEndButton;
+    private Button CreateEvent;
+    private SwitchMaterial geolocationSwitch;
     private Date startDate;
     private Date endDate;
     private Date eventDate;
-    private EditText OrganizerCreateEventLimitWaitingListLimit;
+    private EditText EventLimit;
     private EditText categoryName;
     private EditText eventName;
+    private EditText locationName;
 
 
     @Override
@@ -42,54 +48,67 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         //Create EditText
         eventName = findViewById(R.id.OrganizerCreateEventEventTitle);
-        OrganizerCreateEventLimitWaitingListLimit= findViewById(R.id.OrganizerCreateEventLimitWaitingListLimit);
+        EventLimit= findViewById(R.id.OrganizerCreateEventLimitWaitingListLimit);
         categoryName = findViewById(R.id.OrganizerCreateEventCategory);
+        locationName = findViewById(R.id.OrganizerCreateEventEventLocation);
+        //Create Switch
+        geolocationSwitch = findViewById(R.id.OrganizerCreateEventGeolocationSwitch);
         //Create Buttons
-        OrganizerCreateEventUploadPosterButton = findViewById(R.id.OrganizerCreateEventUploadPosterButton);
-        OrganizerCreateEventDate = findViewById(R.id.OrganizerCreateEventDate);
-        OrganizerCreateEventRegistrationPeriodStart = findViewById(R.id.OrganizerCreateEventRegistrationPeriodStart);
-        OrganizerCreateEventRegistrationPeriodEnd = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEnd);
-        OrganizerCreateEventCreateEvent = findViewById(R.id.OrganizerCreateEventCreateEvent);
+        UploadPosterButton = findViewById(R.id.OrganizerCreateEventUploadPosterButton);
+        EventDate = findViewById(R.id.OrganizerCreateEventDate);
+        RegistrationPeriodStartButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodStart);
+        RegistrationPeriodEndButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEnd);
+        CreateEvent = findViewById(R.id.OrganizerCreateEventCreateEvent);
 
 
-        OrganizerCreateEventUploadPosterButton.setOnClickListener(v -> {
+        UploadPosterButton.setOnClickListener(v -> {
             //This needs to allow for upload of a image
             //Currently don't worry about images
 
         });
-        OrganizerCreateEventRegistrationPeriodStart.setOnClickListener(v -> {
+        RegistrationPeriodStartButton.setOnClickListener(v -> {
             // Set Registration start date
             showDatePicker(date -> {
                 this.startDate = date;
             });
         });
-        OrganizerCreateEventRegistrationPeriodEnd.setOnClickListener(v -> {
+        RegistrationPeriodEndButton.setOnClickListener(v -> {
             // Set Registration end date
             showDatePicker(date -> {
                 this.endDate = date;
             });
         });
-        OrganizerCreateEventDate.setOnClickListener(v -> {
+        EventDate.setOnClickListener(v -> {
             // Set Registration end date
             showDatePicker(date -> {
                 this.eventDate = date;
             });
         });
-        OrganizerCreateEventCreateEvent.setOnClickListener(v -> {
+        CreateEvent.setOnClickListener(v -> {
             // Confirm creation of event
 
             String name = eventName.getText().toString().trim();
             String category = categoryName.getText().toString().trim();
-            Double numberOfPeople = Double.parseDouble(OrganizerCreateEventLimitWaitingListLimit
-                    .getText().toString().trim());
+            //Uppercase first letter and lowercase rest of string
+            category = category.substring(0, 1).toUpperCase() + category.substring(1).toLowerCase();
+            double numberOfPeople = Double.parseDouble(EventLimit.getText().toString().trim());
+            String location = locationName.getText().toString().trim();
+            location = location.substring(0,1).toUpperCase() + location.substring(1).toLowerCase();
 
-            Event event = new Event("",name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate, null, null, null);
-            db.collection("events")
-                    .add(event)
-                    .addOnSuccessListener(documentReference ->{
-                        String generatedId = documentReference.getId();
-                        documentReference.update("id", generatedId);
-                    });
+            Map<String, Object> eventData = new HashMap<>();
+            eventData.put("name", name);
+            eventData.put("category", category);
+            eventData.put("capacity",numberOfPeople);
+            eventData.put("open", startDate);
+            eventData.put("close", endDate);
+            eventData.put("date", eventDate);
+            eventData.put("image", "IMAGE REFERENCE");
+            eventData.put("location", location);
+            eventData.put("geolocation",geolocationSwitch.isChecked());
+
+            //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
+            db.collection("events").add(eventData);
+            finish();
         });
     }
     /*
