@@ -1,11 +1,15 @@
 package com.icarus.events;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -41,13 +45,15 @@ public class AdministratorDashboardEventArrayAdapter extends ArrayAdapter<Event>
                 .findViewById(R.id.admin_dashboard_event_list_event_name);
         Button eventDetailsButton = view
                 .findViewById(R.id.admin_dashboard_event_list_event_details_button);
-        Button removeEventButton = view
+        ImageButton removeEventButton = view
                 .findViewById(R.id.admin_dashboard_event_list_remove_event_button);
 
         eventName.setText(event.getName());
 
         eventDetailsButton.setOnClickListener(v -> {
-            // TODO: Have this navigate to the event details activity for the event
+//            Intent intent = new Intent(context, EventDetailsActivity.class);
+//            intent.putExtra("eventId", event.getId());
+//            context.startActivity(intent);
         });
 
         removeEventButton.setOnClickListener(v -> {
