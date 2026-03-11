@@ -27,7 +27,7 @@ public class NavigationBarActivity extends AppCompatActivity {
 
         // Profile will be a class named "UserRegistrationActivity"
         navBar.findViewById(R.id.profile)
-                .setOnClickListener((v -> openActivity(EntrantEventListActivity.class)));
+                .setOnClickListener((v -> openActivity(UserProfileActivity.class)));
         navBar.findViewById(R.id.event_details)
                 .setOnClickListener((v -> openActivity(EntrantEventListActivity.class)));
         navBar.findViewById(R.id.registered_events)
