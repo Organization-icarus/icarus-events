@@ -14,6 +14,7 @@ import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -36,6 +37,7 @@ public class EntrantEventListActivity extends AppCompatActivity {
     //private Button showMusicFilterButton;
     //private Button showEducationFilterButton;
     private Button filterCategoryButton;
+    private FloatingActionButton addEvent;
     private ArrayList<Event> eventArrayList;
     private HashMap<String, Boolean> currentFilters;
     private ArrayList<Event> filteredEventArrayList;
@@ -60,6 +62,7 @@ public class EntrantEventListActivity extends AppCompatActivity {
         //showMusicFilterButton = findViewById(R.id.entrant_event_list_music_filter_button);
         //showEducationFilterButton = findViewById(R.id.entrant_event_list_education_filter_button);
         filterCategoryButton = findViewById(R.id.entrant_event_list_filter_button);
+        addEvent = findViewById(R.id.entrant_event_list_add_event_button);
 
         //Initialize text filter
         searchTextFilter = findViewById(R.id.entrant_event_list_search_filter);
@@ -127,6 +130,12 @@ public class EntrantEventListActivity extends AppCompatActivity {
         });**/
 
         // Set buttons on click listeners
+
+        addEvent.setOnClickListener(v -> {
+            Intent intent = new Intent(this, OrganizerCreateEventActivity.class);
+            startActivity(intent);
+        });
+
         filterCategoryButton.setOnClickListener(v -> showCategoryFilterDialog());
 //        showSportsFilterButton.setOnClickListener(v -> {
 //            handleFilterEvent("Sports", showSportsFilterButton);
