@@ -61,8 +61,9 @@
             android:id="@+id/entrant_event_list_view"
             android:layout_width="300dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_gravity="top|center"/>
+            android:layout_gravity="top|center"
+            android:layout_marginTop="16dp"
+            android:layout_weight="1" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/entrant_event_list_add_event_button"
