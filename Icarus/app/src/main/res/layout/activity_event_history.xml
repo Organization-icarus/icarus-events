@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
+
+    <!-- Title for event history page-->
+    <TextView
+        android:id="@+id/event_history_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Registered Events"
+        android:textSize="@dimen/font_super_heading_size"
+        android:textStyle="bold" />
+
+    <!-- Search Filter -->
+    <EditText
+        android:id="@+id/event_history_search_filter"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Search events..."
+        android:inputType="text"
+        android:maxLines="1"
+        android:textSize="@dimen/font_subheading_size" />
+
+    <!-- Filter buttons -->
+    <Button
+        android:id="@+id/event_history_filter_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/primary_container_highlighted"
+        android:text="Filter Events"
+        android:textColor="@color/primary_container"
+        android:textSize="@dimen/font_text_size" />
+
+    <!-- Message for empty list -->
+    <TextView
+        android:id="@+id/event_history_list_empty_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="24dp"
+        android:text="@string/entrants_event_list_empty_events"
+        android:textSize="@dimen/font_subheading_size"
+        android:visibility="gone"
+        />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Event History list -->
+        <ListView
+            android:id="@+id/event_history_list_view"
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_gravity="top|center"/>
+
+        <include
+            android:id="@+id/nav_bar"
+            layout="@layout/nav_bar"
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom|center"
+            android:layout_height="60dp"/>
+    </FrameLayout>
+
+</LinearLayout>

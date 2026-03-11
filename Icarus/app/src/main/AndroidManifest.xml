@@ -31,6 +31,8 @@
 
         <activity android:name=".UserProfileActivity" />
 
+        <activity android:name=".EventHistoryActivity" />
+
     </application>
 
 </manifest>
