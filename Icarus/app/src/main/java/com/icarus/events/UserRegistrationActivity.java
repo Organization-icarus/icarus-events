@@ -52,15 +52,14 @@ public class UserRegistrationActivity extends AppCompatActivity {
         registerButton.setOnClickListener(v -> {
             String name = nameEditText.getText().toString().trim();
 
-            // Check if user entered name
+            // Check if user entered name in text field
             if (name.isEmpty()) {
                 Toast.makeText(this, "Please enter your name", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Check if user selected role
-            int selectedId = roleRadioGroup.getCheckedRadioButtonId();
-
+            // Check if user selected role in radio buttons
+            int selectedId= roleRadioGroup.getCheckedRadioButtonId();
             if (selectedId == -1) {
                 Toast.makeText(this, "Please select a role", Toast.LENGTH_SHORT).show();
                 return;
@@ -70,21 +69,18 @@ public class UserRegistrationActivity extends AppCompatActivity {
             String role = selectedRole.getText().toString().toLowerCase();
 
             // Send user data to database
-            Map<String, Object> data = new HashMap<>();
-            data.put("name", name);
-            data.put("role", role);
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("name", name);
+            userData.put("role", role);
 
-            db.collection("users").document(deviceId).set(data)
+            db.collection("users").document(deviceId).set(userData)
                     .addOnSuccessListener(unused -> {
                         // Add information into global session and return user to event list
                         User user = new User(deviceId, name, null, null, null, role);
                         UserSession.getInstance().setCurrentUser(user);
                         startActivity(new Intent(this, EntrantEventListActivity.class));
                         finish();
-                    })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "Registration failed: " + e.getMessage(),
-                                    Toast.LENGTH_SHORT).show());
+                    });
         });
 
     }
