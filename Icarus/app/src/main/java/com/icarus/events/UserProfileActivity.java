@@ -48,6 +48,11 @@ public class UserProfileActivity extends AppCompatActivity {
         user = UserSession.getInstance().getCurrentUser();
         String deviceId = user.getId();
 
+        //Pre fill text fields if user is logged in and information exists
+        nameEditText.setText(user.getName());
+        if (user.getEmail() != null) emailEditText.setText(user.getEmail());
+        if (user.getPhone() != null)phoneEditText.setText(user.getPhone());
+
         // Set buttons on click listeners
         editProfileButton.setOnClickListener(v -> {
             if (editState) {

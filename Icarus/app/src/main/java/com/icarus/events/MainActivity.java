@@ -49,8 +49,7 @@ public class MainActivity extends AppCompatActivity {
                                 snapshot.getString("role")
                         );
                         UserSession.getInstance().setCurrentUser(user);
-                        //startActivity(new Intent(this, EntrantEventListActivity.class));
-                        startActivity(new Intent(this, UserProfileActivity.class));
+                        startActivity(new Intent(this, EntrantEventListActivity.class));
                     } else {
                         // if user doesn't exist, go to sign up page
                         Intent intent = new Intent(this, UserRegistrationActivity.class);
