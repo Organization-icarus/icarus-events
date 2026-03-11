@@ -2,41 +2,41 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
-    android:padding="24dp">
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <!-- Create account heading -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Create Account"
-        android:textSize="@dimen/font_super_heading_size"
-        android:textStyle="bold"
-        android:textColor="@color/primary_container_highlighted"
         android:layout_marginBottom="24dp"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:text="Create Account"
+        android:textColor="@color/primary_container_highlighted"
+        android:textSize="@dimen/font_super_heading_size"
+        android:textStyle="bold" />
 
     <!-- Name field -->
     <EditText
         android:id="@+id/user_register_name_field"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:hint="Enter your name"
-        android:inputType="textPersonName"
+        android:layout_marginBottom="24dp"
         android:gravity="center"
-        android:layout_marginBottom="24dp" />
+        android:hint="Enter your name"
+        android:inputType="textPersonName" />
 
     <!-- Role selection textview and radio group -->
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select your role"
-        android:textSize="@dimen/font_subheading_size"
-        android:layout_marginBottom="8dp"
-        android:textColor="@color/primary_container_highlighted"
         android:gravity="center"
-        android:textStyle="bold"/>
+        android:text="Select your role"
+        android:textColor="@color/primary_container_highlighted"
+        android:textSize="@dimen/font_subheading_size"
+        android:textStyle="bold" />
 
     <RadioGroup
         android:id="@+id/user_register_role_radio_group"
@@ -49,19 +49,19 @@
             android:id="@+id/registration_role_entrant"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Entrant"/>
+            android:text="Entrant" />
 
         <RadioButton
             android:id="@+id/registration_role_organizer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Organizer"/>
+            android:text="Organizer" />
 
         <RadioButton
             android:id="@+id/registration_role_administrator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Administrator"/>
+            android:text="Administrator" />
 
     </RadioGroup>
 
@@ -69,9 +69,9 @@
         android:id="@+id/user_register_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Register"
-        android:textSize="@dimen/font_subheading_size"
         android:backgroundTint="@color/primary_container_highlighted"
-        android:textColor="@color/primary_container" />
+        android:text="Register"
+        android:textColor="@color/primary_container"
+        android:textSize="@dimen/font_subheading_size" />
 
 </LinearLayout>
