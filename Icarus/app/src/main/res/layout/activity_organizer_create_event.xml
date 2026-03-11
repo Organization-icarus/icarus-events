@@ -51,19 +51,35 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventEventTitle"/>
 
-        <Button
-            android:id="@+id/OrganizerCreateEventLimitWaitingListLimitButton"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/OrganizerCreateEventLimitWaitingListLimit"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Optional Waiting List Limit"
-            android:textSize="@dimen/font_text_size"
-            android:backgroundTint="@color/primary_container"
-            android:textColor="@color/primary_container_highlighted"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:hint="Enter Number of Participants"
+            android:inputType="textCapWords"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_heading_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventUploadPosterButton"/>
+            app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventUploadPosterButton"/>
 
+    <EditText
+        android:id="@+id/OrganizerCreateEventCategory"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Enter Category"
+        android:inputType="textCapWords"
+        android:textColor="@color/black"
+        android:textSize="@dimen/font_heading_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventLimitWaitingListLimit"/>
         <Button
             android:id="@+id/OrganizerCreateEventRegistrationPeriodStart"
             android:layout_width="wrap_content"
@@ -75,7 +91,7 @@
             android:textColor="@color/primary_container_highlighted"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventLimitWaitingListLimitButton"/>
+            app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventCategory"/>
 
         <Button
             android:id="@+id/OrganizerCreateEventRegistrationPeriodEnd"
@@ -89,6 +105,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventRegistrationPeriodStart"/>
+
+        <Button
+            android:id="@+id/OrganizerCreateEventDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Event Date"
+            android:textSize="@dimen/font_text_size"
+            android:backgroundTint="@color/primary_container"
+            android:textColor="@color/primary_container_highlighted"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventRegistrationPeriodEnd"/>
+
         <Button
             android:id="@+id/OrganizerCreateEventCreateEvent"
             android:layout_width="wrap_content"
@@ -100,7 +130,7 @@
             android:textColor="@color/primary_container_highlighted"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventRegistrationPeriodEnd"/>
+            app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventDate"/>
 
 
         <include

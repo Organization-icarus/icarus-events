@@ -22,13 +22,16 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     private  FirebaseFirestore db;
     private Button OrganizerCreateEventUploadPosterButton;
 
-    private Button OrganizerCreateEventLimitWaitingListLimitButton;
+    private Button OrganizerCreateEventDate;
 
     private Button OrganizerCreateEventRegistrationPeriodStart;
     private Button OrganizerCreateEventRegistrationPeriodEnd;
     private Button OrganizerCreateEventCreateEvent;
     private Date startDate;
     private Date endDate;
+    private Date eventDate;
+    private EditText OrganizerCreateEventLimitWaitingListLimit;
+    private EditText categoryName;
     private EditText eventName;
 
 
@@ -36,9 +39,14 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_create_event);
+        db = FirebaseFirestore.getInstance();
+        //Create EditText
         eventName = findViewById(R.id.OrganizerCreateEventEventTitle);
+        OrganizerCreateEventLimitWaitingListLimit= findViewById(R.id.OrganizerCreateEventLimitWaitingListLimit);
+        categoryName = findViewById(R.id.OrganizerCreateEventCategory);
+        //Create Buttons
         OrganizerCreateEventUploadPosterButton = findViewById(R.id.OrganizerCreateEventUploadPosterButton);
-        OrganizerCreateEventLimitWaitingListLimitButton = findViewById(R.id.OrganizerCreateEventLimitWaitingListLimitButton);
+        OrganizerCreateEventDate = findViewById(R.id.OrganizerCreateEventDate);
         OrganizerCreateEventRegistrationPeriodStart = findViewById(R.id.OrganizerCreateEventRegistrationPeriodStart);
         OrganizerCreateEventRegistrationPeriodEnd = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEnd);
         OrganizerCreateEventCreateEvent = findViewById(R.id.OrganizerCreateEventCreateEvent);
@@ -47,9 +55,6 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         OrganizerCreateEventUploadPosterButton.setOnClickListener(v -> {
             //This needs to allow for upload of a image
 
-        });
-        OrganizerCreateEventLimitWaitingListLimitButton.setOnClickListener(v -> {
-            // Toggle the waiting list limit on/off, or open an input dialog
         });
         OrganizerCreateEventRegistrationPeriodStart.setOnClickListener(v -> {
             // Set Registration start date
@@ -63,12 +68,29 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
                 this.endDate = date;
             });
         });
+        OrganizerCreateEventDate.setOnClickListener(v -> {
+            // Set Registration end date
+            showDatePicker(date -> {
+                this.eventDate = date;
+            });
+        });
         OrganizerCreateEventCreateEvent.setOnClickListener(v -> {
             // Confirm creation of event
             //Event(String id, String name, double capacity, Date regOpen, Date regClose, Date date)
-            String string = eventName.getText().toString().trim();
-        });
+            //Event(String id, String name, String category, double capacity, Date regOpen, Date regClose, Date date)
+            String name = eventName.getText().toString().trim();
+            String category = categoryName.getText().toString().trim();
+            double numberOfPeople = Double.parseDouble(OrganizerCreateEventLimitWaitingListLimit
+                    .getText().toString().trim());
 
+            Event event = new Event("",name,category,numberOfPeople,this.startDate,this.endDate,this.eventDate);
+            db.collection("events")
+                    .add(event)
+                    .addOnSuccessListener(documentReference ->{
+                        String generatedId = documentReference.getId();
+                        documentReference.update("id", generatedId);
+                    });
+        });
 
     }
     /*
