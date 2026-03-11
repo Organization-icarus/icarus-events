@@ -2,6 +2,7 @@ package com.icarus.events;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,13 +29,14 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     private Button OrganizerCreateEventCreateEvent;
     private Date startDate;
     private Date endDate;
+    private EditText eventName;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_create_event);
-
+        eventName = findViewById(R.id.OrganizerCreateEventEventTitle);
         OrganizerCreateEventUploadPosterButton = findViewById(R.id.OrganizerCreateEventUploadPosterButton);
         OrganizerCreateEventLimitWaitingListLimitButton = findViewById(R.id.OrganizerCreateEventLimitWaitingListLimitButton);
         OrganizerCreateEventRegistrationPeriodStart = findViewById(R.id.OrganizerCreateEventRegistrationPeriodStart);
@@ -48,14 +50,12 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         });
         OrganizerCreateEventLimitWaitingListLimitButton.setOnClickListener(v -> {
             // Toggle the waiting list limit on/off, or open an input dialog
-
         });
         OrganizerCreateEventRegistrationPeriodStart.setOnClickListener(v -> {
             // Set Registration start date
             showDatePicker(date -> {
                 this.startDate = date;
             });
-
         });
         OrganizerCreateEventRegistrationPeriodEnd.setOnClickListener(v -> {
             // Set Registration end date
@@ -65,10 +65,15 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         });
         OrganizerCreateEventCreateEvent.setOnClickListener(v -> {
             // Confirm creation of event
+            //Event(String id, String name, double capacity, Date regOpen, Date regClose, Date date)
+            String string = eventName.getText().toString().trim();
         });
 
 
     }
+    /*
+    * This was created by claude AI, March 10, 2026
+    * "How can I create a popup calander with creating a new XML file"*/
     private void  showDatePicker(Consumer<Date> onDatePicked){
         CalendarConstraints constraints = new CalendarConstraints.Builder()
                 .setValidator(DateValidatorPointForward.now())
