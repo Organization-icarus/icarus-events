@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        Button goToEventsButton = findViewById(R.id.main_go_to_events_button);
         TextView deviceIdText = findViewById(R.id.main_device_id_text);
 
         String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
