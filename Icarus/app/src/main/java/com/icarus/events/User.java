@@ -14,12 +14,23 @@ public class User {
     private String phone;
     private Date birthday;
 
+    private String role;
+
     public User(String id, String name, String email, String phone, Date birthday) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
         this.birthday = birthday;
+    }
+
+    public User(String id, String name, String email, String phone, Date birthday, String role) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.birthday = birthday;
+        this.role = role;
     }
 
     public String getId() {
@@ -57,4 +68,11 @@ public class User {
     public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
+    public String getRole() {
+        return role;
+    }
+    public void setRole(String role) {
+        this.role = role;
+    }
+
 }
