@@ -59,7 +59,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!--####################-->
     <!-- DYNAMIC BUTTONS -->
+    <!--####################-->
     <LinearLayout
         android:id="@+id/buttonContainer"
         android:layout_width="300dp"
@@ -73,37 +75,32 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/nav_bar">
 
-        <!-- ADMIN -->
-        <Button
-            android:id="@+id/dummy_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Dummy"
-            android:backgroundTint="@color/primary_container_highlighted"
-            android:textColor="@color/onPrimary"
-            android:allCaps="false"
-            android:visibility="gone"/>
 
-        <!-- ORGANIZER -->
+        <!--####################-->
+        <!-- ADMIN -->
+        <!--####################-->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/join_waiting_list"
+            android:id="@+id/event_organizer_button"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
             android:padding="0dp"
-            android:text="Alerts"
+            android:text="Organizer"
             android:textColor="@color/primary_container_highlighted"
             android:backgroundTint="@color/primary_container"
-            android:allCaps="false"
             app:cornerRadius="0dp"
-            app:icon="@drawable/notifications"
+            app:icon="@drawable/profile"
             app:iconTint="@color/primary_container_highlighted"
             app:iconPadding="8dp"
-            app:iconGravity="textStart" />
+            app:iconGravity="textStart"
+            android:visibility="visible" />
 
+
+        <!--####################-->
+        <!-- ORGANIZER -->
+        <!--####################-->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_2"
+            android:id="@+id/manage_button"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
@@ -112,15 +109,35 @@
             android:textSize="@dimen/font_text_size"
             android:textColor="@color/primary_container_highlighted"
             android:backgroundTint="@color/primary_container"
-            android:allCaps="false"
             app:cornerRadius="0dp"
             app:icon="@drawable/gear"
             app:iconTint="@color/primary_container_highlighted"
             app:iconPadding="8dp"
-            app:iconGravity="textStart" />
+            app:iconGravity="textStart"
+            android:visibility="gone" />
+
+
+        <!--####################-->
+        <!--ADMIN AND ORGANIZER -->
+        <!--####################-->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/alerts_button"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:padding="0dp"
+            android:text="Alerts"
+            android:textColor="@color/primary_container_highlighted"
+            android:backgroundTint="@color/primary_container"
+            app:cornerRadius="0dp"
+            app:icon="@drawable/notifications"
+            app:iconTint="@color/primary_container_highlighted"
+            app:iconPadding="8dp"
+            app:iconGravity="textStart"
+            android:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_3"
+            android:id="@+id/delete_button"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
@@ -129,14 +146,17 @@
             android:textSize="@dimen/font_text_size"
             android:textColor="@color/primary_container_highlighted"
             android:backgroundTint="@color/primary_container"
-            android:allCaps="false"
             app:cornerRadius="0dp"
             app:icon="@drawable/delete"
             app:iconTint="@color/primary_container_highlighted"
             app:iconPadding="8dp"
-            app:iconGravity="textStart" />
+            app:iconGravity="textStart"
+            android:visibility="visible" />
 
+
+        <!--####################-->
         <!-- USER -->
+        <!--####################-->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/join_waiting_list"
             android:layout_width="0dp"

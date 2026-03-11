@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Field Name"
-        android:textSize="@dimen/font_text_size"
+        android:textSize="@dimen/font_subheading_size"
         android:textColor="@color/black"
         android:textStyle="bold" />
 
@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Field Data"
-        android:textSize="@dimen/font_text_size"
+        android:textSize="@dimen/font_subheading_size"
         android:textColor="@color/black"
         android:alpha="0.5" /> <!-- semi-transparent for greyed-out effect -->
 
