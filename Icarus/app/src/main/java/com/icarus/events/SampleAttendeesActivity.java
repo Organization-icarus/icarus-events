@@ -1,5 +1,6 @@
 package com.icarus.events;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -20,11 +21,18 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Screen for organizers to choose how many attendees to sample.
+ * Activity that allows an organizer to randomly sample attendees
+ * from the event waitlist.
+ * <p>
+ * The organizer specifies how many attendees to select. A random
+ * subset of users from the {@code waitlist_entrants} field in Firestore
+ * is moved to the {@code selected_entrants} field.
+ * <p>
+ * Note: The event ID is currently hardcoded for testing purposes
+ * and should be replaced with a dynamic value when integrated with
+ * the full event management flow.
  *
- * Outstanding issues:
- * - Event ID is currently hardcoded for testing.
- * - Sampling currently updates Firestore directly from this screen.
+ * @author Yifan Jiao
  */
 public class SampleAttendeesActivity extends NavigationBarActivity {
 
@@ -36,6 +44,16 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
     private FirebaseFirestore db;
     private DocumentReference eventRef;
 
+    /**
+     * Initializes the sampling interface and UI controls.
+     * <p>
+     * This method configures the attendee count selector, navigation
+     * buttons, and sampling functionality. It also initializes the
+     * Firestore reference used to retrieve and update event data.
+     *
+     * @param savedInstanceState previously saved activity state,
+     *                           or null if the activity is newly created
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,16 +102,18 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
     }
 
     /**
-     * Updates the attendee count shown on screen.
+     * Updates the attendee count displayed on screen.
      *
-     * @param attendeeCountText text view displaying the count
+     * @param attendeeCountText TextView used to display the current
+     *                          number of attendees to sample
      */
     private void updateAttendeeCount(TextView attendeeCountText) {
         attendeeCountText.setText(String.valueOf(attendeeCount));
     }
 
     /**
-     * Moves a sampled number of entrants from waitlist_entrants to selected_entrants.
+     * Randomly selects entrants from the event waitlist and moves them
+     * to the selected entrants list.
      */
     @SuppressWarnings("unchecked")
     private void sampleEntrants() {
