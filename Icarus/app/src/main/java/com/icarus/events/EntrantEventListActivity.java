@@ -246,7 +246,6 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         eventListArrayAdapter.notifyDataSetChanged();
     }
 
-    //
     /**
      * Displays a dialog allowing the user to select event categories to filter.
      * <p>
