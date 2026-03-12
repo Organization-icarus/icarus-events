@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chosenEntrantsMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/primary"
+    android:padding="16dp">
+
+    <!-- Top bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="24dp"
+        android:background="@color/primary_container"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/chosenEntrantsBackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="‹"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_heading_size"
+            android:textStyle="normal" />
+
+        <TextView
+            android:id="@+id/chosenEntrantsTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Chosen Entrants"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_heading_size"
+            android:textStyle="normal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="◉"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_text_size"
+            android:textStyle="normal" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/chosenEntrantsListView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@color/primary_container_highlighted"
+        android:dividerHeight="1dp" />
+
+</LinearLayout>
