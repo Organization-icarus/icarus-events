@@ -1,5 +1,7 @@
 package com.icarus.events;
 
+import static java.sql.Types.NULL;
+
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,11 +9,14 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.content.Intent;
+import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -78,48 +83,119 @@ public class EventDetailsActivity extends NavigationBarActivity {
         // SET CLICK LISTENERS
         //---------------------------
 
-        // Set once in onCreate, after findViewById assignments
+        // Lets uninitialized users join the waiting list
         joinBtn.setOnClickListener(v -> {
-            /* join logic */
-            // To join the waiting list
-            // Add user ID to event as "waiting"
+            // TODO: should not capacity be 0, -1, or NULL?
+            if (currentCapacity > 0 && currentWaitingCount >= currentCapacity) {
+                // No more users can enter
+                Toast.makeText(this, "This event is full", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            currentStatus = "waiting";
+            Map<String, Object> entrant = new HashMap<>();
+            entrant.put("status", currentStatus);
+
+            // Add user ID to event with status: "waiting"
+            db.collection("events").document(finalEventId)
+                    .collection("entrants").document(userId)
+                    .set(entrant);
         });
 
+
+        // Lets waiting users leave the waiting list
         leaveBtn.setOnClickListener(v -> {
             /* leave logic */
             // To leave the waiting list
-            // Set the user status to "rejected"
+
+            currentStatus = "uninitialized";
+            Map<String, Object> entrant = new HashMap<>();
+            entrant.put("status", currentStatus);
+
+            // Add user ID to event with status: "waiting"
+            db.collection("events").document(finalEventId)
+                    .collection("entrants").document(userId)
+                    .set(entrant);
         });
 
+
+        // Lets invited or registered users leave the event
         declineBtn.setOnClickListener(v -> {
             /* decline logic */
             // To decline the invitation or the registration
-            // Set the user status to "rejected"
+            // Set the user status to "rejected"?
+
+            currentStatus = "rejected";
+            Map<String, Object> entrant = new HashMap<>();
+            entrant.put("status", currentStatus);
+
+            // Add user ID to event with status: "waiting"
+            db.collection("events").document(finalEventId)
+                    .collection("entrants").document(userId)
+                    .set(entrant);
         });
 
+
+        // TODO: adjust intent destination. Should I register premptively here?
         registerBtn.setOnClickListener(v -> {
             /* register logic */
+
+            currentStatus = "registered";
+            Map<String, Object> entrant = new HashMap<>();
+            entrant.put("status", currentStatus);
+
+            // Add user ID to event with status: "waiting"
+            db.collection("events").document(finalEventId)
+                    .collection("entrants").document(userId)
+                    .set(entrant);
+
             // Navigates to the registration page
+            /*
+            Intent intent = new Intent(
+                    EventDetailsActivity.this,
+                    EntrantEventListActivity.class);
+            startActivity(intent);
+            */
         });
 
+        // TODO: adjust intent destination
         organizerBtn.setOnClickListener(v -> {
             /* organizer logic */
             // Navigates to the organizer profile
+            Intent intent = new Intent(
+                    EventDetailsActivity.this,
+                    EntrantEventListActivity.class);
+            startActivity(intent);
         });
 
+        // TODO: adjust intent destination
         manageBtn.setOnClickListener(v -> {
             /* manage logic */
             // Navigates to the manage page
+            Intent intent = new Intent(
+                    EventDetailsActivity.this,
+                    EntrantEventListActivity.class);
+            startActivity(intent);
         });
 
+        // TODO: adjust intent destination
         notificationBtn.setOnClickListener(v -> {
             /* notification logic */
             // Navigates to the events notification page
+            Intent intent = new Intent(
+                    EventDetailsActivity.this,
+                    EntrantEventListActivity.class);
+            startActivity(intent);
         });
 
+        // TODO: adjust intent destination
         deleteBtn.setOnClickListener(v -> {
             /* delete logic */
             // Deletes the event
+            Intent intent = new Intent(
+                    EventDetailsActivity.this,
+                    EntrantEventListActivity.class);
+            startActivity(intent);
         });
 
 
@@ -171,7 +247,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
 
         //---------------------------
-        // COUNT THE EVENT'S WAITING LISTR
+        // COUNT THE EVENT'S WAITING LIST
         // Fires on load + anytime the user's entrant document changes
         //---------------------------
 
@@ -204,6 +280,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
                         currentStatus = "uninitialized";
                     }
                     setupButtons(currentRole, currentStatus);
+                    refreshAdapter(finalEventId);
                 });
 
 
@@ -252,14 +329,21 @@ public class EventDetailsActivity extends NavigationBarActivity {
             manageBtn.setVisibility(View.VISIBLE);
 
         } else if (role.equals("user")) {
+
             if (status == null || status.equals("uninitialized")) {
                 joinBtn.setVisibility(View.VISIBLE);
-            } else if (status.equals("waiting")) {
+            }
+
+            else if (status.equals("waiting")) {
                 leaveBtn.setVisibility(View.VISIBLE);
-            } else if (status.equals("selected")) {
+            }
+
+            else if (status.equals("selected")) {
                 declineBtn.setVisibility(View.VISIBLE);
                 registerBtn.setVisibility(View.VISIBLE);
-            } else if (status.equals("registered")) {
+            }
+
+            else if (status.equals("registered")) {
                 declineBtn.setVisibility(View.VISIBLE);
             }
         }
