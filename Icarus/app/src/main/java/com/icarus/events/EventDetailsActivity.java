@@ -100,6 +100,10 @@ public class EventDetailsActivity extends NavigationBarActivity {
             db.collection("events").document(finalEventId)
                     .collection("entrants").document(userId)
                     .set(entrant);
+
+            // Add event to user's own event collection
+            db.collection("users").document(userId)
+                    .update("events", com.google.firebase.firestore.FieldValue.arrayUnion(finalEventId));
         });
 
 
@@ -113,36 +117,24 @@ public class EventDetailsActivity extends NavigationBarActivity {
             db.collection("events").document(finalEventId)
                     .collection("entrants").document(userId)
                     .delete();
+
+            // Remove event from user's own event collection
+            db.collection("users").document(userId)
+                    .update("events", com.google.firebase.firestore.FieldValue.arrayRemove(finalEventId));
         });
 
 
-        // Lets selected users reject their invitation, or registered users remove
-        // their event entrant document.
-        declineBtn.setOnClickListener(v -> {
-            currentStatus = "rejected";
-            setupButtons(currentRole, currentStatus);
-            refreshAdapter(finalEventId);
-
-            Map<String, Object> entrant = new HashMap<>();
-            entrant.put("status", currentStatus);
-            db.collection("events").document(finalEventId)
-                    .collection("entrants").document(userId)
-                    .set(entrant);
-        });
-
-
+        // Lets selected users reject their invitation, or already registered users leave an event.
         declineBtn.setOnClickListener(v -> {
             if (currentStatus.equals("registered")) {
                 // Remove from event's entrant list
+                Map<String, Object> entrant = new HashMap<>();
+                entrant.put("status", "rejected");
                 db.collection("events").document(finalEventId)
                         .collection("entrants").document(userId)
-                        .delete();
+                        .set(entrant);
 
-                // Remove event from user's own event collection
-                db.collection("users").document(userId)
-                        .update("events", com.google.firebase.firestore.FieldValue.arrayRemove(finalEventId));
-
-                currentStatus = null;
+                currentStatus = "rejected";
             } else {
                 // Selected → rejected
                 Map<String, Object> entrant = new HashMap<>();
@@ -169,10 +161,6 @@ public class EventDetailsActivity extends NavigationBarActivity {
             db.collection("events").document(finalEventId)
                     .collection("entrants").document(userId)
                     .set(entrant);
-
-            // Add event to user's own event collection
-            db.collection("users").document(userId)
-                    .update("events", com.google.firebase.firestore.FieldValue.arrayUnion(finalEventId));
         });
 
 
