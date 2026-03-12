@@ -5,28 +5,94 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/OrganizerEntrantOnWaitingListText"
+        android:id="@+id/OrganizerEntrantOnWaitingListEventText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:text="View Entrants on\n Waiting List"
+        android:text="Event Name"
         android:textColor="@color/black"
         android:textSize="@dimen/font_super_heading_size"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+    <TextView
+        android:id="@+id/OrganizerEntrantOnWaitingListText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:gravity="center"
+        android:text="Entrant List"
+        android:textColor="@color/black"
+        android:textSize="@dimen/font_super_heading_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerEntrantOnWaitingListEventText"/>
+
+
 
     <ListView
         android:id="@+id/OrganizerEntrantOnWaitingList"
         android:layout_width="300dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/OrganizerEntrantOnWaitingListText"
+        app:layout_constraintTop_toBottomOf="@id/OrganizerEntrantOnWaitingListFilterBar"
         app:layout_constraintBottom_toTopOf="@id/OrganizerEntrantOnWaitingListBackButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/OrganizerEntrantOnWaitingListFilterBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"
+        app:checkedButtonBackgroundColor="@color/primary_container_highlighted"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        app:layout_constraintTop_toBottomOf="@id/OrganizerEntrantOnWaitingListText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/OrganizerEntrantOnWaitingListFilterBar_waiting"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Waiting"
+            android:textSize="12sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/OrganizerEntrantOnWaitingListFilterBar_chosen"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Chosen"
+            android:textSize="12sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/OrganizerEntrantOnWaitingListFilterBar_cancelled"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cancelled"
+            android:textSize="12sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/OrganizerEntrantOnWaitingListFilterBar_final"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Final"
+            android:textSize="12sp" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <Button
         android:id="@+id/OrganizerEntrantOnWaitingListBackButton"
@@ -48,4 +114,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
