@@ -31,6 +31,9 @@ import java.util.Locale;
  * @author Bradley Bravender
  */
 public class EventDetailsActivity extends NavigationBarActivity {
+    private Button organizerBtn, manageBtn, notificationBtn, deleteBtn;
+    private Button joinBtn, leaveBtn, declineBtn, registerBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +50,6 @@ public class EventDetailsActivity extends NavigationBarActivity {
         // Get the current user's role and status
         User user = UserSession.getInstance().getCurrentUser();
         String role = user.getRole();
-        // TODO: get status
-        String status = "waiting";
 
         //---------------------------
         // GET EVENT DATA
@@ -58,8 +59,50 @@ public class EventDetailsActivity extends NavigationBarActivity {
         an array adapter */
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+        // Will run anytime the database document changes
+        db.collection("events").document(eventId)
+                .addSnapshotListener((doc, e) -> {
+                    if (doc != null && doc.exists()) {
+
+                        String name         = doc.getString("name");
+                        String category     = doc.getString("category");
+                        double capacity     = doc.getDouble("capacity");
+                        Date regOpen        = doc.getDate("open");
+                        Date regClose       = doc.getDate("close");
+                        Date date           = doc.getDate("date");
+                        String location     = doc.getString("location");
+                        String image        = doc.getString("image");
+                        String organizer    = doc.getString("organizer");
+                        String status       = doc.getString("status");
+
+                        TextView eventName = findViewById(R.id.eventName);
+                        eventName.setText(name);
+
+                        Event event = new Event(
+                                finalEventId, name, category, capacity,
+                                regOpen, regClose, date, location,
+                                image, organizer, status, waiting_list
+                        );
+
+                        EventDetailsAdapter adapter = new EventDetailsAdapter(EventDetailsActivity.this, event);
+                        ListView listView = findViewById(R.id.event_details_event_list);
+                        listView.setAdapter(adapter);
+
+                        setupButtons(role, status);
+                    }
+                });
+
+        /*
         db.collection("events").document(eventId)
                 .get()
+                .addSnapshotListener((doc, e) -> {  // swap .get() for addSnapshotListener
+                    if (doc != null && doc.exists()) {
+                        // ... your existing event setup code ...
+
+                        String status = doc.getString("status"); // fetch real status
+                        setupButtons(role, status);
+                    }
+                })
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
 
@@ -100,7 +143,9 @@ public class EventDetailsActivity extends NavigationBarActivity {
                         ListView listView = findViewById(R.id.event_details_event_list);
                         listView.setAdapter(adapter);
                     }
+
                 });
+         */
 
 
         //---------------------------
@@ -128,15 +173,37 @@ public class EventDetailsActivity extends NavigationBarActivity {
         // GET AND HIDE ALL BUTTONS
         //---------------------------
 
-        Button organizerBtn = findViewById(R.id.event_organizer_button);
-        Button manageBtn = findViewById(R.id.manage_button);
-        Button notificationBtn = findViewById(R.id.notification_button);
-        Button deleteBtn = findViewById(R.id.delete_button);
-        Button joinBtn = findViewById(R.id.join_waiting_list_button);
-        Button leaveBtn = findViewById(R.id.leave_waiting_list_button);
-        Button declineBtn = findViewById(R.id.decline_button);
-        Button registerBtn = findViewById(R.id.register_button);
+        organizerBtn = findViewById(R.id.event_organizer_button);
+        manageBtn = findViewById(R.id.manage_button);
+        notificationBtn = findViewById(R.id.notification_button);
+        deleteBtn = findViewById(R.id.delete_button);
+        joinBtn = findViewById(R.id.join_waiting_list_button);
+        leaveBtn = findViewById(R.id.leave_waiting_list_button);
+        declineBtn = findViewById(R.id.decline_button);
+        registerBtn = findViewById(R.id.register_button);
 
+
+        //---------------------------
+        // SET CLICK LISTENERS
+        //---------------------------
+
+        // Set once in onCreate, after findViewById assignments
+        joinBtn.setOnClickListener(v -> { /* join logic */ });
+        leaveBtn.setOnClickListener(v -> { /* leave logic */ });
+        declineBtn.setOnClickListener(v -> { /* decline logic */ });
+        registerBtn.setOnClickListener(v -> { /* register logic */ });
+        organizerBtn.setOnClickListener(v -> { /* organizer logic */ });
+        manageBtn.setOnClickListener(v -> { /* manage logic */ });
+        notificationBtn.setOnClickListener(v -> { /* notification logic */ });
+        deleteBtn.setOnClickListener(v -> { /* delete logic */ });
+
+        // Then call setupButtons once initially
+        setupButtons(role, status);
+    }
+
+
+    private void setupButtons(String role, String status) {
+        // Hide all first
         organizerBtn.setVisibility(View.GONE);
         manageBtn.setVisibility(View.GONE);
         notificationBtn.setVisibility(View.GONE);
@@ -146,70 +213,27 @@ public class EventDetailsActivity extends NavigationBarActivity {
         declineBtn.setVisibility(View.GONE);
         registerBtn.setVisibility(View.GONE);
 
-
-        //---------------------------
-        // UNHIDE RELEVANT BUTTONS, SET CLICK LISTENERS
-        //---------------------------
-
-        if (role.equals("administrator")) {
-            /*
-            - show organizer, notifications, delete
-            - hide all others
-             */
-        } else if (role.equals("organizer")) {
-            /*
-            - show manage, notifications, delete
-            - hide all others
-             */
-        }  else if (role.equals("user") && status.equals("uninitialized")) {
-            /*
-            If the user is a user and is uninitialized:
-            - show join waiting list button
-            - hide all others
-         */
-        } else if (role.equals("user") && status.equals("waiting")) {
-          /*
-            If the user is a user and is uninitialized:
-            - show join waiting list button
-            - hide all others
-         */
-        } else if (role.equals("user") && status.equals("selected")) {
-            /*
-            If the user is a user and is selected:
-                - show the accept and decline buttons
-                - hide all others
-             */
-        } else if (role.equals("user") && status.equals("registered")) {
-            /*
-            If the user is a user and is registered
-                - show leave event
-                - hide all others
-             */
-        } else if (role.equals("user") && status.equals("rejected")) {
-
+        // Show relevant buttons
+        if (role.equals("administrator") || role.equals("organizer")) {
+            notificationBtn.setVisibility(View.VISIBLE);
+            deleteBtn.setVisibility(View.VISIBLE);
         }
 
-
-
-
-
-
-        /* Template for click listener to new intent
-        // 1️⃣ Find your button
-        Button myButton = findViewById(R.id.my_button);
-
-        // 2️⃣ Set a click listener
-        myButton.setOnClickListener(v -> {
-            // 3️⃣ Create an Intent to navigate to the other Activity
-            Intent intent = new Intent(EventDetailsActivity.this, OtherActivity.class);
-
-            // 4️⃣ Optional: pass data to the next Activity
-            intent.putExtra("eventId", "abc123"); // Example key-value
-
-            // 5️⃣ Start the Activity
-            startActivity(intent);
-        });
-         */
-
+        if (role.equals("administrator")) {
+            organizerBtn.setVisibility(View.VISIBLE);
+        } else if (role.equals("organizer")) {
+            manageBtn.setVisibility(View.VISIBLE);
+        } else if (role.equals("user")) {
+            if (status.equals("uninitialized")) {
+                joinBtn.setVisibility(View.VISIBLE);
+            } else if (status.equals("waiting")) {
+                leaveBtn.setVisibility(View.VISIBLE);
+            } else if (status.equals("selected")) {
+                declineBtn.setVisibility(View.VISIBLE);
+                registerBtn.setVisibility(View.VISIBLE);
+            } else if (status.equals("registered")) {
+                declineBtn.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }
