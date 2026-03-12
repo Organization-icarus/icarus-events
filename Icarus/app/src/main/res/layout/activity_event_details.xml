@@ -84,7 +84,7 @@
                 app:iconTint="@color/primary_container_highlighted"
                 app:iconPadding="8dp"
                 app:iconGravity="textStart"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
 
             <!--####################-->
@@ -125,7 +125,7 @@
                 app:iconTint="@color/primary_container_highlighted"
                 app:iconPadding="8dp"
                 app:iconGravity="textStart"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/delete_button"
@@ -142,17 +142,16 @@
                 app:iconTint="@color/primary_container_highlighted"
                 app:iconPadding="8dp"
                 app:iconGravity="textStart"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
 
             <!--####################-->
-            <!-- USER -->
+            <!-- USER UNINITIALIZED -->
             <!--####################-->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/join_waiting_list"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Join Waiting List"
                 android:textSize="@dimen/font_text_size"
                 android:textColor="@color/primary_container_highlighted"
@@ -161,6 +160,63 @@
                 app:iconTint="@color/primary_container_highlighted"
                 app:iconGravity="textStart"
                 android:visibility="gone"/>
+
+
+            <!--####################-->
+            <!-- USER WAITING -->
+            <!--####################-->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/leave_waiting_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Leave Waiting List"
+                android:textSize="@dimen/font_text_size"
+                android:textColor="@color/primary_container_highlighted"
+                android:backgroundTint="@color/primary_container"
+                app:icon="@drawable/check"
+                app:iconTint="@color/primary_container_highlighted"
+                app:iconGravity="textStart"
+                android:visibility="gone"/>
+
+            <!--####################-->
+            <!-- USER SELECTED OR REGISTERED -->
+            <!--####################-->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/decline"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:text="Decline"
+                android:textSize="@dimen/font_text_size"
+                android:textColor="@color/primary_container_highlighted"
+                android:backgroundTint="@color/primary_container"
+                app:icon="@drawable/check"
+                app:iconTint="@color/primary_container_highlighted"
+                app:iconGravity="textStart"
+                android:visibility="visible"/>
+
+
+            <!--####################-->
+            <!-- USER SELECTED -->
+            <!--####################-->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/register"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:text="Register"
+                android:textSize="@dimen/font_text_size"
+                android:textColor="@color/primary_container_highlighted"
+                android:backgroundTint="@color/primary_container"
+                app:icon="@drawable/check"
+                app:iconTint="@color/primary_container_highlighted"
+                app:iconGravity="textStart"
+                android:visibility="visible"/>
+
+
+
+
+
 
         </LinearLayout>
 

@@ -43,6 +43,12 @@ public class EventDetailsActivity extends NavigationBarActivity {
         if (eventId == null) eventId = "3O8RgEkz3sVBq31gv5VI";
         String finalEventId = eventId;
 
+        // Get the current user's role and status
+        User user = UserSession.getInstance().getCurrentUser();
+        String role = user.getRole();
+        // TODO: get status
+        String status = "waiting";
+
         //---------------------------
         // GET EVENT DATA
         //---------------------------
@@ -66,7 +72,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
                         String image = doc.getString("image");
                         String organizer = doc.getString("organizer");
                         // TODO
-                        String user_status = "TODO";
+                        String user_status = role;
                         int waiting_list = 5;
 
                         // Update the event name
@@ -116,55 +122,64 @@ public class EventDetailsActivity extends NavigationBarActivity {
             dialog.getWindow().setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT);
         });
 
-        /*
-        GET USER ROLE (USER, ADMIN, ORG) AND STATUS
-         */
+        //---------------------------
+        // GET AND HIDE ALL BUTTONS
+        //---------------------------
 
-        String user_role;
-        String user_status;
+        Button joinBtn = findViewById(R.id.join_waiting_list);
+        Button acceptBtn = findViewById(R.id.accept);
+        Button declineBtn = findViewById(R.id.decline);
+        Button leaveBtn = findViewById(R.id.leave_event);
+        Button manageBtn = findViewById(R.id.manage);
+        Button notificationsBtn = findViewById(R.id.notifications);
+        Button deleteBtn = findViewById(R.id.delete);
 
-        /*
-        If the user is an admin:
-        - show notifications, organizer, delete
-        - hide all others
-         */
+        //---------------------------
+        // HIDE BUTTONS, SET LISTENERS
+        //---------------------------
 
-        /*
-        If the user is an organizer:
-         */
-
-        /*
-        If the user has been is an admin:
-         */
-
-        /*
-        If the user is a user and is uninitialized:
+        if (role.equals("administrator")) {
+            /*
+            - show organizer, notifications, delete
+            - hide all others
+             */
+        } else if (role.equals("organizer")) {
+            /*
+            - show manage, notifications, delete
+            - hide all others
+             */
+        }  else if (role.equals("user") && status.equals("uninitialized")) {
+            /*
+            If the user is a user and is uninitialized:
             - show join waiting list button
             - hide all others
          */
-
-        /*
-        If the user is a user and is selected:
-            - show the accept and decline buttons
+        } else if (role.equals("user") && status.equals("waiting")) {
+          /*
+            If the user is a user and is uninitialized:
+            - show join waiting list button
             - hide all others
          */
+        } else if (role.equals("user") && status.equals("selected")) {
+            /*
+            If the user is a user and is selected:
+                - show the accept and decline buttons
+                - hide all others
+             */
+        } else if (role.equals("user") && status.equals("registered")) {
+            /*
+            If the user is a user and is registered
+                - show leave event
+                - hide all others
+             */
+        } else if (role.equals("user") && status.equals("rejected")) {
 
-        /*
-        If the user is a user and is selected
-         */
+        }
 
-        /*
-        TODO:
-        - Parse firebase to count the waiting list size
-        - Determine the user (user, org, admin). Accordingly, use intents to:
-          - Join waiting list (user:uninitialized)
-          - Accept or decline (user:selected)
-          - Leave waiting list (user:waiting)
-          - Notifications (admin/organizer)
-          - Delete (admin/organizer)
-          - Manage (organizer)
-          - View organizer (admin)
-         */
+
+
+
+
 
         /* Template for click listener to new intent
         // 1️⃣ Find your button
