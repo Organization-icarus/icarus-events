@@ -70,14 +70,12 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
         User user = users.get(position);
         TextView userName = view
                 .findViewById(R.id.admin_dashboard_user_list_user_name);
-        Button userDetailsButton = view
-                .findViewById(R.id.admin_dashboard_user_list_user_details_button);
         ImageButton removeUserButton = view
                 .findViewById(R.id.admin_dashboard_user_list_remove_user_button);
 
         userName.setText(user.getName());
 
-        userDetailsButton.setOnClickListener(v -> {
+        userName.setOnClickListener(v -> {
 //            Intent intent = new Intent(context, UserProfileActivity.class);
 //            intent.putExtra("userId", user.getId());
 //            context.startActivity(intent);
