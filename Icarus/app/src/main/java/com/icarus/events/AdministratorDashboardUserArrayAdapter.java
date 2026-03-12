@@ -25,6 +25,8 @@ import java.util.ArrayList;
  * <p>
  * Binds User objects to the user list item layout and provides administrator
  * controls for viewing user details and removing users from Firebase Firestore.
+ *
+ * @author Benjamin Hall
  */
 public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
     private ArrayList<User> users;
