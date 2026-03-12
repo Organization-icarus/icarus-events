@@ -2,4 +2,12 @@
     <string name="app_name">Icarus</string>
     <string name="entrant_event_list_missing_date">Date TBD</string>
     <string name="entrants_event_list_empty_events">No events to show yet!</string>
+    <string name="lottery_guidelines_message">
+        Icarus uses a lottery system to ensure that all entrants have a fair chance to participate in
+        the events around them.\n\n
+        Entrants are selected from the lottery waiting list in a fair and
+        random manner.\n\n
+        Entrants who win a spot in the lottery are then able to register for the event they signed up
+        for.
+    </string>
 </resources>

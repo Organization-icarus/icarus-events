@@ -29,11 +29,17 @@
 
         <activity android:name=".UserRegistrationActivity" />
 
+        <activity android:name=".UserSettingsActivity" />
+
         <activity android:name=".AdministratorDashboardActivity" />
 
         <activity android:name=".UserProfileActivity" />
 
         <activity android:name=".EventHistoryActivity" />
+
+        <activity android:name=".EventDetailsActivity" />
+
+        <activity android:name=".OrganizerViewEntrantsOnWaitingList"/>
 
     </application>
 

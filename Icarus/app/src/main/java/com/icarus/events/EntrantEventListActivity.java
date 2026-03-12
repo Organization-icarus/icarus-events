@@ -26,18 +26,23 @@ import java.util.HashMap;
 
 import androidx.appcompat.app.AlertDialog;
 
-
+/**
+ * Activity that displays the list of available events for entrants.
+ * <p>
+ * Retrieves events from Firebase Firestore, displays them in a ListView,
+ * and allows users to filter events by search text and category. Users
+ * can also navigate to create a new event.
+ *
+ * @author Alex Alves
+ */
 public class EntrantEventListActivity extends NavigationBarActivity {
     //Define attributes
     private ListView eventListView;
     private EditText searchTextFilter;
     private String currentSearch = "";
-    //Placeholder filter buttons, will replace later.
-    //private Button showSportsFilterButton;
-    //private Button showMusicFilterButton;
-    //private Button showEducationFilterButton;
     private Button filterCategoryButton;
     private FloatingActionButton addEvent;
+    private FloatingActionButton adminDashboard;
     private ArrayList<Event> eventArrayList;
     private HashMap<String, Boolean> currentFilters;
     private ArrayList<Event> filteredEventArrayList;
@@ -45,6 +50,16 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     private CollectionReference eventsRef;
     private FirebaseFirestore db;
 
+    /**
+     * Initializes the entrant event list activity.
+     * <p>
+     * Sets up the layout, navigation bar, Firestore references, ListView adapter,
+     * and UI controls for searching and filtering events. Also registers a
+     * snapshot listener to keep the event list synchronized with Firestore.
+     *
+     * @param savedInstanceState the previously saved activity state, or null if
+     *                           the activity is being created for the first time
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,11 +74,26 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         eventListView = findViewById(R.id.entrant_event_list_view);
 
         // Initialize buttons
-        //showSportsFilterButton = findViewById(R.id.entrant_event_list_sports_filter_button);
-        //showMusicFilterButton = findViewById(R.id.entrant_event_list_music_filter_button);
-        //showEducationFilterButton = findViewById(R.id.entrant_event_list_education_filter_button);
         filterCategoryButton = findViewById(R.id.entrant_event_list_filter_button);
         addEvent = findViewById(R.id.entrant_event_list_add_event_button);
+        adminDashboard = findViewById(R.id.entrant_event_list_admin_dashboard_button);
+
+        // Retrieve current user role
+        User currentUser = UserSession.getInstance().getCurrentUser();
+        String role = currentUser.getRole();
+
+        // Show/hide buttons based on users role
+        if (role.equals("organizer")) {
+            addEvent.setVisibility(VISIBLE);
+        } else {
+            addEvent.setVisibility(GONE);
+        }
+
+        if (role.equals("administrator")) {
+            adminDashboard.setVisibility(VISIBLE);
+        } else {
+            adminDashboard.setVisibility(GONE);
+        }
 
         //Initialize text filter
         searchTextFilter = findViewById(R.id.entrant_event_list_search_filter);
@@ -86,7 +116,10 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         currentFilters = new HashMap<>();
         currentFilters.put("Sports", false);
         currentFilters.put("Music", false);
+        currentFilters.put("School", false);
+        currentFilters.put("Art", false);
         currentFilters.put("Education", false);
+        currentFilters.put("Other", false);
 
         // Get all items in the collection
         eventsRef.addSnapshotListener((value,error) -> {
@@ -128,38 +161,34 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         eventListView.setAdapter(eventListArrayAdapter);
 
         // Set navigation on click listeners
-        /**eventListView.setOnItemClickListener((parent, view, position, id) -> {
+        eventListView.setOnItemClickListener((parent, view, position, id) -> {
             Event selected = filteredEventArrayList.get(position);
-            Intent intent = new Intent(this, EntrantEventDetailActivity.class);
+            Intent intent = new Intent(this, EventDetailsActivity.class);
             intent.putExtra("eventId", selected.getId());
             startActivity(intent);
-        });**/
+        });
 
         // Set buttons on click listeners
-
         addEvent.setOnClickListener(v -> {
             Intent intent = new Intent(this, OrganizerCreateEventActivity.class);
             startActivity(intent);
         });
 
-        filterCategoryButton.setOnClickListener(v -> showCategoryFilterDialog());
-//        showSportsFilterButton.setOnClickListener(v -> {
-//            handleFilterEvent("Sports", showSportsFilterButton);
-//        });
-//        showMusicFilterButton.setOnClickListener(v -> {
-//            handleFilterEvent("Music", showMusicFilterButton);
-//        });
-//        showEducationFilterButton.setOnClickListener(v -> {
-//            handleFilterEvent("Education", showEducationFilterButton);
-//        });
+        adminDashboard.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AdministratorDashboardActivity.class);
+            startActivity(intent);
+        });
 
-        // Check if list is empty, if so hide list and show message
-        /**if (eventArrayList.isEmpty()) {
-            findViewById(R.id.entrant_event_list_empty_text).setVisibility(VISIBLE);
-            eventListView.setVisibility(GONE);
-        }**/
+        filterCategoryButton.setOnClickListener(v -> showCategoryFilterDialog());
     }
 
+    /**
+     * Handles a category filter button click by toggling its visual state
+     * and applying the updated filters to the event list. (Currently not in use)
+     *
+     * @param filterName the category associated with the button
+     * @param button the button that was clicked
+     */
     private void handleButtonClick(String filterName, Button button) {
         //Check if already true in filter list
         boolean selected = Boolean.TRUE.equals(currentFilters.get(filterName));
@@ -194,6 +223,12 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         applyFilters();
     }
 
+    /**
+     * Applies the current search text and category filters to the event list.
+     * <p>
+     * Updates the filtered event list based on the active filters and refreshes
+     * the ListView adapter to display the results.
+     */
     private void applyFilters() {
         filteredEventArrayList.clear();
         // Checking if any filters are set before proceeding
@@ -214,8 +249,15 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         eventListArrayAdapter.notifyDataSetChanged();
     }
 
-    // Taken from Claude March 10th 2026, "How can I adapt my current filter buttons to
-    // be in an alert dialog?"
+    /**
+     * Displays a dialog allowing the user to select event categories to filter.
+     * <p>
+     * The dialog presents a multi-selection list of categories and updates the
+     * active filters when the user applies or clears the selections.
+     * <p>
+     * Taken from Claude March 10th 2026, "How can I adapt my current filter buttons to
+     * be in an alert dialog?"
+     */
     private void showCategoryFilterDialog() {
         String[] categories = currentFilters.keySet().toArray(new String[0]);
         boolean[] checkedItems = new boolean[categories.length];

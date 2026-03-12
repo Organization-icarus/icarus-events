@@ -19,9 +19,26 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.Map;
 
-
+/**
+ * Entry activity for the application.
+ * <p>
+ * Determines whether the current device is associated with an existing user
+ * in Firebase Firestore. If a user is found, the user is loaded into the
+ * global session and the event list activity is launched. Otherwise, the
+ * user is redirected to the registration activity.
+ *
+ * @author Alex Alves
+ */
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Initializes the main activity and determines the appropriate screen
+     * to display based on whether the device is associated with an existing
+     * user in Firestore.
+     *
+     * @param savedInstanceState the previously saved activity state, or null if
+     *                           the activity is being created for the first time
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

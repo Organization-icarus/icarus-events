@@ -1,5 +1,6 @@
 package com.icarus.events;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -26,6 +27,11 @@ import java.util.Collections;
  * The organizer specifies how many attendees to select. A random
  * subset of entrants with status {@code waiting} in Firestore
  * is updated to status {@code selected}.
+ * from the event waitlist.
+ * <p>
+ * The organizer specifies how many attendees to select. A random
+ * subset of users from the {@code waitlist_entrants} field in Firestore
+ * is moved to the {@code selected_entrants} field.
  * <p>
  * Note: The event ID is currently hardcoded for testing purposes
  * and should be replaced with a dynamic value when integrated with
@@ -115,6 +121,8 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
 
     /**
      * Randomly selects entrants with status "waiting" and updates them to "selected".
+     * Randomly selects entrants from the event waitlist and moves them
+     * to the selected entrants list.
      */
     private void sampleEntrants() {
         entrantsRef.whereEqualTo("status", "waiting")

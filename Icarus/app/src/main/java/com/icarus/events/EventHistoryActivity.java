@@ -27,8 +27,16 @@ import java.util.HashMap;
 
 import androidx.appcompat.app.AlertDialog;
 
-
-public class EventHistoryActivity extends AppCompatActivity {
+/**
+ * Activity that displays the event history for the current user.
+ * <p>
+ * Retrieves events associated with the logged-in user from Firebase Firestore
+ * and displays them in a ListView. Supports filtering events by search text
+ * and category.
+ *
+ * @author Benjamin Hall
+ */
+public class EventHistoryActivity extends NavigationBarActivity {
     //Define attributes
     private ListView eventHistoryListView;
     private EditText searchTextFilter;
@@ -42,10 +50,21 @@ public class EventHistoryActivity extends AppCompatActivity {
     private User user;
     private FirebaseFirestore db;
 
+    /**
+     * Initializes the event history activity.
+     * <p>
+     * Sets up the layout, initializes Firestore references, retrieves the
+     * current user's events, and configures the ListView adapter and UI
+     * controls for searching and filtering events.
+     *
+     * @param savedInstanceState the previously saved activity state, or null if
+     *                           the activity is being created for the first time
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_history);
+        setupNavBar();
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
@@ -134,12 +153,12 @@ public class EventHistoryActivity extends AppCompatActivity {
         eventHistoryListView.setAdapter(eventHistoryListArrayAdapter);
 
         // Set navigation on click listeners
-        /**eventListView.setOnItemClickListener((parent, view, position, id) -> {
-         Event selected = filteredEventArrayList.get(position);
-         Intent intent = new Intent(this, EntrantEventDetailActivity.class);
-         intent.putExtra("eventId", selected.getId());
-         startActivity(intent);
-         });**/
+        eventHistoryListView.setOnItemClickListener((parent, view, position, id) -> {
+            Event selected = filteredEventHistoryArrayList.get(position);
+            Intent intent = new Intent(this, EventDetailsActivity.class);
+            intent.putExtra("eventId", selected.getId());
+            startActivity(intent);
+        });
 
 
         filterCategoryButton.setOnClickListener(v -> showCategoryFilterDialog());
@@ -151,6 +170,13 @@ public class EventHistoryActivity extends AppCompatActivity {
          }**/
     }
 
+    /**
+     * Updates the visual state of a category filter button and reapplies
+     * the active filters to the event history list.
+     *
+     * @param filterName the category associated with the button
+     * @param button the button that was clicked
+     */
     private void handleButtonClick(String filterName, Button button) {
         //Check if already true in filter list
         boolean selected = Boolean.TRUE.equals(currentFilters.get(filterName));
@@ -185,6 +211,12 @@ public class EventHistoryActivity extends AppCompatActivity {
         applyFilters();
     }
 
+    /**
+     * Applies the current search text and category filters to the event history list.
+     * <p>
+     * Updates the filtered event list based on the active filters and refreshes
+     * the ListView adapter to display the results.
+     */
     private void applyFilters() {
         filteredEventHistoryArrayList.clear();
         // Checking if any filters are set before proceeding
@@ -205,8 +237,15 @@ public class EventHistoryActivity extends AppCompatActivity {
         eventHistoryListArrayAdapter.notifyDataSetChanged();
     }
 
-    // Taken from Claude March 10th 2026, "How can I adapt my current filter buttons to
-    // be in an alert dialog?"
+    /**
+     * Displays a dialog allowing the user to select event categories to filter.
+     * <p>
+     * The dialog presents a multi-selection list of categories and updates the
+     * active filters when the user applies or clears the selections.
+     * <p>
+     * Taken from Claude March 10th 2026, "How can I adapt my current filter buttons
+     * to be in an alert dialog?"
+     */
     private void showCategoryFilterDialog() {
         String[] categories = currentFilters.keySet().toArray(new String[0]);
         boolean[] checkedItems = new boolean[categories.length];
