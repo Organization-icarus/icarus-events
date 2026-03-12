@@ -2,6 +2,7 @@ package com.icarus.events;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -79,7 +80,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_create_event);
         setupNavBar();
-
+        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         db = FirebaseFirestore.getInstance();
         //Create EditText
         eventName = findViewById(R.id.OrganizerCreateEventEventTitle);
@@ -185,10 +186,19 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             eventData.put("image", "IMAGE REFERENCE");
             eventData.put("location", location);
             eventData.put("geolocation",geolocationSwitch.isChecked());
+            eventData.put("organizer",deviceId );
 
             //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
             db.collection("events").add(eventData)
-                    .addOnSuccessListener(unused -> {
+                    .addOnSuccessListener(documentReference  -> {
+                        Map<String, Object> entrantData = new HashMap<>();
+                        entrantData.put("status", "organizer");
+
+                        documentReference
+                                .collection("entrants")
+                                .document(deviceId)
+                                .set(entrantData);
+
                         finish();
                     })
                     .addOnFailureListener(e -> {

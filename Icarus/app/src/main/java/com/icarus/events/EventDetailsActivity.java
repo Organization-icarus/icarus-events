@@ -174,7 +174,8 @@ public class EventDetailsActivity extends NavigationBarActivity {
             // Navigates to the manage page
             Intent intent = new Intent(
                     EventDetailsActivity.this,
-                    EntrantEventListActivity.class);
+                    OrganizerViewEntrantsOnWaitingList.class);
+            intent.putExtra("eventId", finalEventId);
             startActivity(intent);
         });
 
