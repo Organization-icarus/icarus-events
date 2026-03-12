@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * Class for storing user information
+ * Represents a user in the application.
+ * <p>
+ * Stores user information retrieved from Firebase Firestore, including
+ * identifying details, roles, related events, and settings.
  *
  * @author Benjamin Hall
  */
@@ -17,6 +20,17 @@ public class User {
     private ArrayList<String> events;
     private Map<String, Object> settings;
 
+    /**
+     * Creates a new User object with the provided information.
+     *
+     * @param id unique identifier for the user (typically the device ID)
+     * @param name user's display name
+     * @param email user's email address
+     * @param phone user's phone number
+     * @param role role assigned to the user (e.g., entrant, organizer, admin)
+     * @param events list of event IDs associated with the user
+     * @param settings map of user-specific configuration settings
+     */
     public User(String id, String name, String email, String phone, String role,
                 ArrayList<String> events, Map<String, Object> settings) {
         this.id = id;
@@ -28,54 +42,119 @@ public class User {
         this.settings = settings;
     }
 
+    /**
+     * Returns unique identifier for the user
+     *
+     * @return the unique id
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Returns the name of the user
+     *
+     * @return the user's name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name of the user
+     *
+     * @param name the user's new name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns the email of the user
+     *
+     * @return the user's email
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * Sets the email of the user
+     *
+     * @param email the user's new email
+     */
     public void setEmail(String email) {
         this.email = email;
     }
 
+    /**
+     * Returns the phone number of the user
+     *
+     * @return the user's phone number
+     */
     public String getPhone() {
         return phone;
     }
 
+    /**
+     * Sets the phone number of the user
+     *
+     * @param phone the user's new phone number
+     */
     public void setPhone(String phone) {
         this.phone = phone;
     }
 
+    /**
+     * Returns the role of the user
+     *
+     * @return the user's role
+     */
     public String getRole() {
         return role;
     }
 
+    /**
+     * Sets the role of the user
+     *
+     * @param role the user's new role
+     */
     public void setRole(String role) {
         this.role = role;
     }
 
+    /**
+     * Returns the events that the user has registered/attended
+     *
+     * @return the user's registered/attended events
+     */
     public ArrayList<String> getEvents() {
         return events;
     }
 
+    /**
+     * Sets the events that the user has registered/attended
+     *
+     * @param events the user's registered/attended events
+     */
     public void setEvents(ArrayList<String> events) {
         this.events = events;
     }
 
+    /**
+     * Returns the settings for the user
+     *
+     * @return the user's settings
+     */
     public Map<String, Object> getSettings() {
         return settings;
     }
 
+    /**
+     * Sets the settings for the user
+     *
+     * @param settings the user's new settings
+     */
     public void setSettings(Map<String, Object> settings) {
         this.settings = settings;
     }
