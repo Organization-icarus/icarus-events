@@ -37,7 +37,7 @@ public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
         db = FirebaseFirestore.getInstance();
 
         //Create TextView
-        eventName = findViewById(R.id.OrganizerCreateEventEventTitle);
+        eventName = findViewById(R.id.OrganizerEntrantOnWaitingListEventText);
         //Create Buttons
         filterButtons = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar);
         backButton = findViewById(R.id.OrganizerEntrantOnWaitingListBackButton);
@@ -48,11 +48,14 @@ public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
         eventListArrayAdapter = new OraganizerEntrantViewListArrayAdapter(this, entrantList);
         entrantsOnWaitingList.setAdapter(eventListArrayAdapter);
 
+        //get eventId
+        eventId = getIntent().getStringExtra("eventId");
+
         //Set default as waiting
         filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
+        loadList("waiting");
 
         //Set event Title
-        eventId = getIntent().getStringExtra("eventId");
         db.collection("events").document(eventId)
                 .addSnapshotListener((value, error) -> {
                     if (error != null || value == null) return;
@@ -88,6 +91,8 @@ public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
     }
     private void loadList(String listStatus) {
         //events -> eventID -> entrants -> entrantId -> status
+        entrantList.clear();
+        eventListArrayAdapter.notifyDataSetChanged();
         db.collection("events").document(eventId).collection("entrants")
                 .get()
                 .addOnSuccessListener(value -> {
