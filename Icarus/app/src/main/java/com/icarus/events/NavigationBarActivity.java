@@ -8,20 +8,34 @@ import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Base activity class that provides a reusable navigation bar for subclasses.
- *
+ * <p>
  * Subclasses should call setupNavBar() after setContentView() in their onCreate()
- * to wire up the navigation bar's click listeners.
+ * to initialize the navigation bar's click listeners.
  *
  * @author Bradley Bradley
  */
 public class NavigationBarActivity extends AppCompatActivity {
 
+
+    /**
+     * Initializes the base navigation bar activity.
+     *
+     * @param savedInstanceState the previously saved activity state, or null if
+     *                           the activity is being created for the first time
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
     // TODO: adjust where the profile and registered event click listeners point
+    /**
+     * Initializes the navigation bar and assigns click listeners to its buttons.
+     * <p>
+     * Each navigation item launches the corresponding activity when selected.
+     * This method should be called by subclasses after setting their layout
+     * with setContentView().
+     */
     protected void setupNavBar() {
         View navBar = findViewById(R.id.nav_bar);
 
@@ -34,6 +48,14 @@ public class NavigationBarActivity extends AppCompatActivity {
                 .setOnClickListener((v -> openActivity(EventDetailsActivity.class)));
     }
 
+    /**
+     * Launches the specified activity if it is not already the current activity.
+     * <p>
+     * The transition animation is disabled to provide seamless navigation
+     * between screens using the navigation bar.
+     *
+     * @param cls the activity class to launch
+     */
     private void openActivity(Class<?> cls) {
         if (!this.getClass().equals(cls)) {
             Intent intent = new Intent(this, cls);

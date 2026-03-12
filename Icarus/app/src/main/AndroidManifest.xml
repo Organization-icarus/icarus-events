@@ -29,6 +29,8 @@
 
         <activity android:name=".UserRegistrationActivity" />
 
+        <activity android:name=".UserSettingsActivity" />
+
         <activity android:name=".AdministratorDashboardActivity" />
 
         <activity android:name=".UserProfileActivity" />

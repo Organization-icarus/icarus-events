@@ -26,7 +26,16 @@ import java.util.HashMap;
 
 import androidx.appcompat.app.AlertDialog;
 
-
+/**
+ * Activity that displays the list of available events for entrants.
+ * <p>
+ * Retrieves events from Firebase Firestore, displays them in a ListView,
+ * and allows users to filter events by search text and category. Users
+ * can also navigate to create a new event.
+ *
+ * @author Alex Alves
+ * @author Benjamin Hall
+ */
 public class EntrantEventListActivity extends NavigationBarActivity {
     //Define attributes
     private ListView eventListView;
@@ -45,6 +54,16 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     private CollectionReference eventsRef;
     private FirebaseFirestore db;
 
+    /**
+     * Initializes the entrant event list activity.
+     * <p>
+     * Sets up the layout, navigation bar, Firestore references, ListView adapter,
+     * and UI controls for searching and filtering events. Also registers a
+     * snapshot listener to keep the event list synchronized with Firestore.
+     *
+     * @param savedInstanceState the previously saved activity state, or null if
+     *                           the activity is being created for the first time
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -160,6 +179,13 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         }**/
     }
 
+    /**
+     * Handles a category filter button click by toggling its visual state
+     * and applying the updated filters to the event list.
+     *
+     * @param filterName the category associated with the button
+     * @param button the button that was clicked
+     */
     private void handleButtonClick(String filterName, Button button) {
         //Check if already true in filter list
         boolean selected = Boolean.TRUE.equals(currentFilters.get(filterName));
@@ -194,6 +220,12 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         applyFilters();
     }
 
+    /**
+     * Applies the current search text and category filters to the event list.
+     * <p>
+     * Updates the filtered event list based on the active filters and refreshes
+     * the ListView adapter to display the results.
+     */
     private void applyFilters() {
         filteredEventArrayList.clear();
         // Checking if any filters are set before proceeding
@@ -214,8 +246,15 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         eventListArrayAdapter.notifyDataSetChanged();
     }
 
-    // Taken from Claude March 10th 2026, "How can I adapt my current filter buttons to
-    // be in an alert dialog?"
+    /**
+     * Displays a dialog allowing the user to select event categories to filter.
+     * <p>
+     * The dialog presents a multi-selection list of categories and updates the
+     * active filters when the user applies or clears the selections.
+     * <p>
+     * Taken from Claude March 10th 2026, "How can I adapt my current filter buttons to
+     * be in an alert dialog?"
+     */
     private void showCategoryFilterDialog() {
         String[] categories = currentFilters.keySet().toArray(new String[0]);
         boolean[] checkedItems = new boolean[categories.length];

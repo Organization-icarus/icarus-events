@@ -20,11 +20,26 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 
+/**
+ * Adapter used in the administrator dashboard to display users in a ListView.
+ * <p>
+ * Binds User objects to the user list item layout and provides administrator
+ * controls for viewing user details and removing users from Firebase Firestore.
+ *
+ * @author Benjamin Hall
+ */
 public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
     private ArrayList<User> users;
     private Context context;
     private FirebaseFirestore db;
 
+    /**
+     * Constructs an adapter for displaying User objects in the administrator
+     * dashboard user list.
+     *
+     * @param context the context used to inflate views and access resources
+     * @param users the list of users to be displayed by the adapter
+     */
     public AdministratorDashboardUserArrayAdapter(Context context, ArrayList<User> users){
         super(context, 0, users);
         this.users = users;
@@ -32,6 +47,18 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
         this.db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Returns a view for displaying a user in the administrator user list.
+     * <p>
+     * Inflates the list item layout if necessary, binds the data to the UI
+     * components, and configures actions for viewing user details and
+     * removing the user from the database.
+     *
+     * @param position the position of the user in the adapter's data set
+     * @param convertView a view to reuse
+     * @param parent the parent view that this view will be attached to
+     * @return the view representing the user at the specified position
+     */
     @NonNull
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent){
         View view = convertView;

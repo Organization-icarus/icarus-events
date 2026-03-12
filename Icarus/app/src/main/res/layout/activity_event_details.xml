@@ -213,11 +213,6 @@
                 app:iconGravity="textStart"
                 android:visibility="visible"/>
 
-
-
-
-
-
         </LinearLayout>
 
     </LinearLayout>
