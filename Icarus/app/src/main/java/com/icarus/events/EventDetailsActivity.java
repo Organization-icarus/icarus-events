@@ -1,9 +1,6 @@
 package com.icarus.events;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -11,16 +8,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.content.Intent;
 
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.EventListener;
-import java.util.Locale;
 
 
 /**
@@ -38,10 +29,17 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
     private String currentRole;
     private String currentStatus;
+    private int currentWaitingCount;
+
+    private String currentName, currentCategory, currentLocation, currentImage, currentOrganizer;
+    private double currentCapacity;
+    private Date currentRegOpen, currentRegClose, currentDate;
 
     // To prevent the firebase snapshot listener from creating memory leaks
     private ListenerRegistration eventListener;
     private ListenerRegistration userListener;
+    private ListenerRegistration entrantStatusListener;
+    private ListenerRegistration entrantWaitlistListener;
 
     // Runs every time a user navigates to this intent
     @Override
@@ -57,7 +55,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         // Get the current user's role and status
         User user = UserSession.getInstance().getCurrentUser();
-        String role = user.getRole();
+        currentRole = user.getRole();
         String userId = user.getId();
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -81,14 +79,48 @@ public class EventDetailsActivity extends NavigationBarActivity {
         //---------------------------
 
         // Set once in onCreate, after findViewById assignments
-        joinBtn.setOnClickListener(v -> { /* join logic */ });
-        leaveBtn.setOnClickListener(v -> { /* leave logic */ });
-        declineBtn.setOnClickListener(v -> { /* decline logic */ });
-        registerBtn.setOnClickListener(v -> { /* register logic */ });
-        organizerBtn.setOnClickListener(v -> { /* organizer logic */ });
-        manageBtn.setOnClickListener(v -> { /* manage logic */ });
-        notificationBtn.setOnClickListener(v -> { /* notification logic */ });
-        deleteBtn.setOnClickListener(v -> { /* delete logic */ });
+        joinBtn.setOnClickListener(v -> {
+            /* join logic */
+            // To join the waiting list
+            // Add user ID to event as "waiting"
+        });
+
+        leaveBtn.setOnClickListener(v -> {
+            /* leave logic */
+            // To leave the waiting list
+            // Set the user status to "rejected"
+        });
+
+        declineBtn.setOnClickListener(v -> {
+            /* decline logic */
+            // To decline the invitation or the registration
+            // Set the user status to "rejected"
+        });
+
+        registerBtn.setOnClickListener(v -> {
+            /* register logic */
+            // Navigates to the registration page
+        });
+
+        organizerBtn.setOnClickListener(v -> {
+            /* organizer logic */
+            // Navigates to the organizer profile
+        });
+
+        manageBtn.setOnClickListener(v -> {
+            /* manage logic */
+            // Navigates to the manage page
+        });
+
+        notificationBtn.setOnClickListener(v -> {
+            /* notification logic */
+            // Navigates to the events notification page
+        });
+
+        deleteBtn.setOnClickListener(v -> {
+            /* delete logic */
+            // Deletes the event
+        });
 
 
         //---------------------------
@@ -120,40 +152,36 @@ public class EventDetailsActivity extends NavigationBarActivity {
         eventListener = db.collection("events").document(finalEventId)
                 .addSnapshotListener((doc, e) -> {
                     if (doc != null && doc.exists()) {
-
-                        String name         = doc.getString("name");
-                        String category     = doc.getString("category");
-                        double capacity     = doc.getDouble("capacity");
-                        Date regOpen        = doc.getDate("open");
-                        Date regClose       = doc.getDate("close");
-                        Date date           = doc.getDate("date");
-                        String location     = doc.getString("location");
-                        String image        = doc.getString("image");
-                        String organizer    = doc.getString("organizer");
-                        String status       = doc.getString("status");
+                        currentName      = doc.getString("name");
+                        currentCategory  = doc.getString("category");
+                        currentCapacity  = doc.getDouble("capacity");
+                        currentRegOpen   = doc.getDate("open");
+                        currentRegClose  = doc.getDate("close");
+                        currentDate      = doc.getDate("date");
+                        currentLocation  = doc.getString("location");
+                        currentImage     = doc.getString("image");
+                        currentOrganizer = doc.getString("organizer");
 
                         TextView eventName = findViewById(R.id.eventName);
-                        eventName.setText(name);
+                        eventName.setText(currentName);
 
-                        // Runs anytime the event document changes in Firebase
-                        db.collection("events").document(finalEventId).collection("entrants")
-                                .whereEqualTo("status", "waiting")
-                                .get()
-                                .addOnSuccessListener(query -> {
-                                    int waitingCount = query.size();
+                        refreshAdapter(finalEventId);
+                    }
+                });
 
-                                    Event event = new Event(
-                                            finalEventId, name, category, capacity,
-                                            regOpen, regClose, date, location,
-                                            image, organizer, status, waitingCount
-                                    );
 
-                                    EventDetailsAdapter adapter = new EventDetailsAdapter(EventDetailsActivity.this, event);
-                                    ListView listView = findViewById(R.id.event_details_event_list);
-                                    listView.setAdapter(adapter);
+        //---------------------------
+        // COUNT THE EVENT'S WAITING LISTR
+        // Fires on load + anytime the user's entrant document changes
+        //---------------------------
 
-                                     // setupButtons(role, status);
-                                });
+        entrantWaitlistListener = db.collection("events").document(finalEventId)
+                .collection("entrants")
+                .whereEqualTo("status", "waiting")
+                .addSnapshotListener((query, e) -> {
+                    if (query != null) {
+                        currentWaitingCount = query.size();
+                        refreshAdapter(finalEventId);
                     }
                 });
 
@@ -163,7 +191,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
         // Fires on load + anytime the user's entrant document changes
         //---------------------------
 
-        db.collection("events").document(finalEventId)
+        entrantStatusListener = db.collection("events").document(finalEventId)
                 .collection("entrants").document(userId)
                 .addSnapshotListener((doc, e) -> {
                     if (doc != null && doc.exists()) {
@@ -238,10 +266,27 @@ public class EventDetailsActivity extends NavigationBarActivity {
     }
 
 
+    private void refreshAdapter(String finalEventId) {
+        if (currentName == null) return; // event data not loaded yet
+
+        Event event = new Event(
+                finalEventId, currentName, currentCategory, currentCapacity,
+                currentRegOpen, currentRegClose, currentDate, currentLocation,
+                currentImage, currentOrganizer, currentStatus, currentWaitingCount
+        );
+
+        EventDetailsAdapter adapter = new EventDetailsAdapter(this, event);
+        ListView listView = findViewById(R.id.event_details_event_list);
+        listView.setAdapter(adapter);
+    }
+
+
     @Override
     protected void onStop() {
         super.onStop();
         if (eventListener != null) eventListener.remove();
         if (userListener != null) userListener.remove();
+        if (entrantStatusListener != null) entrantStatusListener.remove();
+        if (entrantWaitlistListener != null) entrantWaitlistListener.remove();
     }
 }
