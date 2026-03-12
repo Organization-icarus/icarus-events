@@ -25,11 +25,26 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 
+/**
+ * ArrayAdapter used in the administrator dashboard to display events in a ListView.
+ * <p>
+ * Binds Event objects to the event list item layout and provides administrator
+ * controls for viewing event details and removing events from Firebase Firestore.
+ *
+ * @author Benjamin Hall
+ */
 public class AdministratorDashboardEventArrayAdapter extends ArrayAdapter<Event> {
     private ArrayList<Event> events;
     private Context context;
     private FirebaseFirestore db;
 
+    /**
+     * Constructs an adapter for displaying Event objects in the administrator
+     * dashboard event list.
+     *
+     * @param context the context used to inflate views and access resources
+     * @param events the list of events to be displayed by the adapter
+     */
     public AdministratorDashboardEventArrayAdapter(Context context, ArrayList<Event> events){
         super(context, 0, events);
         this.events = events;
@@ -37,6 +52,18 @@ public class AdministratorDashboardEventArrayAdapter extends ArrayAdapter<Event>
         this.db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Returns a view for displaying an event in the administrator event list.
+     * <p>
+     * Inflates the list item layout if necessary, binds the data to the UI
+     * components, and configures actions for viewing event details and
+     * removing the event from the database.
+     *
+     * @param position the position of the event in the adapter's data set
+     * @param convertView a view to reuse
+     * @param parent the parent view that this view will be attached to
+     * @return the view representing the event at the specified position
+     */
     @NonNull
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent){
         View view = convertView;
