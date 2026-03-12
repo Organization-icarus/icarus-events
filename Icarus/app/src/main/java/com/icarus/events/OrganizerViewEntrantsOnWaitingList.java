@@ -35,26 +35,26 @@ public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
 
 
         //TODO: This needs to read from a event collection to get users. Not just users
-        db.collection("users")
-        //db.collection("events").document(eventId).collection("waitingList")
+        //events -> eventID -> entrants -> entrantId -> status
+
+        db.collection("events").document(eventId).collection("entrants")
                 .addSnapshotListener((value, error) -> {
                     if (error != null || value == null) return;
                     entrantList.clear();
                     for (QueryDocumentSnapshot snapshot : value) {
-                            //public User(String id, String name, String email, String phone, String role,
-                            //    ArrayList<String> events, Map<String, Object> settings) {
-                        String id = snapshot.getId();
-                        String name = snapshot.getString("name");
-                        String email = snapshot.getString("email");
-                        String phone = snapshot.getString("phone");
-                        String role = snapshot.getString("role");
+                        String deviceId = snapshot.getId();
+                        String status = snapshot.getString("status");
 
-                        // populate with whatever fields your User class needs
-                        if(Objects.equals(role, "entrant")){
-                            entrantList.add(new User(id, name, email, phone, role, null, null));
+                        if (Objects.equals(status, "waiting")) {
+                            db.collection("users").document(deviceId)
+                                    .get()
+                                    .addOnSuccessListener(userSnapshot -> {
+                                        String name = userSnapshot.getString("name");
+                                        entrantList.add(new User(deviceId, name, null, null, null, null, null));
+                                        eventListArrayAdapter.notifyDataSetChanged();
+                                    });
                         }
                     }
-                    eventListArrayAdapter.notifyDataSetChanged();
                 });
     }
 }
