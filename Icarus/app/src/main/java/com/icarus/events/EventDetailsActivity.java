@@ -231,7 +231,8 @@ public class EventDetailsActivity extends NavigationBarActivity {
                     if (doc != null && doc.exists()) {
                         currentName      = doc.getString("name");
                         currentCategory  = doc.getString("category");
-                        currentCapacity  = doc.getDouble("capacity");
+                        Double capacityValue = doc.getDouble("capacity");
+                        currentCapacity = capacityValue != null ? capacityValue : -1;
                         currentRegOpen   = doc.getDate("open");
                         currentRegClose  = doc.getDate("close");
                         currentDate      = doc.getDate("date");

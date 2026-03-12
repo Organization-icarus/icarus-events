@@ -47,7 +47,7 @@ public class EventDetailsAdapter extends ArrayAdapter<EventField> {
         // Convert Event fields into EventField list
         add(new EventField("Name", event.getName()));
         add(new EventField("Category", event.getCategory()));
-        add(new EventField("Capacity", String.valueOf(event.getCapacity().intValue())));
+        add(new EventField("Capacity", event.getCapacity() < 1 ? "Unlimited" : String.valueOf(event.getCapacity().intValue())));
         add(new EventField("Reg. Opens", regOpen));
         add(new EventField("Reg. Closes", regClose));
         add(new EventField("Date", date));
