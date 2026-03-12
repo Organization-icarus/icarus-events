@@ -22,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -69,12 +70,10 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 .addOnSuccessListener(queryDocumentSnapshots ->{
                     dbCategories.add("Category");
                     for(DocumentSnapshot doc : queryDocumentSnapshots){
-                        Log.d("SPINNER", "All fields: " + doc.getData());
                         String category = doc.getString("category");
                         //check for null
                         if(category != null){
                             dbCategories.add(category);
-                            Log.d("SPINNER", category);
                         }
                     }
                     ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
@@ -87,7 +86,6 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load categories: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.d("SPINNER", "FAILED TO CREATE SPINNER");
                 });
         //Create Switch
         geolocationSwitch = findViewById(R.id.OrganizerCreateEventGeolocationSwitch);
@@ -109,7 +107,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             showDatePicker(date -> {
                 this.startDate = date;
                 String regStart = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
-                RegistrationPeriodStartButton.setText("Start: "+ regStart);
+                RegistrationPeriodStartButton.setText("Start:\n"+ regStart);
             });
         });
         RegistrationPeriodEndButton.setOnClickListener(v -> {
@@ -117,7 +115,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             showDatePicker(date -> {
                 this.endDate = date;
                 String regEnd = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
-                RegistrationPeriodEndButton.setText("End: "+ regEnd);
+                RegistrationPeriodEndButton.setText("End:\n"+ regEnd);
             });
         });
         EventDate.setOnClickListener(v -> {
@@ -125,7 +123,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             showDatePicker(date -> {
                 this.eventDate = date;
                 String eventDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
-                EventDate.setText("Event: "+ eventDate);
+                EventDate.setText("Event:\n"+ eventDate);
             });
         });
         CreateEvent.setOnClickListener(v -> {
@@ -175,7 +173,6 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                     });
 
         });
-        finish();
     }
     /*
      * This was created by claude AI, March 10, 2026
@@ -190,8 +187,14 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 .setCalendarConstraints(constraints)
                 .build();
         datePicker.addOnPositiveButtonClickListener(selection -> {
-            Date newDate = new Date(selection);
-            onDatePicked.accept(newDate);
+            Calendar utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            utc.setTimeInMillis(selection);
+
+            Calendar local = Calendar.getInstance();
+            local.set(utc.get(Calendar.YEAR), utc.get(Calendar.MONTH), utc.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+            local.set(Calendar.MILLISECOND, 0);
+
+            onDatePicked.accept(local.getTime());
         });
         datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
     }

@@ -115,12 +115,13 @@
         android:text="Registration Start:"
         android:textSize="@dimen/font_subheading_size"
         app:layout_constraintBottom_toTopOf="@id/OrganizerCreateEventRegistrationPeriodStart"
-        app:layout_constraintStart_toStartOf="@id/OrganizerCreateEventRegistrationPeriodStart"/>
+        app:layout_constraintStart_toStartOf="@id/OrganizerCreateEventRegistrationPeriodStart"
+        app:layout_constraintEnd_toEndOf="@id/OrganizerCreateEventRegistrationPeriodStart"/>
 
     <Button
         android:id="@+id/OrganizerCreateEventRegistrationPeriodStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="160dp"
+        android:layout_height="56dp"
         android:layout_marginTop="36dp"
         android:layout_marginStart="16dp"
         android:text="Registration Period Start"
@@ -129,8 +130,7 @@
         android:textColor="@color/primary_container_highlighted"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/OrganizerCreateEventRegistrationPeriodEnd"
-        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventCategory"
-        app:layout_constraintHorizontal_chainStyle="packed"/>
+        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventCategory" />
 
     <TextView
         android:id="@+id/OrganizerCreateEventShowRegPeriodEnd"
@@ -139,12 +139,13 @@
         android:text="Registration End:"
         android:textSize="@dimen/font_subheading_size"
         app:layout_constraintBottom_toTopOf="@id/OrganizerCreateEventRegistrationPeriodEnd"
-        app:layout_constraintStart_toStartOf="@id/OrganizerCreateEventRegistrationPeriodEnd"/>
+        app:layout_constraintStart_toStartOf="@id/OrganizerCreateEventRegistrationPeriodEnd"
+        app:layout_constraintEnd_toEndOf="@id/OrganizerCreateEventRegistrationPeriodEnd"/>
 
     <Button
         android:id="@+id/OrganizerCreateEventRegistrationPeriodEnd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="160dp"
+        android:layout_height="56dp"
         android:layout_marginTop="36dp"
         android:layout_marginEnd="16dp"
         android:text="Registration Period End"
@@ -159,8 +160,8 @@
 
     <Button
         android:id="@+id/OrganizerCreateEventDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="160dp"
+        android:layout_height="56dp"
         android:layout_marginTop="24dp"
         android:text="Event Date"
         android:textSize="@dimen/font_text_size"
