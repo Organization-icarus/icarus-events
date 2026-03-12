@@ -31,6 +31,19 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.function.Consumer;
 
+/**
+ * Activity that allows organizers to create a new event.
+ * <p>
+ * Users can enter event details such as name, category, location,
+ * registration period, event date, participant limit, and whether
+ * geolocation tracking is enabled. Event information is validated
+ * and then stored in the Firestore "events" collection.
+ * <p>
+ * This activity extends {@link NavigationBarActivity} to include
+ * the application's reusable navigation bar.
+ *
+ * @author Ben Salmon
+ */
 public class OrganizerCreateEventActivity extends NavigationBarActivity {
     private  FirebaseFirestore db;
     private Button UploadPosterButton;
@@ -50,7 +63,17 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
     private EditText locationName;
     private Spinner categoryNameList;
 
-
+    /**
+     * Initializes the event creation interface.
+     * <p>
+     * This method sets up all UI components, retrieves event categories
+     * from Firestore, and assigns click listeners for selecting dates
+     * and submitting the event. When the user confirms creation, the
+     * event data is validated and saved to the database.
+     *
+     * @param savedInstanceState the previously saved activity state,
+     *                           or null if the activity is starting fresh
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -174,9 +197,19 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
 
         });
     }
-    /*
-     * This was created by claude AI, March 10, 2026
-     * "How can I create a popup calendar with creating a new XML file"*/
+
+    /**
+     * Displays a material design date picker and returns the selected date.
+     * <p>
+     * The picker restricts selections to current or future dates. The
+     * selected date is converted from UTC to the device's local time zone
+     * before being returned through the provided callback.
+     * <p>
+     * This was created by claude AI, March 10, 2026 "How can I create a
+     * popup calendar with creating a new XML file"
+     *
+     * @param onDatePicked callback executed when the user selects a date
+     */
     private void  showDatePicker(Consumer<Date> onDatePicked){
         CalendarConstraints constraints = new CalendarConstraints.Builder()
                 .setValidator(DateValidatorPointForward.now())

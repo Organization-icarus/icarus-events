@@ -15,6 +15,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Activity that allows a user to view and update their profile information.
+ * <p>
+ * The screen displays the user's current name, email, and phone number.
+ * Users can toggle between view mode and edit mode to modify their profile
+ * details. When changes are confirmed, the updated information is written
+ * to the Firestore "users" collection and the local {@link UserSession}
+ * is updated accordingly.
+ *
+ * @author Alex Alves
+ */
 public class UserProfileActivity extends NavigationBarActivity {
 
     private EditText nameEditText;
@@ -26,7 +37,13 @@ public class UserProfileActivity extends NavigationBarActivity {
     private boolean editState = false;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-
+    /**
+     * Initializes the user profile screen and populates the fields with
+     * the current user's information.
+     *
+     * @param savedInstanceState previously saved activity state, or null
+     *                           if the activity is newly created
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,6 +114,13 @@ public class UserProfileActivity extends NavigationBarActivity {
         });
     }
 
+    /**
+     * Toggles the profile editing state.
+     * <p>
+     * When editing is enabled, text fields become editable and the
+     * button changes to "Confirm Changes". When editing is disabled,
+     * the fields become read-only and the button returns to "Edit Profile".
+     */
     public void changeEditState() {
         // User confirmed changes and finished editing profile
         if (editState) {

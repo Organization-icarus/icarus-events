@@ -21,6 +21,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Activity that allows a new user to register in the application.
+ * <p>
+ * Users enter their name and select a role before their information
+ * is stored in the Firestore "users" collection. Once registered,
+ * the user is stored in the {@link UserSession} and redirected to
+ * the event list screen.
+ *
+ * @author Alex Alves
+ */
 public class UserRegistrationActivity extends AppCompatActivity {
     private EditText nameEditText;
     private RadioGroup roleRadioGroup;
@@ -28,6 +38,16 @@ public class UserRegistrationActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String deviceId;
 
+    /**
+     * Initializes the user registration interface.
+     * <p>
+     * This method sets up the input fields and handles registration
+     * when the user submits their name and role. The user information
+     * is validated and then saved to Firestore.
+     *
+     * @param savedInstanceState the previously saved activity state,
+     *                           or null if the activity is newly created
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

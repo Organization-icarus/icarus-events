@@ -13,6 +13,15 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Screen for users to manage personal settings and account deletion.
+ * <p>
+ * Loads current notification preferences from Firestore and allows
+ * the user to update them. Provides functionality to delete the
+ * user's account and remove them from all event entrant subcollections.
+ *
+ * @author Alex Alves
+ */
 public class UserSettingsActivity extends NavigationBarActivity{
     private Button deleteProfileButton;
     private Switch adminNotificationsSwitch;
@@ -20,7 +29,13 @@ public class UserSettingsActivity extends NavigationBarActivity{
     private User user;
     FirebaseFirestore db;
 
-
+    /**
+     * Initializes the UserSettingsActivity.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously
+     *                           being shut down, this Bundle contains the data it most
+     *                           recently supplied; otherwise, it is null.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
