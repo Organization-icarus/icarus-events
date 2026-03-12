@@ -2,8 +2,11 @@ package com.icarus.events;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,13 +16,18 @@ import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.function.Consumer;
 
 public class OrganizerCreateEventActivity extends NavigationBarActivity {
@@ -36,9 +44,10 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
     private Date endDate;
     private Date eventDate;
     private EditText EventLimit;
-    private EditText categoryName;
+
     private EditText eventName;
     private EditText locationName;
+    private Spinner categoryNameList;
 
 
     @Override
@@ -51,8 +60,35 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         //Create EditText
         eventName = findViewById(R.id.OrganizerCreateEventEventTitle);
         EventLimit= findViewById(R.id.OrganizerCreateEventLimitWaitingListLimit);
-        categoryName = findViewById(R.id.OrganizerCreateEventCategory);
         locationName = findViewById(R.id.OrganizerCreateEventEventLocation);
+        //Create Spinner
+        categoryNameList = findViewById(R.id.OrganizerCreateEventCategory);
+        ArrayList<String> dbCategories = new ArrayList<>();
+        db.collection("event-categories")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots ->{
+                    dbCategories.add("Category");
+                    for(DocumentSnapshot doc : queryDocumentSnapshots){
+                        Log.d("SPINNER", "All fields: " + doc.getData());
+                        String category = doc.getString("category");
+                        //check for null
+                        if(category != null){
+                            dbCategories.add(category);
+                            Log.d("SPINNER", category);
+                        }
+                    }
+                    ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
+                            this,
+                            R.layout.organizer_create_event_spinner_content,
+                            dbCategories
+                    );
+                    categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    categoryNameList.setAdapter(categoryAdapter);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load categories: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.d("SPINNER", "FAILED TO CREATE SPINNER");
+                });
         //Create Switch
         geolocationSwitch = findViewById(R.id.OrganizerCreateEventGeolocationSwitch);
         //Create Buttons
@@ -72,25 +108,31 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             // Set Registration start date
             showDatePicker(date -> {
                 this.startDate = date;
+                String regStart = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
+                RegistrationPeriodStartButton.setText("Start: "+ regStart);
             });
         });
         RegistrationPeriodEndButton.setOnClickListener(v -> {
             // Set Registration end date
             showDatePicker(date -> {
                 this.endDate = date;
+                String regEnd = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
+                RegistrationPeriodEndButton.setText("End: "+ regEnd);
             });
         });
         EventDate.setOnClickListener(v -> {
             // Set Registration end date
             showDatePicker(date -> {
                 this.eventDate = date;
+                String eventDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
+                EventDate.setText("Event: "+ eventDate);
             });
         });
         CreateEvent.setOnClickListener(v -> {
             // Confirm creation of event
 
             String name = eventName.getText().toString().trim();
-            String category = categoryName.getText().toString().trim();
+            String category = categoryNameList.getSelectedItem().toString().trim();
             String location = locationName.getText().toString().trim();
 
             // Check if user filled all text fields before proceeding
@@ -147,7 +189,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 .setCalendarConstraints(constraints)
                 .build();
         datePicker.addOnPositiveButtonClickListener(selection -> {
-            Date newDate = new Date(selection);
+            Date newDate = new Date(selection + TimeZone.getDefault().getOffset(selection));
             onDatePicked.accept(newDate);
         });
         datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
