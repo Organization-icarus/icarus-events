@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
@@ -122,20 +123,32 @@ public class EventDetailsActivity extends NavigationBarActivity {
             dialog.getWindow().setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT);
         });
 
+
         //---------------------------
         // GET AND HIDE ALL BUTTONS
         //---------------------------
 
-        Button joinBtn = findViewById(R.id.join_waiting_list);
-        Button acceptBtn = findViewById(R.id.accept);
-        Button declineBtn = findViewById(R.id.decline);
-        Button leaveBtn = findViewById(R.id.leave_event);
-        Button manageBtn = findViewById(R.id.manage);
-        Button notificationsBtn = findViewById(R.id.notifications);
-        Button deleteBtn = findViewById(R.id.delete);
+        Button organizerBtn = findViewById(R.id.event_organizer_button);
+        Button manageBtn = findViewById(R.id.manage_button);
+        Button notificationBtn = findViewById(R.id.notification_button);
+        Button deleteBtn = findViewById(R.id.delete_button);
+        Button joinBtn = findViewById(R.id.join_waiting_list_button);
+        Button leaveBtn = findViewById(R.id.leave_waiting_list_button);
+        Button declineBtn = findViewById(R.id.decline_button);
+        Button registerBtn = findViewById(R.id.register_button);
+
+        organizerBtn.setVisibility(View.GONE);
+        manageBtn.setVisibility(View.GONE);
+        notificationBtn.setVisibility(View.GONE);
+        deleteBtn.setVisibility(View.GONE);
+        joinBtn.setVisibility(View.GONE);
+        leaveBtn.setVisibility(View.GONE);
+        declineBtn.setVisibility(View.GONE);
+        registerBtn.setVisibility(View.GONE);
+
 
         //---------------------------
-        // HIDE BUTTONS, SET LISTENERS
+        // UNHIDE RELEVANT BUTTONS, SET CLICK LISTENERS
         //---------------------------
 
         if (role.equals("administrator")) {

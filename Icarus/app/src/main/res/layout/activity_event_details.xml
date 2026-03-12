@@ -112,7 +112,7 @@
             <!--ADMIN AND ORGANIZER -->
             <!--####################-->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/alerts_button"
+                android:id="@+id/notification_button"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_weight="1"
@@ -149,7 +149,7 @@
             <!-- USER UNINITIALIZED -->
             <!--####################-->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/join_waiting_list"
+                android:id="@+id/join_waiting_list_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Join Waiting List"
@@ -166,7 +166,7 @@
             <!-- USER WAITING -->
             <!--####################-->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/leave_waiting_list"
+                android:id="@+id/leave_waiting_list_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Leave Waiting List"
@@ -181,16 +181,17 @@
             <!--####################-->
             <!-- USER SELECTED OR REGISTERED -->
             <!--####################-->
+            <!-- TODO: make both of these buttons have the same width -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/decline"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="1"
+                android:id="@+id/decline_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:text="Decline"
                 android:textSize="@dimen/font_text_size"
                 android:textColor="@color/primary_container_highlighted"
                 android:backgroundTint="@color/primary_container"
-                app:icon="@drawable/check"
+                app:icon="@drawable/decline"
                 app:iconTint="@color/primary_container_highlighted"
                 app:iconGravity="textStart"
                 android:visibility="visible"/>
@@ -200,10 +201,9 @@
             <!-- USER SELECTED -->
             <!--####################-->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/register"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="1"
+                android:id="@+id/register_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Register"
                 android:textSize="@dimen/font_text_size"
                 android:textColor="@color/primary_container_highlighted"
