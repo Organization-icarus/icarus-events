@@ -175,6 +175,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                     });
 
         });
+        finish();
     }
     /*
      * This was created by claude AI, March 10, 2026
@@ -189,7 +190,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 .setCalendarConstraints(constraints)
                 .build();
         datePicker.addOnPositiveButtonClickListener(selection -> {
-            Date newDate = new Date(selection + TimeZone.getDefault().getOffset(selection));
+            Date newDate = new Date(selection);
             onDatePicked.accept(newDate);
         });
         datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
