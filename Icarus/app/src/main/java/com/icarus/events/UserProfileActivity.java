@@ -77,6 +77,11 @@ public class UserProfileActivity extends NavigationBarActivity {
             userSettingsButton.setVisibility(View.GONE);
             editProfileButton.setVisibility(View.GONE);
             adminDeleteButton.setVisibility(View.VISIBLE);
+
+            nameEditText.setHint("Not provided");
+            emailEditText.setHint("Not provided");
+            phoneEditText.setHint("Not provided");
+
             // Bring context user information into the menu
             db.collection("users").document(deviceId).get()
                     .addOnSuccessListener(snapshot -> {

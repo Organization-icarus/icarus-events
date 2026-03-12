@@ -110,9 +110,6 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <!-- Settings button + icon -->
-
-    <!-- Edit profile button -->
-
     <ImageButton
         android:id="@+id/user_profile_settings_button"
         android:layout_width="48dp"
@@ -130,6 +127,7 @@
         app:layout_constraintVertical_bias="0.049"
         app:srcCompat="@drawable/android_settings" />
 
+    <!-- Edit profile button -->
     <Button
         android:id="@+id/user_profile_edit_confirm_button"
         android:layout_width="wrap_content"
@@ -152,7 +150,7 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/attention"
         android:text="Delete Profile"
-        android:textColor="@color/primary_container_highlighted"
+        android:textColor="@color/white"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
