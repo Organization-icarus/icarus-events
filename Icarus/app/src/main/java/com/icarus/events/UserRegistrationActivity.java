@@ -88,10 +88,17 @@ public class UserRegistrationActivity extends AppCompatActivity {
             RadioButton selectedRole = findViewById(selectedId);
             String role = selectedRole.getText().toString().toLowerCase();
 
+
+            // Initialize default settings map
+            Map<String, Object> settings = new HashMap<>();
+            settings.put("adminNotifications", true);
+            settings.put("organizerNotifications", true);
+
             // Send user data to database
             Map<String, Object> userData = new HashMap<>();
             userData.put("name", name);
             userData.put("role", role);
+            userData.put("settings", settings);
 
             db.collection("users").document(deviceId).set(userData)
                     .addOnSuccessListener(unused -> {
