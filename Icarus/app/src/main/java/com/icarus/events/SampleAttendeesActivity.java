@@ -12,29 +12,30 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Screen for organizers to choose how many attendees to sample.
  *
  * Outstanding issues:
  * - Event ID is currently hardcoded for testing.
- * - Sampling currently updates Firestore directly from this screen.
+ * - Entrants are sampled by device ID from the entrants subcollection.
  */
 public class SampleAttendeesActivity extends NavigationBarActivity {
 
     private static final String TAG = "SampleAttendeesActivity";
-    private static final String EVENT_ID = "lw5v5aQ2g4UD5RB7uJHS";
+    private static final String EVENT_ID = "hL8pW5IK9gDloqcWlmqx";
 
     private int attendeeCount = 10;
 
     private FirebaseFirestore db;
-    private DocumentReference eventRef;
+    private CollectionReference entrantsRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,9 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
         setupNavBar();
 
         db = FirebaseFirestore.getInstance();
-        eventRef = db.collection("events").document(EVENT_ID);
+        entrantsRef = db.collection("events")
+                .document(EVENT_ID)
+                .collection("entrants");
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -77,10 +80,7 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
 
         cancelButton.setOnClickListener(v -> finish());
 
-        sampleButton.setOnClickListener(v -> {
-            Toast.makeText(this, "Sample button clicked", Toast.LENGTH_SHORT).show();
-            sampleEntrants();
-        });
+        sampleButton.setOnClickListener(v -> sampleEntrants());
     }
 
     /**
@@ -93,71 +93,47 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
     }
 
     /**
-     * Moves a sampled number of entrants from waitlist_entrants to selected_entrants.
+     * Randomly selects entrants with status "waiting" and updates them to "selected".
      */
-    @SuppressWarnings("unchecked")
     private void sampleEntrants() {
-        Log.d(TAG, "sampleEntrants called");
+        entrantsRef.whereEqualTo("status", "waiting")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    ArrayList<QueryDocumentSnapshot> waitingEntrants = new ArrayList<>();
 
-        eventRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (!documentSnapshot.exists()) {
-                Log.d(TAG, "Event document does not exist");
-                Toast.makeText(this, "Event not found.", Toast.LENGTH_SHORT).show();
-                return;
-            }
+                    for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
+                        waitingEntrants.add(snapshot);
+                    }
 
-            List<String> waitingEntrants =
-                    (List<String>) documentSnapshot.get("waitlist_entrants");
-            List<String> selectedEntrants =
-                    (List<String>) documentSnapshot.get("selected_entrants");
+                    if (waitingEntrants.isEmpty()) {
+                        Toast.makeText(this, "No waiting entrants to sample.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
-            if (waitingEntrants == null) {
-                waitingEntrants = new ArrayList<>();
-            } else {
-                waitingEntrants = new ArrayList<>(waitingEntrants);
-            }
+                    int numberToMove = Math.min(attendeeCount, waitingEntrants.size());
 
-            if (selectedEntrants == null) {
-                selectedEntrants = new ArrayList<>();
-            } else {
-                selectedEntrants = new ArrayList<>(selectedEntrants);
-            }
+                    Collections.shuffle(waitingEntrants);
 
-            if (waitingEntrants.isEmpty()) {
-                Log.d(TAG, "No waitlist entrants");
-                Toast.makeText(this, "No waitlist entrants to sample.", Toast.LENGTH_SHORT).show();
-                return;
-            }
+                    WriteBatch batch = db.batch();
 
-            int numberToMove = Math.min(attendeeCount, waitingEntrants.size());
+                    for (int i = 0; i < numberToMove; i++) {
+                        batch.update(waitingEntrants.get(i).getReference(), "status", "selected");
+                    }
 
-            Collections.shuffle(waitingEntrants);
-
-            List<String> movedEntrants = new ArrayList<>(
-                    waitingEntrants.subList(0, numberToMove)
-            );
-
-            waitingEntrants.removeAll(movedEntrants);
-            selectedEntrants.addAll(movedEntrants);
-
-            eventRef.update(
-                    "waitlist_entrants", waitingEntrants,
-                    "selected_entrants", selectedEntrants
-            ).addOnSuccessListener(unused -> {
-                Log.d(TAG, "Firestore update success");
-                Toast.makeText(
-                        this,
-                        "Moved " + numberToMove + " entrants to selected_entrants.",
-                        Toast.LENGTH_SHORT
-                ).show();
-            }).addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to update sampled entrants", e);
-                Toast.makeText(this, "Failed to update entrants.", Toast.LENGTH_SHORT).show();
-            });
-
-        }).addOnFailureListener(e -> {
-            Log.e(TAG, "Failed to fetch event", e);
-            Toast.makeText(this, "Failed to load event.", Toast.LENGTH_SHORT).show();
-        });
+                    batch.commit()
+                            .addOnSuccessListener(unused -> Toast.makeText(
+                                    this,
+                                    "Sampled " + numberToMove + " entrants.",
+                                    Toast.LENGTH_SHORT
+                            ).show())
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to update entrant statuses", e);
+                                Toast.makeText(this, "Failed to update entrants.", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to load waiting entrants", e);
+                    Toast.makeText(this, "Failed to load waiting entrants.", Toast.LENGTH_SHORT).show();
+                });
     }
 }
