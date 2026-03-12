@@ -47,6 +47,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     //private Button showEducationFilterButton;
     private Button filterCategoryButton;
     private FloatingActionButton addEvent;
+    private FloatingActionButton adminDashboard;
     private ArrayList<Event> eventArrayList;
     private HashMap<String, Boolean> currentFilters;
     private ArrayList<Event> filteredEventArrayList;
@@ -83,6 +84,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         //showEducationFilterButton = findViewById(R.id.entrant_event_list_education_filter_button);
         filterCategoryButton = findViewById(R.id.entrant_event_list_filter_button);
         addEvent = findViewById(R.id.entrant_event_list_add_event_button);
+        adminDashboard = findViewById(R.id.entrant_event_list_admin_dashboard_button);
 
         //Initialize text filter
         searchTextFilter = findViewById(R.id.entrant_event_list_search_filter);
@@ -158,6 +160,11 @@ public class EntrantEventListActivity extends NavigationBarActivity {
 
         addEvent.setOnClickListener(v -> {
             Intent intent = new Intent(this, OrganizerCreateEventActivity.class);
+            startActivity(intent);
+        });
+
+        adminDashboard.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AdministratorDashboardActivity.class);
             startActivity(intent);
         });
 

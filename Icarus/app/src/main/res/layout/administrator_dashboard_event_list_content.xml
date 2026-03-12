@@ -14,31 +14,60 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/admin_dashboard_event_list_event_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Event Name"
-            android:textSize="@dimen/font_subheading_size" />
-
-        <Button
-            android:id="@+id/admin_dashboard_event_list_event_details_button"
+        <LinearLayout
+            android:id="@+id/admin_dashboard_event_list_details_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="@color/primary_container"
-            android:text="Event Details"
-            android:textColor="@color/primary_container_highlighted" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/admin_dashboard_event_list_event_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/font_subheading_size"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:id="@+id/admin_dashboard_event_list_event_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:background="@color/primary_container"
+                    android:paddingStart="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="2dp"
+                    android:textColor="@color/primary_container_highlighted"
+                    android:textSize="@dimen/font_text_size" />
+
+                <!-- Event Date -->
+                <TextView
+                    android:id="@+id/admin_dashboard_event_list_event_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/font_text_size" />
+
+            </LinearLayout>
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/admin_dashboard_event_list_remove_event_button"
-            android:contentDescription="remove_event_button"
             android:layout_width="1dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="@color/primary"
-            app:tint="@color/primary_container_highlighted"
-            app:srcCompat="@android:drawable/ic_menu_delete" />
+            android:backgroundTint="?android:attr/windowBackground"
+            android:contentDescription="remove_event_button"
+            app:srcCompat="@android:drawable/ic_menu_delete"
+            app:tint="@color/primary_container_highlighted" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

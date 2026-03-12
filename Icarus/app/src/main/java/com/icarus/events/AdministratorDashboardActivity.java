@@ -98,8 +98,10 @@ public class AdministratorDashboardActivity extends NavigationBarActivity {
                 for (QueryDocumentSnapshot snapshot : value) {
                     String id = snapshot.getId();
                     String name = snapshot.getString("name");
+                    String category = snapshot.getString("category");
+                    Date date = snapshot.getDate("date");
 
-                    eventArrayList.add(new Event(id, name, null, null, null, null, null, null, null, null));
+                    eventArrayList.add(new Event(id, name, category, null, null, null, date, null, null, null));
                 }
                 eventArrayAdapter.notifyDataSetChanged();
             }

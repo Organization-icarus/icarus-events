@@ -57,6 +57,7 @@
         android:layout_height="match_parent">
 
         <!-- Event list -->
+
         <ListView
             android:id="@+id/entrant_event_list_view"
             android:layout_width="300dp"
@@ -73,6 +74,16 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="76dp"
             android:src="@android:drawable/ic_input_add" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/entrant_event_list_admin_dashboard_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="76dp"
+            android:src="?attr/actionModePasteDrawable"
+            android:translationX="-315dp" />
 
         <include
             android:id="@+id/nav_bar"

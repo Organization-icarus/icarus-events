@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,7 +24,9 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * ArrayAdapter used in the administrator dashboard to display events in a ListView.
@@ -72,20 +75,34 @@ public class AdministratorDashboardEventArrayAdapter extends ArrayAdapter<Event>
                     .inflate(R.layout.administrator_dashboard_event_list_content, parent, false);
         }
 
+        // Initializing views
         Event event = events.get(position);
         TextView eventName = view
                 .findViewById(R.id.admin_dashboard_event_list_event_name);
-        Button eventDetailsButton = view
-                .findViewById(R.id.admin_dashboard_event_list_event_details_button);
+        LinearLayout eventDetails = view
+                .findViewById(R.id.admin_dashboard_event_list_details_layout);
         ImageButton removeEventButton = view
                 .findViewById(R.id.admin_dashboard_event_list_remove_event_button);
+        TextView eventCategory = view.findViewById(R.id.admin_dashboard_event_list_event_category);
+        TextView eventDate = view.findViewById(R.id.admin_dashboard_event_list_event_date);
 
+        // Setting event details values
         eventName.setText(event.getName());
+        eventCategory.setText(event.getCategory());
+        // Reformatting date to be more readable and convert to string
+        if (event.getDate() != null) {
+            SimpleDateFormat formatter = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
+            String dateString = formatter.format(event.getDate());
+            eventDate.setText(dateString);
+        } else {
+            eventDate.setText(R.string.entrant_event_list_missing_date);
+        }
 
-        eventDetailsButton.setOnClickListener(v -> {
-//            Intent intent = new Intent(context, EventDetailsActivity.class);
-//            intent.putExtra("eventId", event.getId());
-//            context.startActivity(intent);
+        // Initializing click listeners
+        eventDetails.setOnClickListener(v -> {
+            Intent intent = new Intent(context, EventDetailsActivity.class);
+            intent.putExtra("eventId", event.getId());
+            context.startActivity(intent);
         });
 
         removeEventButton.setOnClickListener(v -> {
