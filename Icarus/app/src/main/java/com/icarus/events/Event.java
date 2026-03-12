@@ -11,6 +11,7 @@ import java.util.Date;
  * @author Benjamin Hall
  */
 public class Event {
+    // TODO: somehow store event poster?
     private String id;
     private String name;
     private String category;
@@ -21,6 +22,10 @@ public class Event {
     private String location;
     private String image;
     private String organizer;
+
+    private int waiting_list_size;
+    private String user_status; // waitlist, selected, registered, or rejected
+
 
     /**
      * Creates a new Event object.
@@ -48,6 +53,24 @@ public class Event {
         this.location = location;
         this.image = image;
         this.organizer = organizer;
+    }
+
+    // A full constructor
+    public Event(String id, String name, String category, Double capacity, Date regOpen,
+                 Date regClose, Date date, String location, String image, String organizer,
+                 String user_status, int waiting_list_size) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.capacity = capacity;
+        this.regOpen = regOpen;
+        this.regClose = regClose;
+        this.date = date;
+        this.location = location;
+        this.image = image;
+        this.organizer = organizer;
+        this.user_status = user_status;
+        this.waiting_list_size = waiting_list_size;
     }
 
     /**
@@ -166,6 +189,12 @@ public class Event {
     public void setDate(Date date) {
         this.date = date;
     }
+
+    public String getUser_status() { return user_status; }
+    public void setUser_status(String user_status) { this.user_status = user_status; }
+
+    public int getWaiting_list_size() { return waiting_list_size; }
+    public void setWaiting_list_size(int waiting_list_size) { this.waiting_list_size = waiting_list_size; }
 
     /**
      * Returns the location of the event.

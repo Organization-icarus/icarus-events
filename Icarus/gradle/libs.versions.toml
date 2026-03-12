@@ -7,6 +7,7 @@ appcompat = "1.7.1"
 material = "1.13.0"
 activity = "1.12.4"
 constraintlayout = "2.2.1"
+firebaseFirestore = "26.1.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
