@@ -78,6 +78,23 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         addEvent = findViewById(R.id.entrant_event_list_add_event_button);
         adminDashboard = findViewById(R.id.entrant_event_list_admin_dashboard_button);
 
+        // Retrieve current user role
+        User currentUser = UserSession.getInstance().getCurrentUser();
+        String role = currentUser.getRole();
+
+        // Show/hide buttons based on users role
+        if (role.equals("organizer")) {
+            addEvent.setVisibility(VISIBLE);
+        } else {
+            addEvent.setVisibility(GONE);
+        }
+
+        if (role.equals("administrator")) {
+            adminDashboard.setVisibility(VISIBLE);
+        } else {
+            adminDashboard.setVisibility(GONE);
+        }
+
         //Initialize text filter
         searchTextFilter = findViewById(R.id.entrant_event_list_search_filter);
         searchTextFilter.addTextChangedListener(new TextWatcher() {
