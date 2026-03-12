@@ -41,6 +41,8 @@ import java.util.function.Consumer;
  * <p>
  * This activity extends {@link NavigationBarActivity} to include
  * the application's reusable navigation bar.
+ *
+ * @author Ben Salmon
  */
 public class OrganizerCreateEventActivity extends NavigationBarActivity {
     private  FirebaseFirestore db;
