@@ -45,7 +45,7 @@ public class NavigationBarActivity extends AppCompatActivity {
         navBar.findViewById(R.id.event_details)
                 .setOnClickListener((v -> openActivity(EntrantEventListActivity.class)));
         navBar.findViewById(R.id.registered_events)
-                .setOnClickListener((v -> openActivity(EventHistoryActivity.class)));
+                .setOnClickListener((v -> openActivity(EventDetailsActivity.class)));
     }
 
     /**
