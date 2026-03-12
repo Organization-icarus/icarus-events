@@ -72,16 +72,16 @@ public class UserSettingsActivity extends NavigationBarActivity{
                         // Then delete the user document itself
                         db.collection("users").document(deviceId).delete()
                                 .addOnSuccessListener(unused -> {
-                                    Toast.makeText(this, "Account deleted", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
                                     UserSession.getInstance().clear();
                                     startActivity(new Intent(this, MainActivity.class));
                                     finish();
                                 })
                                 .addOnFailureListener(e ->
-                                        Toast.makeText(this, "Failed to delete account", Toast.LENGTH_SHORT).show());
+                                        Toast.makeText(this, "Failed to delete profile", Toast.LENGTH_SHORT).show());
                     })
                     .addOnFailureListener(e ->
-                            Toast.makeText(this, "Failed to delete account", Toast.LENGTH_SHORT).show());
+                            Toast.makeText(this, "Failed to delete profile", Toast.LENGTH_SHORT).show());
         });
 
 

@@ -76,9 +76,9 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
         userName.setText(user.getName());
 
         userName.setOnClickListener(v -> {
-//            Intent intent = new Intent(context, UserProfileActivity.class);
-//            intent.putExtra("userId", user.getId());
-//            context.startActivity(intent);
+            Intent intent = new Intent(context, UserProfileActivity.class);
+            intent.putExtra("deviceId", user.getId());
+            context.startActivity(intent);
         });
 
         removeUserButton.setOnClickListener(v -> {
