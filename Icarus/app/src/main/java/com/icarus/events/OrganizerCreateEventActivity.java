@@ -191,13 +191,14 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
             db.collection("events").add(eventData)
                     .addOnSuccessListener(documentReference  -> {
-                        Map<String, Object> entrantData = new HashMap<>();
-                        entrantData.put("status", "organizer");
-
-                        documentReference
-                                .collection("entrants")
-                                .document(deviceId)
-                                .set(entrantData);
+                        //Creation of the subcollection entrants and add the organizer as status
+//                        Map<String, Object> entrantData = new HashMap<>();
+//                        entrantData.put("status", "organizer");
+//
+//                        documentReference
+//                                .collection("entrants")
+//                                .document(deviceId)
+//                                .set(entrantData);
 
                         finish();
                     })
