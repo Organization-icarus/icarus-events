@@ -34,17 +34,12 @@ import androidx.appcompat.app.AlertDialog;
  * can also navigate to create a new event.
  *
  * @author Alex Alves
- * @author Benjamin Hall
  */
 public class EntrantEventListActivity extends NavigationBarActivity {
     //Define attributes
     private ListView eventListView;
     private EditText searchTextFilter;
     private String currentSearch = "";
-    //Placeholder filter buttons, will replace later.
-    //private Button showSportsFilterButton;
-    //private Button showMusicFilterButton;
-    //private Button showEducationFilterButton;
     private Button filterCategoryButton;
     private FloatingActionButton addEvent;
     private FloatingActionButton adminDashboard;
@@ -79,12 +74,26 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         eventListView = findViewById(R.id.entrant_event_list_view);
 
         // Initialize buttons
-        //showSportsFilterButton = findViewById(R.id.entrant_event_list_sports_filter_button);
-        //showMusicFilterButton = findViewById(R.id.entrant_event_list_music_filter_button);
-        //showEducationFilterButton = findViewById(R.id.entrant_event_list_education_filter_button);
         filterCategoryButton = findViewById(R.id.entrant_event_list_filter_button);
         addEvent = findViewById(R.id.entrant_event_list_add_event_button);
         adminDashboard = findViewById(R.id.entrant_event_list_admin_dashboard_button);
+
+        // Retrieve current user role
+        User currentUser = UserSession.getInstance().getCurrentUser();
+        String role = currentUser.getRole();
+
+        // Show/hide buttons based on users role
+        if (role.equals("organizer")) {
+            addEvent.setVisibility(VISIBLE);
+        } else {
+            addEvent.setVisibility(GONE);
+        }
+
+        if (role.equals("administrator")) {
+            adminDashboard.setVisibility(VISIBLE);
+        } else {
+            adminDashboard.setVisibility(GONE);
+        }
 
         //Initialize text filter
         searchTextFilter = findViewById(R.id.entrant_event_list_search_filter);
@@ -107,7 +116,10 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         currentFilters = new HashMap<>();
         currentFilters.put("Sports", false);
         currentFilters.put("Music", false);
+        currentFilters.put("School", false);
+        currentFilters.put("Art", false);
         currentFilters.put("Education", false);
+        currentFilters.put("Other", false);
 
         // Get all items in the collection
         eventsRef.addSnapshotListener((value,error) -> {
@@ -157,7 +169,6 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         });
 
         // Set buttons on click listeners
-
         addEvent.setOnClickListener(v -> {
             Intent intent = new Intent(this, OrganizerCreateEventActivity.class);
             startActivity(intent);
@@ -169,26 +180,11 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         });
 
         filterCategoryButton.setOnClickListener(v -> showCategoryFilterDialog());
-//        showSportsFilterButton.setOnClickListener(v -> {
-//            handleFilterEvent("Sports", showSportsFilterButton);
-//        });
-//        showMusicFilterButton.setOnClickListener(v -> {
-//            handleFilterEvent("Music", showMusicFilterButton);
-//        });
-//        showEducationFilterButton.setOnClickListener(v -> {
-//            handleFilterEvent("Education", showEducationFilterButton);
-//        });
-
-        // Check if list is empty, if so hide list and show message
-        /**if (eventArrayList.isEmpty()) {
-            findViewById(R.id.entrant_event_list_empty_text).setVisibility(VISIBLE);
-            eventListView.setVisibility(GONE);
-        }**/
     }
 
     /**
      * Handles a category filter button click by toggling its visual state
-     * and applying the updated filters to the event list.
+     * and applying the updated filters to the event list. (Currently not in use)
      *
      * @param filterName the category associated with the button
      * @param button the button that was clicked

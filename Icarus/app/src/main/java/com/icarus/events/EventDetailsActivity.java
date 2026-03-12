@@ -105,58 +105,76 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         // Lets waiting users leave the waiting list
         leaveBtn.setOnClickListener(v -> {
-            /* leave logic */
-            // To leave the waiting list
+            currentStatus = null;
+            setupButtons(currentRole, currentStatus);
+            refreshAdapter(finalEventId);
 
-            currentStatus = "uninitialized";
-            Map<String, Object> entrant = new HashMap<>();
-            entrant.put("status", currentStatus);
-
-            // Add user ID to event with status: "waiting"
+            // Delete the entrant from the event document
             db.collection("events").document(finalEventId)
                     .collection("entrants").document(userId)
-                    .set(entrant);
+                    .delete();
         });
 
 
-        // Lets invited or registered users leave the event
+        // Lets selected users reject their invitation, or registered users remove
+        // their event entrant document.
         declineBtn.setOnClickListener(v -> {
-            /* decline logic */
-            // To decline the invitation or the registration
-            // Set the user status to "rejected"?
-
             currentStatus = "rejected";
+            setupButtons(currentRole, currentStatus);
+            refreshAdapter(finalEventId);
+
             Map<String, Object> entrant = new HashMap<>();
             entrant.put("status", currentStatus);
-
-            // Add user ID to event with status: "waiting"
             db.collection("events").document(finalEventId)
                     .collection("entrants").document(userId)
                     .set(entrant);
         });
 
 
-        // TODO: adjust intent destination. Should I register premptively here?
+        declineBtn.setOnClickListener(v -> {
+            if (currentStatus.equals("registered")) {
+                // Remove from event's entrant list
+                db.collection("events").document(finalEventId)
+                        .collection("entrants").document(userId)
+                        .delete();
+
+                // Remove event from user's own event collection
+                db.collection("users").document(userId)
+                        .update("events", com.google.firebase.firestore.FieldValue.arrayRemove(finalEventId));
+
+                currentStatus = null;
+            } else {
+                // Selected → rejected
+                Map<String, Object> entrant = new HashMap<>();
+                entrant.put("status", "rejected");
+                db.collection("events").document(finalEventId)
+                        .collection("entrants").document(userId)
+                        .set(entrant);
+
+                currentStatus = "rejected";
+            }
+            setupButtons(currentRole, currentStatus);
+            refreshAdapter(finalEventId);
+        });
+
+
         registerBtn.setOnClickListener(v -> {
-            /* register logic */
-
             currentStatus = "registered";
+            setupButtons(currentRole, currentStatus);
+            refreshAdapter(finalEventId);
+
+            // Update the event's entrant document
             Map<String, Object> entrant = new HashMap<>();
             entrant.put("status", currentStatus);
-
-            // Add user ID to event with status: "waiting"
             db.collection("events").document(finalEventId)
                     .collection("entrants").document(userId)
                     .set(entrant);
 
-            // Navigates to the registration page
-            /*
-            Intent intent = new Intent(
-                    EventDetailsActivity.this,
-                    EntrantEventListActivity.class);
-            startActivity(intent);
-            */
+            // Add event to user's own event collection
+            db.collection("users").document(userId)
+                    .update("events", com.google.firebase.firestore.FieldValue.arrayUnion(finalEventId));
         });
+
 
         // TODO: adjust intent destination
         organizerBtn.setOnClickListener(v -> {
@@ -167,6 +185,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
                     EntrantEventListActivity.class);
             startActivity(intent);
         });
+
 
         // TODO: adjust intent destination
         manageBtn.setOnClickListener(v -> {
@@ -179,6 +198,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
             startActivity(intent);
         });
 
+
         // TODO: adjust intent destination
         notificationBtn.setOnClickListener(v -> {
             /* notification logic */
@@ -188,6 +208,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
                     EntrantEventListActivity.class);
             startActivity(intent);
         });
+
 
         // TODO: adjust intent destination
         deleteBtn.setOnClickListener(v -> {
@@ -231,7 +252,8 @@ public class EventDetailsActivity extends NavigationBarActivity {
                     if (doc != null && doc.exists()) {
                         currentName      = doc.getString("name");
                         currentCategory  = doc.getString("category");
-                        currentCapacity  = doc.getDouble("capacity");
+                        Double capacityValue = doc.getDouble("capacity");
+                        currentCapacity = capacityValue != null ? capacityValue : -1;
                         currentRegOpen   = doc.getDate("open");
                         currentRegClose  = doc.getDate("close");
                         currentDate      = doc.getDate("date");
@@ -272,13 +294,9 @@ public class EventDetailsActivity extends NavigationBarActivity {
                 .collection("entrants").document(userId)
                 .addSnapshotListener((doc, e) -> {
                     if (doc != null && doc.exists()) {
-                        // User is in the event, get their status
-                        currentStatus = doc.getString("status") != null
-                                ? doc.getString("status")
-                                : "uninitialized";
+                        currentStatus = doc.getString("status"); // could be null if field missing
                     } else {
-                        // User has no entrant document, which means they haven't joined
-                        currentStatus = "uninitialized";
+                        currentStatus = null; // no document = not in event
                     }
                     setupButtons(currentRole, currentStatus);
                     refreshAdapter(finalEventId);
@@ -329,8 +347,9 @@ public class EventDetailsActivity extends NavigationBarActivity {
         } else if (role.equals("organizer")) {
             manageBtn.setVisibility(View.VISIBLE);
 
-        } else if (role.equals("user")) {
+        } else if (role.equals("entrant")) {
 
+            // Allow new (i.e. not rejected) users to join the waiting list
             if (status == null || status.equals("uninitialized")) {
                 joinBtn.setVisibility(View.VISIBLE);
             }
