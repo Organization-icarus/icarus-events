@@ -15,4 +15,5 @@ public class UserSession {
     }
     public User getCurrentUser() { return currentUser; }
     public void setCurrentUser(User user) { this.currentUser = user; }
+    public void clear() { currentUser = null; }
 }
