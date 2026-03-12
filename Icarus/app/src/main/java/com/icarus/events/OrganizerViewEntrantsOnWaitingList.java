@@ -2,18 +2,22 @@ package com.icarus.events;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
 public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
     private FirebaseFirestore db;
+    private Button backButton;
     private ListView entrantsOnWaitingList;
     private ArrayList<User> entrantList;
     private OraganizerEntrantViewListArrayAdapter eventListArrayAdapter;
@@ -26,6 +30,8 @@ public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
 
         db = FirebaseFirestore.getInstance();
 
+        //CreateButton
+        backButton = findViewById(R.id.OrganizerEntrantOnWaitingListBackButton);
         //Create ListView
         entrantsOnWaitingList = findViewById(R.id.OrganizerEntrantOnWaitingList);
         //Initialize ArrayList and ArrayAdapter
@@ -34,9 +40,9 @@ public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
         entrantsOnWaitingList.setAdapter(eventListArrayAdapter);
 
 
-        //TODO: This needs to read from a event collection to get users. Not just users
-        //events -> eventID -> entrants -> entrantId -> status
 
+        //events -> eventID -> entrants -> entrantId -> status
+        String eventId = getIntent().getStringExtra("eventId");
         db.collection("events").document(eventId).collection("entrants")
                 .addSnapshotListener((value, error) -> {
                     if (error != null || value == null) return;
@@ -46,6 +52,7 @@ public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
                         String status = snapshot.getString("status");
 
                         if (Objects.equals(status, "waiting")) {
+                            //If user has waiting role look for name in user collection
                             db.collection("users").document(deviceId)
                                     .get()
                                     .addOnSuccessListener(userSnapshot -> {
@@ -56,5 +63,9 @@ public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
                         }
                     }
                 });
+
+        backButton.setOnClickListener(v -> {
+            finish();
+        });
     }
 }

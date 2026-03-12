@@ -18,18 +18,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-
     <ListView
         android:id="@+id/OrganizerEntrantOnWaitingList"
         android:layout_width="300dp"
         android:layout_height="0dp"
-        android:layout_gravity="top|center"
         android:layout_marginTop="16dp"
-        android:layout_weight="1"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/OrganizerEntrantOnWaitingListText"
+        app:layout_constraintBottom_toTopOf="@id/OrganizerEntrantOnWaitingListBackButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/OrganizerEntrantOnWaitingListText"
-        app:layout_constraintBottom_toTopOf="@+id/nav_bar"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/OrganizerEntrantOnWaitingListBackButton"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Go Back"
+        android:backgroundTint="@color/primary_container"
+        android:textColor="@color/primary_container_highlighted"
+        app:layout_constraintBottom_toTopOf="@id/nav_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <include
         android:id="@+id/nav_bar"

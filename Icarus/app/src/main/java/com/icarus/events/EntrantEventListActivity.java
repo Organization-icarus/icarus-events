@@ -147,12 +147,12 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         eventListView.setAdapter(eventListArrayAdapter);
 
         // Set navigation on click listeners
-        /**eventListView.setOnItemClickListener((parent, view, position, id) -> {
+        eventListView.setOnItemClickListener((parent, view, position, id) -> {
             Event selected = filteredEventArrayList.get(position);
-            Intent intent = new Intent(this, EntrantEventDetailActivity.class);
+            Intent intent = new Intent(this, EventDetailsActivity.class);
             intent.putExtra("eventId", selected.getId());
             startActivity(intent);
-        });**/
+        });
 
         // Set buttons on click listeners
 
