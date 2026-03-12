@@ -35,6 +35,8 @@
 
         <activity android:name=".EventHistoryActivity" />
 
+        <activity android:name=".EventDetailsActivity" />
+
     </application>
 
 </manifest>
