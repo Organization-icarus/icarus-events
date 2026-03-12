@@ -36,7 +36,7 @@ import androidx.appcompat.app.AlertDialog;
  *
  * @author Benjamin Hall
  */
-public class EventHistoryActivity extends AppCompatActivity {
+public class EventHistoryActivity extends NavigationBarActivity {
     //Define attributes
     private ListView eventHistoryListView;
     private EditText searchTextFilter;
@@ -64,6 +64,7 @@ public class EventHistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_history);
+        setupNavBar();
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
@@ -152,12 +153,12 @@ public class EventHistoryActivity extends AppCompatActivity {
         eventHistoryListView.setAdapter(eventHistoryListArrayAdapter);
 
         // Set navigation on click listeners
-        /**eventListView.setOnItemClickListener((parent, view, position, id) -> {
-         Event selected = filteredEventArrayList.get(position);
-         Intent intent = new Intent(this, EntrantEventDetailActivity.class);
-         intent.putExtra("eventId", selected.getId());
-         startActivity(intent);
-         });**/
+        eventHistoryListView.setOnItemClickListener((parent, view, position, id) -> {
+            Event selected = filteredEventHistoryArrayList.get(position);
+            Intent intent = new Intent(this, EventDetailsActivity.class);
+            intent.putExtra("eventId", selected.getId());
+            startActivity(intent);
+        });
 
 
         filterCategoryButton.setOnClickListener(v -> showCategoryFilterDialog());
