@@ -2,7 +2,10 @@ package com.icarus.events;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Intent;
@@ -32,6 +35,8 @@ import java.util.concurrent.CountDownLatch;
  *      US 01.05.02 As an entrant I want to accept an invitation to register.
  *      US 01.05.03 As an entrant I want to decline an invitation.
  *      US 01.05.04 As an entrant I want to know how many users are on the waiting list.
+ *      US 01.05.05 As an entrant, I want to be informed about the criteria or
+ *      guidelines for the lottery selection process.
  * <p>
  * Tests use temporary Firestore collections to avoid interfering with production data.
  *
@@ -272,6 +277,41 @@ public class EventDetailsTest {
         latch.await();
 
         assertEquals("rejected", status[0]);
+    }
+
+    /**
+     * Tests that an entrant can view the lottery guidelines from
+     * the event details page.
+     * <p>
+     * The test simulates a user opening the event details, tapping
+     * the "Lottery Guidelines" button, and verifies that the
+     * guidelines message is displayed as expected.
+     * <p>
+     * User Story Tested:
+     *      US 01.05.05 As an entrant, I want to be informed about
+     *      the criteria or guidelines for the lottery selection process.
+     *
+     * @throws InterruptedException if the wait is interrupted
+     */
+    @Test
+    public void testLotteryGuidelinesDisplayed() throws InterruptedException {
+
+        // Launch the EventDetailsActivity for a test event
+        Intent intent = new Intent(
+                ApplicationProvider.getApplicationContext(),
+                EventDetailsActivity.class
+        );
+        intent.putExtra("eventId", "test_event_id"); // Use a test event ID
+        scenario = ActivityScenario.launch(intent);
+
+        // Click the "Lottery Guidelines" button
+        onView(withId(R.id.lottery_guidelines)).perform(click());
+
+        // Verify that the guidelines message is displayed
+        String expectedMessage = ApplicationProvider.getApplicationContext()
+                .getString(R.string.lottery_guidelines_message);
+
+        onView(withText(expectedMessage)).check(matches(isDisplayed()));
     }
 
     /**
