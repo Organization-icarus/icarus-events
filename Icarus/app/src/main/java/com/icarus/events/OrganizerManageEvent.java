@@ -3,6 +3,9 @@ package com.icarus.events;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
+
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -13,7 +16,10 @@ public class OrganizerManageEvent extends NavigationBarActivity{
     private Button UpdatePoster;
     private Button SampleAttendees;
     private Button ReplaceDeclined;
+    private TextView eventTitle;
     private String eventId;
+
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +34,14 @@ public class OrganizerManageEvent extends NavigationBarActivity{
         SampleAttendees = findViewById(R.id.OrganizerManageEventSampleAttendees);
         ReplaceDeclined = findViewById(R.id.OrganizerManageEventReplaceDeclined);
 
+        //Create textView
+        eventTitle = findViewById(R.id.OrganizerManageEventTitle);
+
         eventId = getIntent().getStringExtra("eventId");
+
+        db = FirebaseFirestore.getInstance();
+
+        db.collection("events").document(eventId)
 
         ViewEntrantMap.setOnClickListener(v -> {
             // View Entrant Map
