@@ -39,7 +39,11 @@ import java.util.Collections;
  *
  * Outstanding issues:
  * - Event ID is currently hardcoded for testing.
- * - Entrants are sampled by device ID from the entrants subcollection.
+ * - Entrants are sampled by device ID from the entrants' subcollection.
+ * AI Use Disclosure:
+ * AI tools were used to assist with drafting and revising parts of this activity,
+ * including logic structure, wording, and code refinement. All final edits,
+ * integration decisions, and testing were reviewed and completed by Yifan Jiao.
  *
  * @author Yifan Jiao
  */
@@ -125,6 +129,8 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
      * Randomly selects entrants with status "waiting" and updates them to "selected".
      * Randomly selects entrants from the event waitlist and moves them
      * to the selected entrants list.
+     * AI tools were used to help draft and refine portions of the entrant sampling
+     * and Firestore batch update logic in this method. Final implementation decisions
      */
     private void sampleEntrants() {
         entrantsRef.whereEqualTo("status", "waiting")
