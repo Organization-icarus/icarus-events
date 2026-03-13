@@ -46,7 +46,7 @@ import java.util.Collections;
 public class SampleAttendeesActivity extends NavigationBarActivity {
 
     private static final String TAG = "SampleAttendeesActivity";
-    private static final String EVENT_ID = "hL8pW5IK9gDloqcWlmqx";
+    private String eventId;
 
     private int attendeeCount = 10;
 
@@ -70,9 +70,11 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
         setContentView(R.layout.activity_sample_attendees);
         setupNavBar();
 
+        eventId = getIntent().getStringExtra("eventId");
+
         db = FirebaseFirestore.getInstance();
         entrantsRef = db.collection("events")
-                .document(EVENT_ID)
+                .document(eventId)
                 .collection("entrants");
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
