@@ -12,8 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Icarus">
 
-        <activity android:name=".SampleAttendeesActivity" />
-
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -39,7 +37,11 @@
 
         <activity android:name=".EventDetailsActivity" />
 
-        <activity android:name=".OrganizerViewEntrantsOnWaitingList"/>
+        <activity android:name=".OrganizerViewEntrantsOnWaitingListActivity"/>
+
+        <activity android:name=".OrganizerManageEventActivity"/>
+
+        <activity android:name=".SampleAttendeesActivity"/>
 
     </application>
 

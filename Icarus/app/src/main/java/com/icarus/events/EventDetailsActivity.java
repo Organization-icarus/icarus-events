@@ -1,7 +1,5 @@
 package com.icarus.events;
 
-import static java.sql.Types.NULL;
-
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -181,7 +179,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
             // Navigates to the manage page
             Intent intent = new Intent(
                     EventDetailsActivity.this,
-                    OrganizerViewEntrantsOnWaitingList.class);
+                    OrganizerManageEventActivity.class);
             intent.putExtra("eventId", finalEventId);
             startActivity(intent);
         });
