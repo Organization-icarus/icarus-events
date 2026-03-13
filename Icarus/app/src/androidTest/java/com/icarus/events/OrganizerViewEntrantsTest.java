@@ -38,7 +38,6 @@ import java.util.concurrent.CountDownLatch;
  *      US 02.06.01 As an organizer I want to view a list of all chosen entrants.
  *      US 02.06.02 As an organizer I want to see a list of all cancelled entrants.
  *      US 02.06.03 As an organizer I want to see a final list of enrolled entrants.
- *
  * <p>
  * Tests use temporary Firestore collections to avoid affecting production data.
  *
