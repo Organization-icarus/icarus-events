@@ -1,6 +1,6 @@
 # Icarus Events (Event Lottery System)
 
-A simple Android + Firestore prototype for an event lottery/waitlist system. Users can join event waitlists via QR code, organizers can manage events and entrants, and administrators can moderate content. Overall， the program should be working after the project part 3.
+A simple Android with Firestore prototype for an event lottery/waitlist system. Users can join event waitlists via QR code(not the traditional method), organizers can manage events and entrants, and administrators can moderate content. Overall， the program should be working after the project part 3.
 
 ## Tech Stack
 - Android (Java)
