@@ -25,7 +25,7 @@ public class OrganizerManageEvent extends NavigationBarActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_organizer_view_entrants_on_waiting_list);
+        setContentView(R.layout.activity_organizer_manage_event);
         setupNavBar();
 
         //Create Buttons
@@ -58,7 +58,7 @@ public class OrganizerManageEvent extends NavigationBarActivity{
         ViewEntrantList.setOnClickListener(v -> {
             // View Entrant List
             Intent intent = new Intent(this, OrganizerViewEntrantsOnWaitingList.class);
-            intent.putExtra("EventId", eventId);
+            intent.putExtra("eventId", eventId);
             startActivity(intent);
         });
         UpdatePoster.setOnClickListener(v -> {
