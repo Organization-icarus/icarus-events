@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -42,6 +43,11 @@ public class OrganizerManageEvent extends NavigationBarActivity{
         db = FirebaseFirestore.getInstance();
 
         db.collection("events").document(eventId)
+                .get()
+                .addOnSuccessListener(document -> {
+                    String eventName = document.getString("name");
+                    eventTitle.setText(eventName);
+                });
 
         ViewEntrantMap.setOnClickListener(v -> {
             // View Entrant Map
@@ -61,9 +67,8 @@ public class OrganizerManageEvent extends NavigationBarActivity{
         });
         SampleAttendees.setOnClickListener(v -> {
             // Sample Attendees
-//            Intent intent = new Intent(this, UserRegistrationActivity.class);
-//            intent.putExtra("deviceId", deviceId);
-//            startActivity(intent);
+            Intent intent = new Intent(this, SampleAttendeesActivity.class);
+            startActivity(intent);
 
         });
         ReplaceDeclined.setOnClickListener(v -> {
