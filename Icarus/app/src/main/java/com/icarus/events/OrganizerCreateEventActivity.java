@@ -80,6 +80,8 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_create_event);
         setupNavBar();
+        User user = UserSession.getInstance().getCurrentUser();
+        String userId = user.getId();
 
         db = FirebaseFirestore.getInstance();
         //Create EditText
@@ -186,6 +188,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             eventData.put("image", "IMAGE REFERENCE");
             eventData.put("location", location);
             eventData.put("geolocation",geolocationSwitch.isChecked());
+            eventData.put("organizer", userId);
 
             //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
             db.collection(FirestoreCollections.EVENTS_COLLECTION).add(eventData)
