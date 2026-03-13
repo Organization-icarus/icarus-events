@@ -80,7 +80,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
 
         // Retrieve current user role
         User currentUser = UserSession.getInstance().getCurrentUser();
-        String role = currentUser.getRole();
+        String role = (currentUser != null) ? currentUser.getRole() : "entrant";
 
         // Show/hide buttons based on users role
         if (role.equals("organizer")) {
