@@ -154,7 +154,7 @@ public class UserProfileActivity extends NavigationBarActivity {
                 if (!email.isEmpty()) userData.put("email", email);
                 if (!phone.isEmpty()) userData.put("phone", phone);
 
-                db.collection("users").document(deviceId).update(userData)
+                db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).update(userData)
                         .addOnSuccessListener(unused -> {
                             // Add information into global session
                             user.setName(name);

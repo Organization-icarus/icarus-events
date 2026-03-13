@@ -62,7 +62,7 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
         setupNavBar();
 
         db = FirebaseFirestore.getInstance();
-        eventRef = db.collection("events").document(EVENT_ID);
+        eventRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(EVENT_ID);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

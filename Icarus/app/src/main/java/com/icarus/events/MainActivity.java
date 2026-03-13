@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         deviceIdText.setText("Device ID: " + deviceId);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").document(deviceId).get()
+        db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
                 .addOnSuccessListener(snapshot -> {
                     if (snapshot.exists()) {
                         // if user exists, load that user into global session and go to event list

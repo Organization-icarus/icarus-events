@@ -68,7 +68,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
-        eventsRef = db.collection("events");
+        eventsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION);
 
         // Set views
         eventListView = findViewById(R.id.entrant_event_list_view);
