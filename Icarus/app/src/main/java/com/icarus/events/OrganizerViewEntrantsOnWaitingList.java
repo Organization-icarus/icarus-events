@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -17,10 +19,14 @@ import java.util.Objects;
 
 public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
     private FirebaseFirestore db;
+    private TextView eventName;
     private Button backButton;
     private ListView entrantsOnWaitingList;
+    private MaterialButtonToggleGroup filterButtons;
     private ArrayList<User> entrantList;
     private OraganizerEntrantViewListArrayAdapter eventListArrayAdapter;
+
+    private String eventId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +36,10 @@ public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
 
         db = FirebaseFirestore.getInstance();
 
-        //CreateButton
+        //Create TextView
+        eventName = findViewById(R.id.OrganizerEntrantOnWaitingListEventText);
+        //Create Buttons
+        filterButtons = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar);
         backButton = findViewById(R.id.OrganizerEntrantOnWaitingListBackButton);
         //Create ListView
         entrantsOnWaitingList = findViewById(R.id.OrganizerEntrantOnWaitingList);
@@ -39,19 +48,60 @@ public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
         eventListArrayAdapter = new OraganizerEntrantViewListArrayAdapter(this, entrantList);
         entrantsOnWaitingList.setAdapter(eventListArrayAdapter);
 
+        //get eventId
+        eventId = getIntent().getStringExtra("eventId");
 
+        //Set default as waiting
+        filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
+        loadList("waiting");
 
-        //events -> eventID -> entrants -> entrantId -> status
-        String eventId = getIntent().getStringExtra("eventId");
-        db.collection("events").document(eventId).collection("entrants")
+        //Set event Title
+        db.collection("events").document(eventId)
                 .addSnapshotListener((value, error) -> {
                     if (error != null || value == null) return;
+
+                    String name = value.getString("name");
+
+                    runOnUiThread(() -> {
+                        eventName.setText(name);
+                    });
+                });
+
+        filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) ->{
+            String status = null;
+            if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_waiting)){
+                status = "waiting";
+                loadList(status);
+            }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_chosen)){
+                status = "selected";
+                loadList(status);
+            }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_cancelled)){
+                status = "rejected";
+                loadList(status);
+            }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_final)){
+                status = "registered";
+                loadList(status);
+            }
+
+        });
+
+        backButton.setOnClickListener(v -> {
+            finish();
+        });
+    }
+    private void loadList(String listStatus) {
+        //events -> eventID -> entrants -> entrantId -> status
+        entrantList.clear();
+        eventListArrayAdapter.notifyDataSetChanged();
+        db.collection("events").document(eventId).collection("entrants")
+                .get()
+                .addOnSuccessListener(value -> {
                     entrantList.clear();
                     for (QueryDocumentSnapshot snapshot : value) {
                         String deviceId = snapshot.getId();
                         String status = snapshot.getString("status");
 
-                        if (Objects.equals(status, "waiting")) {
+                        if (Objects.equals(status, listStatus)) {
                             //If user has waiting role look for name in user collection
                             db.collection("users").document(deviceId)
                                     .get()
@@ -63,9 +113,5 @@ public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
                         }
                     }
                 });
-
-        backButton.setOnClickListener(v -> {
-            finish();
-        });
     }
 }

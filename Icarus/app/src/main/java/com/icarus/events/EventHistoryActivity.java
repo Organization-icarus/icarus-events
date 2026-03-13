@@ -11,12 +11,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -95,9 +97,21 @@ public class EventHistoryActivity extends NavigationBarActivity {
 
         // Initialize current filters
         currentFilters = new HashMap<>();
-        currentFilters.put("Sports", false);
-        currentFilters.put("Music", false);
-        currentFilters.put("Education", false);
+
+        db.collection("event-categories")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots ->{
+                    for(DocumentSnapshot doc : queryDocumentSnapshots){
+                        String category = doc.getString("category");
+                        //check for null
+                        if(category != null){
+                            currentFilters.put(category, false);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load categories: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
 
         // Generated from Claude AI on March 11, 2026
         // "I want to only get events that are in the current users event list"
