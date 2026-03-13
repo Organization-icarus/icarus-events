@@ -41,9 +41,6 @@ import java.util.concurrent.CountDownLatch;
  * Test class for verifying the functionality of an entrant
  * joining and leaving the waitlist for events.
  * <p>
- * This test suite verifies that entrants can join and leave the waitlist from the
- * event list retrieved from Firestore.
- * <p>
  * User Stories Tested:
  *     US 01.01.01 – As an entrant, I want to join the waiting list for a specific event.
  *     US 01.01.02 – As an entrant, I want to leave the waiting list for a specific event.

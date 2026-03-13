@@ -33,10 +33,6 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Instrumented UI tests for {@link EntrantEventListActivity}.
  * <p>
- * This test suite verifies that entrants can view and interact with the
- * event list retrieved from Firestore. It validates that events are correctly
- * displayed and that category-based filtering behaves as expected.
- * <p>
  * User Stories Tested:
  *      US 01.01.03 – As an entrant, I want to be able to see a list
  *      of events that I can join the waiting list for.

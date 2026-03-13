@@ -28,10 +28,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Tests Entrant update profile functionality.
- * <p>
- * This test suite verifies that users can update their name, email, and phone number
- * in the profile page, which then updates Firestore.
+ * Instrumented UI tests for {@link UserProfileActivity}.
  * <p>
  * User Stories Tested:
  *     US 01.02.02 As an entrant I want to update information such as name, email and contact information on my profile
