@@ -37,6 +37,8 @@ import java.util.concurrent.CountDownLatch;
  *      US 01.05.04 As an entrant I want to know how many users are on the waiting list.
  *      US 01.05.05 As an entrant, I want to be informed about the criteria or
  *      guidelines for the lottery selection process.
+ *      US 01.06.02 As an entrant I want to be able to sign up for an event
+ *      from the event details.
  * <p>
  * Tests use temporary Firestore collections to avoid interfering with production data.
  *
@@ -52,6 +54,7 @@ public class EventDetailsTest {
     private String entrantId;
     private String event1Id;
     private String event2Id;
+    private String event3Id;
 
     private ActivityScenario<EventDetailsActivity> scenario;
 
@@ -112,7 +115,7 @@ public class EventDetailsTest {
         entrantLatch.await();
 
         // create events
-        CountDownLatch eventLatch = new CountDownLatch(2);
+        CountDownLatch eventLatch = new CountDownLatch(3);
 
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("name", "Test Event 1");
@@ -133,6 +136,15 @@ public class EventDetailsTest {
                 .add(eventData)
                 .addOnSuccessListener(doc -> {
                     event2Id = doc.getId();
+                    eventLatch.countDown();
+                });
+
+        eventData.put("name", "Test Event 3");
+
+        db.collection("events_test")
+                .add(eventData)
+                .addOnSuccessListener(doc -> {
+                    event3Id = doc.getId();
                     eventLatch.countDown();
                 });
 
@@ -312,6 +324,56 @@ public class EventDetailsTest {
                 .getString(R.string.lottery_guidelines_message);
 
         onView(withText(expectedMessage)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Tests that an entrant can sign up for a new event from the event details page.
+     * <p>
+     * The test launches the EventDetailsActivity for an event that the
+     * entrant is not registered for, clicks the "Join Waitlist" button,
+     * and verifies that Firestore updates the entrant's status to "waiting".
+     * <p>
+     * User Story Tested:
+     *     US 01.06.02 As an entrant I want to be able to sign up for an event from the event details.
+     */
+    @Test
+    public void testEntrantSignUpForEvent() throws InterruptedException {
+
+        // Launch EventDetailsActivity for the new event
+        Intent intent = new Intent(
+                ApplicationProvider.getApplicationContext(),
+                EventDetailsActivity.class);
+        intent.putExtra("eventId", event3Id);
+        scenario = ActivityScenario.launch(intent);
+
+        // Click the "Join Waitlist" button
+        onView(withId(R.id.join_waiting_list_button))
+                .perform(click());
+
+        // Verify Firestore updates the entrant's status to "waiting"
+        CountDownLatch latch = new CountDownLatch(1);
+        final String[] status = {""};
+
+        db.collection("events_test")
+                .document(event3Id)
+                .collection("entrants")
+                .document(entrantId)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    status[0] = doc.getString("status");
+                    latch.countDown();
+                });
+
+        latch.await();
+
+        assertEquals("waiting", status[0]);
+
+        // Clean up the new event after test
+        CountDownLatch cleanupLatch = new CountDownLatch(1);
+        db.collection("events_test").document(event3Id)
+                .delete()
+                .addOnSuccessListener(v -> cleanupLatch.countDown());
+        cleanupLatch.await();
     }
 
     /**
