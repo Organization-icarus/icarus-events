@@ -77,6 +77,7 @@ public class EntrantWaitlistTest {
     public void setupFirestoreData() throws InterruptedException {
 
         FirestoreCollections.EVENTS_COLLECTION = "events_test";
+        FirestoreCollections.USERS_COLLECTION = "users_test";
 
         // insert organizer into the database
         CountDownLatch organizerLatch = new CountDownLatch(1);
@@ -270,6 +271,7 @@ public class EntrantWaitlistTest {
         }
 
         FirestoreCollections.EVENTS_COLLECTION = "events";
+        FirestoreCollections.USERS_COLLECTION = "users";
 
         CountDownLatch latch = new CountDownLatch(2);
         db.collection("events_test")
