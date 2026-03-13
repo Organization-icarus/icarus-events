@@ -1,6 +1,5 @@
 package com.icarus.events;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ListView;
@@ -10,11 +9,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 /**
  * Activity that allows organizers to view the entrants on the waiting,
@@ -30,7 +25,7 @@ import java.util.Objects;
  *
  * @author Ben Salmon
  */
-public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
+public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarActivity{
     private FirebaseFirestore db;
     private TextView eventName;
     private Button backButton;

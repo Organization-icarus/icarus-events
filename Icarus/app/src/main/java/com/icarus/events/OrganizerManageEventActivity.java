@@ -4,14 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
-public class OrganizerManageEvent extends NavigationBarActivity{
+public class OrganizerManageEventActivity extends NavigationBarActivity{
     private Button ViewEntrantMap;
     private Button ViewEntrantList;
     private Button UpdatePoster;
@@ -57,7 +53,7 @@ public class OrganizerManageEvent extends NavigationBarActivity{
         });
         ViewEntrantList.setOnClickListener(v -> {
             // View Entrant List
-            Intent intent = new Intent(this, OrganizerViewEntrantsOnWaitingList.class);
+            Intent intent = new Intent(this, OrganizerViewEntrantsOnWaitingListActivity.class);
             intent.putExtra("eventId", eventId);
             startActivity(intent);
         });
@@ -68,6 +64,7 @@ public class OrganizerManageEvent extends NavigationBarActivity{
         SampleAttendees.setOnClickListener(v -> {
             // Sample Attendees
             Intent intent = new Intent(this, SampleAttendeesActivity.class);
+            intent.putExtra("eventId", eventId);
             startActivity(intent);
 
         });
