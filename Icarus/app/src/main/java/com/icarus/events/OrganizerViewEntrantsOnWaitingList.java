@@ -16,7 +16,20 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-
+/**
+ * Activity that allows organizers to view the entrants on the waiting,
+ * selected, rejected, and registered list .
+ * <p>
+ * Organziers can filter the entrant list by selecting a
+ * option at the top of the activity. The list shown is refreshed
+ * when the Organizer selects a filter type
+ *
+ * <p>
+ * This activity extends {@link NavigationBarActivity} to include
+ * the application's reusable navigation bar.
+ *
+ * @author Ben Salmon
+ */
 public class OrganizerViewEntrantsOnWaitingList extends NavigationBarActivity{
     private FirebaseFirestore db;
     private TextView eventName;

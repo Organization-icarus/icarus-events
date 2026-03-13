@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <TextView
+        android:id="@+id/OrganizerManageEventScreenTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:text="Manage Event"
+        android:textColor="@color/black"
+        android:textSize="@dimen/font_super_heading_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/OrganizerManageEventViewImage"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/ic_launcher_background"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventScreenTitle"/>
+
+    <TextView
+        android:id="@+id/OrganizerManageEventTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:text="Event Title"
+        android:textColor="@color/black"
+        android:textSize="@dimen/font_subheading_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventViewImage"/>
+
+    <TextView
+        android:id="@+id/OrganizerManageEventActionTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:gravity="center"
+        android:text="Actions"
+        android:textColor="@color/black"
+        android:textSize="@dimen/font_super_heading_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventTitle"/>
+
+    <Button
+        android:id="@+id/OrganizerManageEventViewEntrantMap"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:text="View Entrant Map"
+        android:backgroundTint="@color/primary_container"
+        android:textColor="@color/primary_container_highlighted"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventActionTitle"/>
+
+    <Button
+        android:id="@+id/OrganizerManageEventViewEntrantList"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:text="View Entrant list"
+        android:backgroundTint="@color/primary_container"
+        android:textColor="@color/primary_container_highlighted"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventViewEntrantMap"/>
+
+    <Button
+        android:id="@+id/OrganizerManageEventUpdatePoster"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:text="Update Poster"
+        android:backgroundTint="@color/primary_container"
+        android:textColor="@color/primary_container_highlighted"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventViewEntrantList"/>
+
+    <Button
+        android:id="@+id/OrganizerManageEventSampleAttendees"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:text="Sample Attendees"
+        android:backgroundTint="@color/primary_container"
+        android:textColor="@color/primary_container_highlighted"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventUpdatePoster"/>
+
+    <Button
+        android:id="@+id/OrganizerManageEventReplaceDeclined"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:text="Replace Declined"
+        android:backgroundTint="@color/primary_container"
+        android:textColor="@color/primary_container_highlighted"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventSampleAttendees"/>
+
+    <include
+        android:id="@+id/nav_bar"
+        layout="@layout/nav_bar"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
