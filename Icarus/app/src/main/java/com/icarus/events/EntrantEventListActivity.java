@@ -11,12 +11,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -114,12 +116,20 @@ public class EntrantEventListActivity extends NavigationBarActivity {
 
         // Initialize current filters
         currentFilters = new HashMap<>();
-        currentFilters.put("Sports", false);
-        currentFilters.put("Music", false);
-        currentFilters.put("School", false);
-        currentFilters.put("Art", false);
-        currentFilters.put("Education", false);
-        currentFilters.put("Other", false);
+        db.collection("event-categories")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots ->{
+                    for(DocumentSnapshot doc : queryDocumentSnapshots){
+                        String category = doc.getString("category");
+                        //check for null
+                        if(category != null){
+                            currentFilters.put(category, false);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load categories: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
 
         // Get all items in the collection
         eventsRef.addSnapshotListener((value,error) -> {

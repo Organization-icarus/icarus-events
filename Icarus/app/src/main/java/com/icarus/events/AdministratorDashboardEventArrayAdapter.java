@@ -118,6 +118,8 @@ public class AdministratorDashboardEventArrayAdapter extends ArrayAdapter<Event>
                     String userId = userDoc.getId();
                     DocumentReference userRef = db.collection("users").document(userId);
                     batch.update(userRef, "events", FieldValue.arrayRemove(event.getId()));
+                    // Delete the entrant document from the 'entrants' subcollection
+                    batch.delete(userDoc.getReference());
                 }
 
                 // remove event document
