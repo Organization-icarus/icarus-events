@@ -64,7 +64,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
         loadList("waiting");
 
         //Set event Title
-        db.collection("events").document(eventId)
+        db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId)
                 .addSnapshotListener((value, error) -> {
                     if (error != null || value == null) return;
 
@@ -101,7 +101,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
         //events -> eventID -> entrants -> entrantId -> status
         entrantList.clear();
         eventListArrayAdapter.notifyDataSetChanged();
-        db.collection("events").document(eventId).collection("entrants")
+        db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants")
                 .get()
                 .addOnSuccessListener(value -> {
                     entrantList.clear();
@@ -111,7 +111,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
 
                         if (Objects.equals(status, listStatus)) {
                             //If user has waiting role look for name in user collection
-                            db.collection("users").document(deviceId)
+                            db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId)
                                     .get()
                                     .addOnSuccessListener(userSnapshot -> {
                                         String name = userSnapshot.getString("name");

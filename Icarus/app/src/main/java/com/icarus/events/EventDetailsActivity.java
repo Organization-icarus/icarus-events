@@ -95,12 +95,12 @@ public class EventDetailsActivity extends NavigationBarActivity {
             entrant.put("status", currentStatus);
 
             // Add user ID to event with status: "waiting"
-            db.collection("events").document(finalEventId)
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
                     .collection("entrants").document(userId)
                     .set(entrant);
 
             // Add event to user's own event collection
-            db.collection("users").document(userId)
+            db.collection(FirestoreCollections.USERS_COLLECTION).document(userId)
                     .update("events", com.google.firebase.firestore.FieldValue.arrayUnion(finalEventId));
         });
 
@@ -112,12 +112,12 @@ public class EventDetailsActivity extends NavigationBarActivity {
             refreshAdapter(finalEventId);
 
             // Delete the entrant from the event document
-            db.collection("events").document(finalEventId)
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
                     .collection("entrants").document(userId)
                     .delete();
 
             // Remove event from user's own event collection
-            db.collection("users").document(userId)
+            db.collection(FirestoreCollections.USERS_COLLECTION).document(userId)
                     .update("events", com.google.firebase.firestore.FieldValue.arrayRemove(finalEventId));
         });
 
@@ -128,7 +128,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
                 // Remove from event's entrant list
                 Map<String, Object> entrant = new HashMap<>();
                 entrant.put("status", "rejected");
-                db.collection("events").document(finalEventId)
+                db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
                         .collection("entrants").document(userId)
                         .set(entrant);
 
@@ -137,7 +137,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
                 // Selected → rejected
                 Map<String, Object> entrant = new HashMap<>();
                 entrant.put("status", "rejected");
-                db.collection("events").document(finalEventId)
+                db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
                         .collection("entrants").document(userId)
                         .set(entrant);
 
@@ -156,7 +156,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
             // Update the event's entrant document
             Map<String, Object> entrant = new HashMap<>();
             entrant.put("status", currentStatus);
-            db.collection("events").document(finalEventId)
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
                     .collection("entrants").document(userId)
                     .set(entrant);
         });
@@ -233,7 +233,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
         //---------------------------
 
         // Will run anytime the database event document changes
-        eventListener = db.collection("events").document(finalEventId)
+        eventListener = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
                 .addSnapshotListener((doc, e) -> {
                     if (doc != null && doc.exists()) {
                         currentName      = doc.getString("name");
@@ -260,7 +260,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
         // Fires on load + anytime the user's entrant document changes
         //---------------------------
 
-        entrantWaitlistListener = db.collection("events").document(finalEventId)
+        entrantWaitlistListener = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
                 .collection("entrants")
                 .whereEqualTo("status", "waiting")
                 .addSnapshotListener((query, e) -> {
@@ -276,7 +276,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
         // Fires on load + anytime the user's entrant document changes
         //---------------------------
 
-        entrantStatusListener = db.collection("events").document(finalEventId)
+        entrantStatusListener = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
                 .collection("entrants").document(userId)
                 .addSnapshotListener((doc, e) -> {
                     if (doc != null && doc.exists()) {
@@ -294,7 +294,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
         // Handles role changes while app is running
         //---------------------------
 
-        userListener = db.collection("users").document(userId)
+        userListener = db.collection(FirestoreCollections.USERS_COLLECTION).document(userId)
                 .addSnapshotListener((doc, e) -> {
                     if (doc != null && doc.exists()) {
                         currentRole = doc.getString("role") != null

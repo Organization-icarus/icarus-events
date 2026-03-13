@@ -2,7 +2,6 @@ package com.icarus.events;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -19,6 +18,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.icarus.events.FirestoreCollections;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -80,7 +80,9 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_create_event);
         setupNavBar();
-        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        User user = UserSession.getInstance().getCurrentUser();
+        String userId = user.getId();
+
         db = FirebaseFirestore.getInstance();
         //Create EditText
         eventName = findViewById(R.id.OrganizerCreateEventEventTitle);
@@ -89,7 +91,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         //Create Spinner
         categoryNameList = findViewById(R.id.OrganizerCreateEventCategory);
         ArrayList<String> dbCategories = new ArrayList<>();
-        db.collection("event-categories")
+        db.collection(FirestoreCollections.EVENT_CATEGORIES_COLLECTION)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots ->{
                     dbCategories.add("Category");
@@ -186,20 +188,11 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             eventData.put("image", "IMAGE REFERENCE");
             eventData.put("location", location);
             eventData.put("geolocation",geolocationSwitch.isChecked());
-            eventData.put("organizer",deviceId );
+            eventData.put("organizer", userId);
 
             //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
-            db.collection("events").add(eventData)
-                    .addOnSuccessListener(documentReference  -> {
-                        //Creation of the subcollection entrants and add the organizer as status
-//                        Map<String, Object> entrantData = new HashMap<>();
-//                        entrantData.put("status", "organizer");
-//
-//                        documentReference
-//                                .collection("entrants")
-//                                .document(deviceId)
-//                                .set(entrantData);
-
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).add(eventData)
+                    .addOnSuccessListener(unused -> {
                         finish();
                     })
                     .addOnFailureListener(e -> {

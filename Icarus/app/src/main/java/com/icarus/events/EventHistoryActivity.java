@@ -70,7 +70,7 @@ public class EventHistoryActivity extends NavigationBarActivity {
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
-        eventsRef = db.collection("events");
+        eventsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION);
         user = UserSession.getInstance().getCurrentUser();
 
         // Set views
@@ -116,7 +116,7 @@ public class EventHistoryActivity extends NavigationBarActivity {
         // Generated from Claude AI on March 11, 2026
         // "I want to only get events that are in the current users event list"
         // Get the current user's eventIds first, then fetch only those events
-        db.collection("users").document(user.getId()).addSnapshotListener((userSnapshot, error) -> {
+        db.collection(FirestoreCollections.USERS_COLLECTION).document(user.getId()).addSnapshotListener((userSnapshot, error) -> {
             if (error != null) {
                 Log.e("Firestore", error.toString());
                 return;

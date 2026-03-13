@@ -73,7 +73,7 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
         eventId = getIntent().getStringExtra("eventId");
 
         db = FirebaseFirestore.getInstance();
-        entrantsRef = db.collection("events")
+        entrantsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(eventId)
                 .collection("entrants");
 

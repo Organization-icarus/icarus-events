@@ -1,6 +1,7 @@
 package com.icarus.events;
 
 import android.app.Activity;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -95,7 +96,7 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
                 return;
             }
             // First remove user from all event entrant subcollections
-            db.collection("events").get()
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).get()
                     .addOnSuccessListener(eventSnapshots -> {
                         for (QueryDocumentSnapshot eventSnapshot : eventSnapshots) {
                             eventSnapshot.getReference()
@@ -104,7 +105,7 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
                                     .delete();
                         }
                         // Then delete the user document itself
-                        db.collection("users").document(user.getId()).delete()
+                        db.collection(FirestoreCollections.USERS_COLLECTION).document(user.getId()).delete()
                                 .addOnSuccessListener(unused -> {
                                     Toast.makeText(context, "Profile deleted", Toast.LENGTH_SHORT).show();
                                     ((Activity) context).finish();

@@ -61,7 +61,7 @@ public class UserSettingsActivity extends NavigationBarActivity{
         // "I need to modify my query to also delete the user from the event collection entrant subcollection"
         deleteProfileButton.setOnClickListener(v -> {
             // First remove user from all event entrant subcollections
-            db.collection("events").get()
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).get()
                     .addOnSuccessListener(eventSnapshots -> {
                         for (QueryDocumentSnapshot eventSnapshot : eventSnapshots) {
                             eventSnapshot.getReference()
@@ -70,7 +70,7 @@ public class UserSettingsActivity extends NavigationBarActivity{
                                     .delete();
                         }
                         // Then delete the user document itself
-                        db.collection("users").document(deviceId).delete()
+                        db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).delete()
                                 .addOnSuccessListener(unused -> {
                                     Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
                                     UserSession.getInstance().clear();
@@ -86,7 +86,7 @@ public class UserSettingsActivity extends NavigationBarActivity{
 
 
         // Taken from Claude March 11th 2026, "What query can I use to load in current settings"
-        db.collection("users").document(deviceId).get()
+        db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
                 .addOnSuccessListener(snapshot -> {
                     if (snapshot.exists()) {
                         Map<String, Object> settings = (Map<String, Object>) snapshot.get("settings");
@@ -100,13 +100,13 @@ public class UserSettingsActivity extends NavigationBarActivity{
                     // Set listeners AFTER loading so setChecked doesn't trigger writes
                     // Taken from Claude March 11th 2026, "What queries can I use to update currently selected settings"
                     adminNotificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                        db.collection("users").document(deviceId)
+                        db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId)
                                 .update("settings.adminNotifications", isChecked)
                                 .addOnFailureListener(e ->
                                         Toast.makeText(this, "Failed to save setting", Toast.LENGTH_SHORT).show());
                     });
                     organizerNotificationsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                        db.collection("users").document(deviceId)
+                        db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId)
                                 .update("settings.organizerNotifications", isChecked)
                                 .addOnFailureListener(e ->
                                         Toast.makeText(this, "Failed to save setting", Toast.LENGTH_SHORT).show());

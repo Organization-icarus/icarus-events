@@ -61,8 +61,8 @@ public class AdministratorDashboardActivity extends NavigationBarActivity {
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
-        eventsRef = db.collection("events");
-        usersRef = db.collection("users");
+        eventsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION);
+        usersRef = db.collection(FirestoreCollections.USERS_COLLECTION);
 
         // Set views
         eventListView = findViewById(R.id.admin_dashboard_event_list);

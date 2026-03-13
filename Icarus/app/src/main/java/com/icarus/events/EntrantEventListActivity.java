@@ -70,7 +70,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
-        eventsRef = db.collection("events");
+        eventsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION);
 
         // Set views
         eventListView = findViewById(R.id.entrant_event_list_view);
@@ -82,7 +82,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
 
         // Retrieve current user role
         User currentUser = UserSession.getInstance().getCurrentUser();
-        String role = currentUser.getRole();
+        String role = (currentUser != null) ? currentUser.getRole() : "entrant";
 
         // Show/hide buttons based on users role
         if (role.equals("organizer")) {
