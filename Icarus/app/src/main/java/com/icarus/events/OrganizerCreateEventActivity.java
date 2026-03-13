@@ -89,7 +89,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         //Create Spinner
         categoryNameList = findViewById(R.id.OrganizerCreateEventCategory);
         ArrayList<String> dbCategories = new ArrayList<>();
-        db.collection("event-categories")
+        db.collection(FirestoreCollections.EVENT_CATEGORIES_COLLECTION)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots ->{
                     dbCategories.add("Category");
@@ -188,7 +188,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             eventData.put("geolocation",geolocationSwitch.isChecked());
 
             //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
-            db.collection("events").add(eventData)
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).add(eventData)
                     .addOnSuccessListener(unused -> {
                         finish();
                     })

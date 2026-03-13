@@ -24,16 +24,17 @@
         android:id="@+id/OrganizerCreateEventEventTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:hint="Event Name"
         android:inputType="textCapWords"
         android:textColor="@color/black"
         android:textSize="@dimen/font_heading_size"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventTitle"/>
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventTitle" />
 
     <EditText
         android:id="@+id/OrganizerCreateEventEventLocation"
