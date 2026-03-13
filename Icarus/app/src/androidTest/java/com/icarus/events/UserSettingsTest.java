@@ -65,7 +65,8 @@ public class UserSettingsTest {
                 .add(userMap)
                 .addOnSuccessListener(doc -> {
                     testUser = new User(doc.getId(), "Test Entrant", "testentrant@email.com",
-                            "1234567890", "entrant", new ArrayList<>(), new HashMap<>());
+                            "1234567890", "entrant", new ArrayList<>(),
+                            Map.of("adminNotifications", true, "organizerNotifications", true));
                     UserSession.getInstance().setCurrentUser(testUser);
                     latch.countDown();
                 });
@@ -73,6 +74,61 @@ public class UserSettingsTest {
         latch.await();
 
         scenario = ActivityScenario.launch(UserSettingsActivity.class);
+    }
+
+    /**
+     * Tests that an entrant can opt out of receiving notifications
+     * from admins and organizers.
+     * <p>
+     * The test toggles each notification switch and verifies
+     * that Firestore reflects the change.
+     * <p>
+     * User Story Tested:
+     *     US 01.04.03 – As an entrant, I want to opt out of receiving notifications from organizers and admins.
+     *
+     * @throws InterruptedException if the Firestore update wait is interrupted
+     */
+    @Test
+    public void testToggleNotifications() throws InterruptedException {
+        // Click admin notifications toggle
+        onView(withId(R.id.user_settings_admin_notifications_switch))
+                .perform(click());
+
+        // Wait for Firestore update
+        CountDownLatch adminLatch = new CountDownLatch(1);
+        final boolean[] adminNotifications = {true};
+
+        db.collection("users_test")
+                .document(testUser.getId())
+                .get()
+                .addOnSuccessListener(doc -> {
+                    Boolean value = doc.getBoolean("adminNotifications");
+                    adminNotifications[0] = value != null && value;
+                    adminLatch.countDown();
+                });
+
+        adminLatch.await();
+        assertFalse("Admin notifications were not turned off", adminNotifications[0]);
+
+        // Click organizer notifications toggle
+        onView(withId(R.id.user_settings_org_notifications_switch))
+                .perform(click());
+
+        // Wait for Firestore update
+        CountDownLatch organizerLatch = new CountDownLatch(1);
+        final boolean[] organizerNotifications = {true};
+
+        db.collection("users_test")
+                .document(testUser.getId())
+                .get()
+                .addOnSuccessListener(doc -> {
+                    Boolean value = doc.getBoolean("organizerNotifications");
+                    organizerNotifications[0] = value != null && value;
+                    organizerLatch.countDown();
+                });
+
+        organizerLatch.await();
+        assertFalse("Organizer notifications were not turned off", organizerNotifications[0]);
     }
 
     /**
