@@ -51,7 +51,7 @@ public class UserSettingsTest {
     @Before
     public void setupTestUser() throws InterruptedException {
 
-        FirestoreCollections.USERS_COLLECTION = "users_test";
+        FirestoreCollections.startTest();
 
         CountDownLatch latch = new CountDownLatch(1);
 
@@ -175,23 +175,7 @@ public class UserSettingsTest {
     @After
     public void cleanup() throws InterruptedException {
 
-        FirestoreCollections.USERS_COLLECTION = "users";
-
-        if (scenario != null) {
-            scenario.close();
-        }
-
-        CountDownLatch latch = new CountDownLatch(1);
-
-        db.collection("users_test")
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    for (DocumentSnapshot doc : snapshot) {
-                        doc.getReference().delete();
-                    }
-                    latch.countDown();
-                });
-
-        latch.await();
+        if (scenario != null) scenario.close();
+        FirestoreCollections.endTest();
     }
 }

@@ -54,7 +54,7 @@ public class UserRegistrationTest {
      */
     @Before
     public void setup() {
-        FirestoreCollections.USERS_COLLECTION = "users_test";
+        FirestoreCollections.startTest();
     }
 
     /**
@@ -117,7 +117,7 @@ public class UserRegistrationTest {
      * default production user collection.
      */
     @After
-    public void teardown() {
-        FirestoreCollections.USERS_COLLECTION = "users";
+    public void teardown() throws InterruptedException {
+        FirestoreCollections.endTest();
     }
 }

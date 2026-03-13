@@ -64,8 +64,7 @@ public class OrganizerViewEntrantsTest {
     @Before
     public void setup() throws InterruptedException {
         // Use test collection
-        FirestoreCollections.EVENTS_COLLECTION = "events_test";
-        FirestoreCollections.USERS_COLLECTION = "users_test";
+        FirestoreCollections.startTest();
 
         // Create a test event
         CountDownLatch eventLatch = new CountDownLatch(1);
@@ -212,16 +211,6 @@ public class OrganizerViewEntrantsTest {
      */
     @After
     public void cleanup() throws InterruptedException {
-        FirestoreCollections.USERS_COLLECTION = "users";
-        FirestoreCollections.EVENTS_COLLECTION = "events";
-
-        // Delete test event
-        CountDownLatch latch = new CountDownLatch(1);
-        db.collection(FirestoreCollections.EVENTS_COLLECTION)
-                .document(createdEventId)
-                .delete()
-                .addOnSuccessListener(v -> latch.countDown());
-
-        latch.await();
+        FirestoreCollections.endTest();
     }
 }

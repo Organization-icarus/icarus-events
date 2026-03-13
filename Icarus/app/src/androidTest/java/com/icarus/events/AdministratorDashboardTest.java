@@ -67,8 +67,7 @@ public class AdministratorDashboardTest {
     @Before
     public void setup() throws InterruptedException {
         // Set test collections
-        FirestoreCollections.EVENTS_COLLECTION = "events_test";
-        FirestoreCollections.USERS_COLLECTION = "users_test";
+        FirestoreCollections.startTest();
 
         // Create admin user
         adminUser = new User("admin1", "Admin User", null, null, null, null, null);
@@ -240,28 +239,7 @@ public class AdministratorDashboardTest {
      */
     @After
     public void cleanup() throws InterruptedException {
-        FirestoreCollections.USERS_COLLECTION = "users";
-        FirestoreCollections.EVENTS_COLLECTION = "events";
+        FirestoreCollections.endTest();
 
-        CountDownLatch latch = new CountDownLatch(2);
-        if (testUserId != null) {
-            db.collection(FirestoreCollections.USERS_COLLECTION)
-                    .document(testUserId)
-                    .delete()
-                    .addOnSuccessListener(v -> latch.countDown());
-        } else {
-            latch.countDown();
-        }
-
-        if (testEventId != null) {
-            db.collection(FirestoreCollections.EVENTS_COLLECTION)
-                    .document(testEventId)
-                    .delete()
-                    .addOnSuccessListener(v -> latch.countDown());
-        } else {
-            latch.countDown();
-        }
-
-        latch.await();
     }
 }

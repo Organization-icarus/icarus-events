@@ -73,8 +73,7 @@ public class EntrantWaitlistTest {
     @Before
     public void setupFirestoreData() throws InterruptedException {
 
-        FirestoreCollections.EVENTS_COLLECTION = "events_test";
-        FirestoreCollections.USERS_COLLECTION = "users_test";
+        FirestoreCollections.startTest();
 
         // insert organizer into the database
         CountDownLatch organizerLatch = new CountDownLatch(1);
@@ -198,7 +197,7 @@ public class EntrantWaitlistTest {
 
         latch.await(); // wait for Firestore to finish
 
-        assertFalse("User was not removed from the waitlist", stillExists[0]);
+        assertTrue("User was not added to the waitlist", stillExists[0]);
     }
 
     /**
@@ -267,26 +266,7 @@ public class EntrantWaitlistTest {
             scenario.close();
         }
 
-        FirestoreCollections.EVENTS_COLLECTION = "events";
-        FirestoreCollections.USERS_COLLECTION = "users";
+        FirestoreCollections.endTest();
 
-        CountDownLatch latch = new CountDownLatch(2);
-        db.collection("events_test")
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    for (DocumentSnapshot doc : snapshot) {
-                        doc.getReference().delete();
-                    }
-                    latch.countDown();
-                });
-        db.collection("users_test")
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    for (DocumentSnapshot doc : snapshot) {
-                        doc.getReference().delete();
-                    }
-                    latch.countDown();
-                });
-        latch.await();
     }
 }

@@ -27,8 +27,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -64,7 +66,18 @@ public class OrganizerCreateEventTest {
      */
     @Before
     public void setup() {
-        FirestoreCollections.EVENTS_COLLECTION = "events_test";
+        FirestoreCollections.startTest();
+
+        User testUser = new User(
+                "dummyOrganizerId",
+                "Test Organizer",
+                "organizer@example.com",
+                "1234567890",
+                "organizer",
+                new ArrayList<>(),
+                new HashMap<>()
+        );
+        UserSession.getInstance().setCurrentUser(testUser);
     }
 
     /**
@@ -382,19 +395,7 @@ public class OrganizerCreateEventTest {
     @After
     public void cleanup() throws InterruptedException {
 
-        FirestoreCollections.EVENTS_COLLECTION = "events";
-
         if (scenario != null) scenario.close();
-
-        if (createdEventId != null) {
-            CountDownLatch latch = new CountDownLatch(1);
-
-            db.collection("events_test")
-                    .document(createdEventId)
-                    .delete()
-                    .addOnSuccessListener(v -> latch.countDown());
-
-            latch.await();
-        }
+        FirestoreCollections.endTest();
     }
 }

@@ -56,7 +56,7 @@ public class UserProfileTest {
     @Before
     public void setupFirestoreData() throws InterruptedException {
 
-        FirestoreCollections.USERS_COLLECTION = "users_test";
+        FirestoreCollections.startTest();
 
         CountDownLatch latch = new CountDownLatch(1);
         Map<String, String> entrant = new HashMap<>();
@@ -148,19 +148,7 @@ public class UserProfileTest {
     @After
     public void cleanupFirestoreData() throws InterruptedException {
 
-        if (scenario != null) {
-            scenario.close();
-        }
-
-        CountDownLatch latch = new CountDownLatch(1);
-        db.collection("users_test")
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    for (DocumentSnapshot doc : snapshot) {
-                        doc.getReference().delete();
-                    }
-                    latch.countDown();
-                });
-        latch.await();
+        if (scenario != null) scenario.close();
+        FirestoreCollections.endTest();
     }
 }

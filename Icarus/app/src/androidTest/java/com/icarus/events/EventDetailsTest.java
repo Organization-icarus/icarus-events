@@ -71,8 +71,7 @@ public class EventDetailsTest {
     @Before
     public void setupTestData() throws InterruptedException {
 
-        FirestoreCollections.EVENTS_COLLECTION = "events_test";
-        FirestoreCollections.USERS_COLLECTION = "users_test";
+        FirestoreCollections.startTest();
 
         // create organizer
         CountDownLatch organizerLatch = new CountDownLatch(1);
@@ -388,25 +387,7 @@ public class EventDetailsTest {
     @After
     public void cleanup() throws InterruptedException {
 
-        FirestoreCollections.EVENTS_COLLECTION = "events";
-        FirestoreCollections.USERS_COLLECTION = "users";
-
         if (scenario != null) scenario.close();
-
-        CountDownLatch latch = new CountDownLatch(4);
-
-        db.collection("events_test").document(event1Id).delete()
-                .addOnSuccessListener(v -> latch.countDown());
-
-        db.collection("events_test").document(event2Id).delete()
-                .addOnSuccessListener(v -> latch.countDown());
-
-        db.collection("users_test").document(entrantId).delete()
-                .addOnSuccessListener(v -> latch.countDown());
-
-        db.collection("users_test").document(organizerId).delete()
-                .addOnSuccessListener(v -> latch.countDown());
-
-        latch.await();
+        FirestoreCollections.endTest();
     }
 }
