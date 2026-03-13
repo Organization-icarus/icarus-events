@@ -51,6 +51,16 @@ public class OrganizerViewEntrantsTest {
     private ActivityScenario<OrganizerViewEntrantsOnWaitingList> scenario;
     private String createdEventId;
 
+    /**
+     * Sets up Firestore test data before each test.
+     * <p>
+     * Overrides Firestore collections to test versions<, adds
+     * a sample event with ID {@code createdEventId}, adds entrants
+     * with different statuses ("selected", "rejected", "registered"),
+     * creates user documents to hold entrant names.
+     *
+     * @throws InterruptedException if Firestore operations are interrupted
+     */
     @Before
     public void setup() throws InterruptedException {
         // Use test collection
@@ -99,6 +109,19 @@ public class OrganizerViewEntrantsTest {
         eventLatch.await();
     }
 
+    /**
+     * Tests that the organizer can view all chosen entrants for the event.
+     * <p>
+     * Launches the {@link OrganizerViewEntrantsOnWaitingList} activity, clicks
+     * the "Chosen" filter button, and verifies that the ListView displays
+     * the entrant with status "selected".
+     * <p>
+     * User Story Tested:
+     *      US 02.06.01 As an organizer I want to view a list of all chosen
+     *      entrants who are invited to apply.
+     *
+     * @throws InterruptedException if Firestore reads or UI operations are interrupted
+     */
     @Test
     public void testViewChosenEntrants() throws InterruptedException {
         // Launch activity with test eventId
@@ -117,6 +140,18 @@ public class OrganizerViewEntrantsTest {
                 .check(matches(hasDescendant(withText("Entrant One"))));
     }
 
+    /**
+     * Tests that the organizer can view all cancelled entrants for the event.
+     * <p>
+     * Launches the {@link OrganizerViewEntrantsOnWaitingList} activity, clicks
+     * the "Cancelled" filter button, and verifies that the ListView displays
+     * the entrant with status "rejected".
+     * <p>
+     * User Story Tested:
+     *      US 02.06.02 As an organizer I want to see a list of all the cancelled entrants.
+     *
+     * @throws InterruptedException if Firestore reads or UI operations are interrupted
+     */
     @Test
     public void testViewCancelledEntrants() throws InterruptedException {
         // Launch activity with test eventId
@@ -135,6 +170,19 @@ public class OrganizerViewEntrantsTest {
                 .check(matches(hasDescendant(withText("Entrant Two"))));
     }
 
+    /**
+     * Tests that the organizer can view all confirmed entrants for the event.
+     * <p>
+     * Launches the {@link OrganizerViewEntrantsOnWaitingList} activity, clicks
+     * the "Final" filter button, and verifies that the ListView displays
+     * the entrant with status "registered".
+     * <p>
+     * User Story Tested:
+     *      US 02.06.03 As an organizer I want to see a final list of entrants
+     *      who enrolled for the event.
+     *
+     * @throws InterruptedException if Firestore reads or UI operations are interrupted
+     */
     @Test
     public void testViewRegisteredEntrants() throws InterruptedException {
         // Launch activity with test eventId
@@ -153,6 +201,15 @@ public class OrganizerViewEntrantsTest {
                 .check(matches(hasDescendant(withText("Entrant Three"))));
     }
 
+    /**
+     * Tests that the organizer can view all cancelled entrants for the event.
+     * <p>
+     * Launches the {@link OrganizerViewEntrantsOnWaitingList} activity, clicks
+     * the "Cancelled" filter button, and verifies that the ListView displays
+     * the entrant with status "rejected".
+     *
+     * @throws InterruptedException if Firestore reads or UI operations are interrupted
+     */
     @After
     public void cleanup() throws InterruptedException {
         FirestoreCollections.USERS_COLLECTION = "users";
