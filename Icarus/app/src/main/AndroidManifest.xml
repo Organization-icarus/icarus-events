@@ -37,9 +37,9 @@
 
         <activity android:name=".EventDetailsActivity" />
 
-        <activity android:name=".OrganizerViewEntrantsOnWaitingList"/>
+        <activity android:name=".OrganizerViewEntrantsOnWaitingListActivity"/>
 
-        <activity android:name=".OrganizerManageEvent"/>
+        <activity android:name=".OrganizerManageEventActivity"/>
 
         <activity android:name=".SampleAttendeesActivity"/>
 
