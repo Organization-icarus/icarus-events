@@ -43,7 +43,7 @@ dependencies {
     /*implementation line from given from Claude AI, March 13, 2026 "How can I find the local
     * android.jar file across any operating system"
     * */
-    implementation(files("${android.sdkDirectory}/platforms/android-${android.compileSdk}/android.jar"))
+    //implementation(files("${android.sdkDirectory}/platforms/android-${android.compileSdk}/android.jar"))
     implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
