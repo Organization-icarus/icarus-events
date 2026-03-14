@@ -40,8 +40,30 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(platform("com.google.firebase:firebase-bom:34.9.0"))
+    /*implementation line from given from Claude AI, March 13, 2026 "How can I find the local
+    * android.jar file across any operating system"
+    * */
+    //implementation(files("${android.sdkDirectory}/platforms/android-${android.compileSdk}/android.jar"))
     implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+}
+
+tasks.register<Javadoc>("javadoc") {
+    source = android.sourceSets["main"].java.getSourceFiles()
+    classpath += files(android.bootClasspath.joinToString(File.pathSeparator))
+
+    android.applicationVariants.configureEach {
+        if (name == "debug") {
+            classpath += javaCompileProvider.get().classpath
+        }
+    }
+
+    destinationDir = file("${projectDir}/docs/javadoc")
+    isFailOnError = false
+
+    (options as StandardJavadocDocletOptions).apply {
+        addStringOption("Xdoclint:none", "-quiet")
+    }
 }

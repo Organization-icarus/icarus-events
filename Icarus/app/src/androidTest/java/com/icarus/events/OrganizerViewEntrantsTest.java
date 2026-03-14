@@ -54,7 +54,7 @@ public class OrganizerViewEntrantsTest {
     /**
      * Sets up Firestore test data before each test.
      * <p>
-     * Overrides Firestore collections to test versions<, adds
+     * Overrides Firestore collections to test versions, adds
      * a sample event with ID {@code createdEventId}, adds entrants
      * with different statuses ("selected", "rejected", "registered"),
      * creates user documents to hold entrant names.

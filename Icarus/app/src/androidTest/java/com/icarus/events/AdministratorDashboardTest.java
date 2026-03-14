@@ -109,7 +109,7 @@ public class AdministratorDashboardTest {
      * <p>
      * Launches the dashboard activity, switches to the event list view,
      * verifies that the test event is visible in the ListView, deletes
-     * the event using its remove button<, and verifies the event has
+     * the event using its remove button, and verifies the event has
      * been removed from Firestore.
      * <p>
      * User Stories Tested:
@@ -164,7 +164,7 @@ public class AdministratorDashboardTest {
      * <p>
      * Launches the dashboard activity, switches to the user list view,
      * verifies that the test user is visible in the ListView, deletes
-     * the user using its remove button<, and verifies the user has
+     * the user using its remove button, and verifies the user has
      * been removed from Firestore.
      * <p>
      * User Stories Tested:
