@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Instrumented UI tests for {@link OrganizerViewEntrantsOnWaitingList}.
+ * Instrumented UI tests for {@link OrganizerViewEntrantsOnWaitingListActivity}.
  * <p>
  * User Stories Tested:
  *      US 02.06.01 As an organizer I want to view a list of all chosen entrants.
@@ -48,7 +48,7 @@ import java.util.concurrent.CountDownLatch;
 public class OrganizerViewEntrantsTest {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ActivityScenario<OrganizerViewEntrantsOnWaitingList> scenario;
+    private ActivityScenario<OrganizerViewEntrantsOnWaitingListActivity> scenario;
     private String createdEventId;
 
     /**
@@ -111,7 +111,7 @@ public class OrganizerViewEntrantsTest {
     /**
      * Tests that the organizer can view all chosen entrants for the event.
      * <p>
-     * Launches the {@link OrganizerViewEntrantsOnWaitingList} activity, clicks
+     * Launches the {@link OrganizerViewEntrantsOnWaitingListActivity} activity, clicks
      * the "Chosen" filter button, and verifies that the ListView displays
      * the entrant with status "selected".
      * <p>
@@ -126,7 +126,7 @@ public class OrganizerViewEntrantsTest {
         // Launch activity with test eventId
         Intent intent = new Intent(
                 ApplicationProvider.getApplicationContext(),
-                OrganizerViewEntrantsOnWaitingList.class
+                OrganizerViewEntrantsOnWaitingListActivity.class
         );
         intent.putExtra("eventId", createdEventId);
         scenario = ActivityScenario.launch(intent);
@@ -134,6 +134,7 @@ public class OrganizerViewEntrantsTest {
         // Click "Chosen" filter button
         onView(withId(R.id.OrganizerEntrantOnWaitingListFilterBar_chosen)).perform(click());
 
+        Thread.sleep(2000);
         // Verify that "Entrant One" (chosen) appears in the ListView
         onView(withId(R.id.OrganizerEntrantOnWaitingList))
                 .check(matches(hasDescendant(withText("Entrant One"))));
@@ -142,7 +143,7 @@ public class OrganizerViewEntrantsTest {
     /**
      * Tests that the organizer can view all cancelled entrants for the event.
      * <p>
-     * Launches the {@link OrganizerViewEntrantsOnWaitingList} activity, clicks
+     * Launches the {@link OrganizerViewEntrantsOnWaitingListActivity} activity, clicks
      * the "Cancelled" filter button, and verifies that the ListView displays
      * the entrant with status "rejected".
      * <p>
@@ -156,7 +157,7 @@ public class OrganizerViewEntrantsTest {
         // Launch activity with test eventId
         Intent intent = new Intent(
                 ApplicationProvider.getApplicationContext(),
-                OrganizerViewEntrantsOnWaitingList.class
+                OrganizerViewEntrantsOnWaitingListActivity.class
         );
         intent.putExtra("eventId", createdEventId);
         scenario = ActivityScenario.launch(intent);
@@ -164,6 +165,7 @@ public class OrganizerViewEntrantsTest {
         // Click "Chosen" filter button
         onView(withId(R.id.OrganizerEntrantOnWaitingListFilterBar_cancelled)).perform(click());
 
+        Thread.sleep(2000);
         // Verify that "Entrant One" (chosen) appears in the ListView
         onView(withId(R.id.OrganizerEntrantOnWaitingList))
                 .check(matches(hasDescendant(withText("Entrant Two"))));
@@ -172,7 +174,7 @@ public class OrganizerViewEntrantsTest {
     /**
      * Tests that the organizer can view all confirmed entrants for the event.
      * <p>
-     * Launches the {@link OrganizerViewEntrantsOnWaitingList} activity, clicks
+     * Launches the {@link OrganizerViewEntrantsOnWaitingListActivity} activity, clicks
      * the "Final" filter button, and verifies that the ListView displays
      * the entrant with status "registered".
      * <p>
@@ -187,7 +189,7 @@ public class OrganizerViewEntrantsTest {
         // Launch activity with test eventId
         Intent intent = new Intent(
                 ApplicationProvider.getApplicationContext(),
-                OrganizerViewEntrantsOnWaitingList.class
+                OrganizerViewEntrantsOnWaitingListActivity.class
         );
         intent.putExtra("eventId", createdEventId);
         scenario = ActivityScenario.launch(intent);
@@ -195,6 +197,7 @@ public class OrganizerViewEntrantsTest {
         // Click "Chosen" filter button
         onView(withId(R.id.OrganizerEntrantOnWaitingListFilterBar_final)).perform(click());
 
+        Thread.sleep(2000);
         // Verify that "Entrant One" (chosen) appears in the ListView
         onView(withId(R.id.OrganizerEntrantOnWaitingList))
                 .check(matches(hasDescendant(withText("Entrant Three"))));
@@ -203,7 +206,7 @@ public class OrganizerViewEntrantsTest {
     /**
      * Tests that the organizer can view all cancelled entrants for the event.
      * <p>
-     * Launches the {@link OrganizerViewEntrantsOnWaitingList} activity, clicks
+     * Launches the {@link OrganizerViewEntrantsOnWaitingListActivity} activity, clicks
      * the "Cancelled" filter button, and verifies that the ListView displays
      * the entrant with status "rejected".
      *

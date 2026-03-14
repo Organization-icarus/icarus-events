@@ -85,13 +85,13 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         String role = (currentUser != null) ? currentUser.getRole() : "entrant";
 
         // Show/hide buttons based on users role
-        if (role.equals("organizer")) {
+        if ("organizer".equals(role)) {
             addEvent.setVisibility(VISIBLE);
         } else {
             addEvent.setVisibility(GONE);
         }
 
-        if (role.equals("administrator")) {
+        if ("administrator".equals(role)) {
             adminDashboard.setVisibility(VISIBLE);
         } else {
             adminDashboard.setVisibility(GONE);
