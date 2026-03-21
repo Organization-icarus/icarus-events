@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.squareup.picasso.Picasso;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -29,7 +31,7 @@ import java.util.Map;
 public class EventDetailsActivity extends NavigationBarActivity {
     private Button organizerBtn, manageBtn, notificationBtn, deleteBtn;
     private Button joinBtn, leaveBtn, declineBtn, registerBtn;
-
+    private ImageView posterView;
     private String currentRole;
     private String currentStatus;
     private int currentWaitingCount;
@@ -76,6 +78,25 @@ public class EventDetailsActivity extends NavigationBarActivity {
         declineBtn = findViewById(R.id.decline_button);
         registerBtn = findViewById(R.id.register_button);
 
+        //---------------------------
+        // SET UP POSTER
+        //---------------------------
+        posterView = findViewById(R.id.eventPoster);
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .document(finalEventId).get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot.exists()) {
+                        if (snapshot.getString("image") != null) {
+                            Picasso.get()
+                                    .load(snapshot.getString("image"))
+                                    .error(R.drawable.poster)           // Optional: shows if link fails
+                                    .into(posterView);
+                        }
+                    }
+                })
+                .addOnFailureListener( e -> {
+                    Toast.makeText(this, "Failed to load poster", Toast.LENGTH_SHORT).show();
+                });
 
         //---------------------------
         // SET CLICK LISTENERS

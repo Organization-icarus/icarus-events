@@ -9,8 +9,13 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -63,6 +68,8 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
     private EditText eventName;
     private EditText locationName;
     private Spinner categoryNameList;
+    private ActivityResultLauncher<String> imagePickerLauncher;
+    private String posterURL;
 
     /**
      * Initializes the event creation interface.
@@ -113,6 +120,34 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load categories: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+        //Create Image Picker Launcher
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(), uri -> {
+                    if (uri != null) {
+                        MediaManager.get().upload(uri)
+                                .option("upload_preset", "ml_default")
+                                .callback(new UploadCallback() {
+                                    @Override
+                                    public void onSuccess(String requestId, Map resultData) {
+                                        posterURL = (String) resultData.get("secure_url");
+                                    }
+
+                                    @Override
+                                    public void onError(String requestId, ErrorInfo error) {
+                                        posterURL = "";
+                                        Toast.makeText(OrganizerCreateEventActivity.this,
+                                                "Failed to Upload Image.", Toast.LENGTH_SHORT).show();
+                                        Log.e("UPLOAD_ERROR", error.getDescription());
+                                    }
+
+                                    @Override public void onStart(String requestId) {}
+                                    @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
+                                    @Override public void onReschedule(String requestId, ErrorInfo error) {}
+                                })
+                                .dispatch();
+                    }
+                }
+        );
         //Create Switch
         geolocationSwitch = findViewById(R.id.OrganizerCreateEventGeolocationSwitch);
         //Create Buttons
@@ -122,11 +157,9 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         RegistrationPeriodEndButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEnd);
         CreateEvent = findViewById(R.id.OrganizerCreateEventCreateEvent);
 
-
         UploadPosterButton.setOnClickListener(v -> {
-            //This needs to allow for upload of a image
-            //Currently don't worry about images
-
+            //Upload event poster
+            imagePickerLauncher.launch("image/*");
         });
         RegistrationPeriodStartButton.setOnClickListener(v -> {
             // Set Registration start date
@@ -185,7 +218,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             eventData.put("open", startDate);
             eventData.put("close", endDate);
             eventData.put("date", eventDate);
-            eventData.put("image", "IMAGE REFERENCE");
+            eventData.put("image", posterURL);
             eventData.put("location", location);
             eventData.put("geolocation",geolocationSwitch.isChecked());
             eventData.put("organizer", userId);

@@ -108,7 +108,6 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
                         db.collection(FirestoreCollections.USERS_COLLECTION).document(user.getId()).delete()
                                 .addOnSuccessListener(unused -> {
                                     Toast.makeText(context, "Profile deleted", Toast.LENGTH_SHORT).show();
-                                    ((Activity) context).finish();
                                 })
                                 .addOnFailureListener(e ->
                                         Toast.makeText(context, "Failed to delete profile", Toast.LENGTH_SHORT).show());
