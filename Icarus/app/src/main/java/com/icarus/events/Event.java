@@ -11,7 +11,6 @@ import java.util.Date;
  * @author Benjamin Hall
  */
 public class Event {
-    // TODO: somehow store event poster?
     private String id;
     private String name;
     private String category;

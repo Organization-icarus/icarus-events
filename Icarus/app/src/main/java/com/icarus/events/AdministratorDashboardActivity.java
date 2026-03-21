@@ -38,10 +38,13 @@ public class AdministratorDashboardActivity extends NavigationBarActivity {
     private FirebaseFirestore db;
     private CollectionReference eventsRef;
     private CollectionReference usersRef;
+    private CollectionReference imagesRef;
     private ArrayList<Event> eventArrayList;
     private ArrayAdapter<Event> eventArrayAdapter;
     private ArrayList<User> userArrayList;
     private ArrayAdapter<User> userArrayAdapter;
+    private ArrayList<Image> imageArrayList;
+    private ArrayAdapter<Image> imageArrayAdapter;
 
     /**
      * Initializes the administrator dashboard activity.
@@ -63,6 +66,7 @@ public class AdministratorDashboardActivity extends NavigationBarActivity {
         db = FirebaseFirestore.getInstance();
         eventsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION);
         usersRef = db.collection(FirestoreCollections.USERS_COLLECTION);
+        imagesRef = db.collection(FirestoreCollections.IMAGES_COLLECTION);
 
         // Set views
         eventListView = findViewById(R.id.admin_dashboard_event_list);
@@ -81,19 +85,21 @@ public class AdministratorDashboardActivity extends NavigationBarActivity {
         userListView.setVisibility(GONE);
         imageListView.setVisibility(GONE);
 
-        // create event & user array
+        // create event, user, and image array
         eventArrayList = new ArrayList<>();
         eventArrayAdapter = new AdministratorDashboardEventArrayAdapter(this,
                 eventArrayList);
         userArrayList = new ArrayList<>();
         userArrayAdapter = new AdministratorDashboardUserArrayAdapter(this, userArrayList);
+        imageArrayList = new ArrayList<>();
+        imageArrayAdapter = new AdministratorDashboardImageArrayAdapter(this, imageArrayList);
 
         // Get all items in the collection
         eventsRef.addSnapshotListener((value,error) -> {
             if (error != null){
                 Log.e("Firestore", error.toString());
             }
-            if (value != null && !value.isEmpty()) {
+            if (value != null) {
                 eventArrayList.clear();
                 for (QueryDocumentSnapshot snapshot : value) {
                     String id = snapshot.getId();
@@ -111,7 +117,7 @@ public class AdministratorDashboardActivity extends NavigationBarActivity {
             if (error != null){
                 Log.e("Firestore", error.toString());
             }
-            if (value != null && !value.isEmpty()) {
+            if (value != null) {
                 userArrayList.clear();
                 for (QueryDocumentSnapshot snapshot : value) {
                     String id = snapshot.getId();
@@ -123,9 +129,26 @@ public class AdministratorDashboardActivity extends NavigationBarActivity {
             }
         });
 
+        imagesRef.addSnapshotListener((value, error) -> {
+            if (error != null) {
+                Log.e("Firestore", error.toString());
+            }
+            if (value != null) {
+                imageArrayList.clear();
+                for (QueryDocumentSnapshot snapshot : value) {
+                    String URL = snapshot.getString("URL");
+                    String publicId = snapshot.getId();
+
+                    imageArrayList.add(new Image(URL, publicId));
+                }
+                imageArrayAdapter.notifyDataSetChanged();
+            }
+        });
+
         // Set ListView adapters
         eventListView.setAdapter(eventArrayAdapter);
         userListView.setAdapter(userArrayAdapter);
+        imageListView.setAdapter(imageArrayAdapter);
 
         // Setup buttons on click listeners
         showEventListButton.setOnClickListener(v -> {
