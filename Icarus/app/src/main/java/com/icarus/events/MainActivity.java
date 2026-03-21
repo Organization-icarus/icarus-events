@@ -14,9 +14,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import android.provider.Settings;
 
+import com.cloudinary.android.MediaManager;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -43,6 +45,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+
+        // Setup MediaManager for Cloudinary image storage (ONLY DO ONCE)
+        Map config = new HashMap();
+        config.put("cloud_name", "icarus-images");
+        config.put("api_key", "291231889216385");
+        config.put("api_secret", "ToWWi626oI0M7Ou1pmPQx_vd5x8");
+        MediaManager.init(this, config);
+
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());

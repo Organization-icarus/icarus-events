@@ -45,6 +45,8 @@ dependencies {
     * */
     //implementation(files("${android.sdkDirectory}/platforms/android-${android.compileSdk}/android.jar"))
     implementation(libs.firebase.firestore)
+    implementation("com.cloudinary:cloudinary-android:2.2.0") // For Storing Images
+    implementation("com.squareup.picasso:picasso:2.71828") // For Displaying Images via URL
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
