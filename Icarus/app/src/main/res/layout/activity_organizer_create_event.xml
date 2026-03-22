@@ -20,170 +20,463 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <EditText
-        android:id="@+id/OrganizerCreateEventEventTitle"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
-        android:hint="Event Name"
-        android:inputType="textCapWords"
-        android:textColor="@color/black"
-        android:textSize="@dimen/font_heading_size"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventTitle"
+        app:layout_constraintBottom_toTopOf="@+id/nav_bar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventTitle" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <EditText
-        android:id="@+id/OrganizerCreateEventEventLocation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:hint="Event Location"
-        android:inputType="textCapWords"
-        android:textColor="@color/black"
-        android:textSize="@dimen/font_heading_size"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventEventTitle"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/OrganizerCreateEventUploadPosterButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:backgroundTint="@color/primary_container"
-        android:drawablePadding="8dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:text="Upload Event Image"
-        android:textSize="@dimen/font_text_size"
-        android:textColor="@color/primary_container_highlighted"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/OrganizerCreateEventGeolocationSwitch"
-        app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventEventLocation"
-        app:layout_constraintHorizontal_chainStyle="packed"/>
+            <!-- CARD 1: Event Image -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/OrganizerCreateEventImageCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="@color/primary_container"
+                app:strokeWidth="2dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/OrganizerCreateEventGeolocationSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:text="Geolocation"
-        android:textSize="@dimen/font_subheading_size"
-        app:layout_constraintStart_toEndOf="@+id/OrganizerCreateEventUploadPosterButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/OrganizerCreateEventUploadPosterButton"
-        app:layout_constraintBottom_toBottomOf="@+id/OrganizerCreateEventUploadPosterButton"/>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp">
 
-    <EditText
-        android:id="@+id/OrganizerCreateEventLimitWaitingListLimit"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:hint="Enter Number of Participants"
-        android:inputType="numberDecimal"
-        android:textColor="@color/black"
-        android:textSize="@dimen/font_heading_size"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventUploadPosterButton"/>
+                    <ImageView
+                        android:id="@+id/OrganizerCreateEventImage"
+                        android:layout_width="180dp"
+                        android:layout_height="180dp"
+                        android:src="@drawable/poster"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
 
-    <Spinner
-        android:id="@+id/OrganizerCreateEventCategory"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:padding="12dp"
-        android:backgroundTint="@color/primary_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/OrganizerCreateEventLimitWaitingListLimit"/>
+                    <Button
+                        android:id="@+id/OrganizerCreateEventUploadPosterButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:backgroundTint="@color/primary_container"
+                        android:text="Upload Event Image"
+                        android:textSize="@dimen/font_text_size"
+                        android:textColor="@color/primary_container_highlighted"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventImage"/>
 
-    <TextView
-        android:id="@+id/OrganizerCreateEventShowRegPeriodStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Registration Start:"
-        android:textSize="@dimen/font_subheading_size"
-        app:layout_constraintBottom_toTopOf="@id/OrganizerCreateEventRegistrationPeriodStart"
-        app:layout_constraintStart_toStartOf="@id/OrganizerCreateEventRegistrationPeriodStart"
-        app:layout_constraintEnd_toEndOf="@id/OrganizerCreateEventRegistrationPeriodStart"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:id="@+id/OrganizerCreateEventRegistrationPeriodStart"
-        android:layout_width="160dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginStart="16dp"
-        android:text="Registration Period Start"
-        android:textSize="@dimen/font_text_size"
-        android:backgroundTint="@color/primary_container"
-        android:textColor="@color/primary_container_highlighted"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/OrganizerCreateEventRegistrationPeriodEnd"
-        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventCategory" />
+            </com.google.android.material.card.MaterialCardView>
 
-    <TextView
-        android:id="@+id/OrganizerCreateEventShowRegPeriodEnd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Registration End:"
-        android:textSize="@dimen/font_subheading_size"
-        app:layout_constraintBottom_toTopOf="@id/OrganizerCreateEventRegistrationPeriodEnd"
-        app:layout_constraintStart_toStartOf="@id/OrganizerCreateEventRegistrationPeriodEnd"
-        app:layout_constraintEnd_toEndOf="@id/OrganizerCreateEventRegistrationPeriodEnd"/>
+            <!-- CARD 2: Event Details (Name + Description) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/OrganizerCreateEventDetailsCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="12dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="@color/primary_container"
+                app:strokeWidth="2dp"
+                app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventImageCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
-    <Button
-        android:id="@+id/OrganizerCreateEventRegistrationPeriodEnd"
-        android:layout_width="160dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="16dp"
-        android:text="Registration Period End"
-        android:textSize="@dimen/font_text_size"
-        android:backgroundTint="@color/primary_container"
-        android:textColor="@color/primary_container_highlighted"
-        app:layout_constraintStart_toEndOf="@id/OrganizerCreateEventRegistrationPeriodStart"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventCategory"/>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp">
 
+                    <TextView
+                        android:id="@+id/OrganizerCreateEventDetailsLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Event Details"
+                        android:textSize="@dimen/font_subheading_size"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
 
+                    <EditText
+                        android:id="@+id/OrganizerCreateEventEventTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="Event Name"
+                        android:inputType="textCapWords"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/font_heading_size"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventDetailsLabel"/>
 
-    <Button
-        android:id="@+id/OrganizerCreateEventDate"
-        android:layout_width="160dp"
-        android:layout_height="56dp"
-        android:layout_marginTop="24dp"
-        android:text="Event Date"
-        android:textSize="@dimen/font_text_size"
-        android:backgroundTint="@color/primary_container"
-        android:textColor="@color/primary_container_highlighted"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventRegistrationPeriodEnd"/>
+                    <EditText
+                        android:id="@+id/OrganizerCreateEventDescription"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Event Description"
+                        android:inputType="textMultiLine"
+                        android:minLines="4"
+                        android:gravity="top"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventEventTitle"/>
 
-    <Button
-        android:id="@+id/OrganizerCreateEventCreateEvent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Create Event"
-        android:textSize="@dimen/font_text_size"
-        android:backgroundTint="@color/primary_container"
-        android:textColor="@color/primary_container_highlighted"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventDate"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- CARD 3: Location + Geolocation -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/OrganizerCreateEventLocationCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="12dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="@color/primary_container"
+                app:strokeWidth="2dp"
+                app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventDetailsCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/OrganizerCreateEventLocationLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Location"
+                        android:textSize="@dimen/font_subheading_size"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <EditText
+                        android:id="@+id/OrganizerCreateEventEventLocation"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:hint="Event Location"
+                        android:inputType="textCapWords"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/font_heading_size"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/OrganizerCreateEventGeolocationSwitch"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventLocationLabel"/>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/OrganizerCreateEventGeolocationSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Geolocation"
+                        android:textSize="@dimen/font_subheading_size"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/OrganizerCreateEventEventLocation"
+                        app:layout_constraintBottom_toBottomOf="@id/OrganizerCreateEventEventLocation"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- CARD 4: Participants + Category -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/OrganizerCreateEventSettingsCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="12dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="@color/primary_container"
+                app:strokeWidth="2dp"
+                app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventLocationCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/OrganizerCreateEventSettingsLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Event Settings"
+                        android:textSize="@dimen/font_subheading_size"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <EditText
+                        android:id="@+id/OrganizerCreateEventLimitWaitingListLimit"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:hint="Enter Number of Participants"
+                        android:inputType="numberDecimal"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/font_heading_size"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventSettingsLabel"/>
+
+                    <Spinner
+                        android:id="@+id/OrganizerCreateEventCategory"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:padding="12dp"
+                        android:backgroundTint="@color/primary_container"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventLimitWaitingListLimit"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- BOX 1: Registration Start -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/OrganizerCreateEventRegStartCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="@color/primary_container"
+                app:strokeWidth="2dp"
+                app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventSettingsCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/OrganizerCreateEventShowRegPeriodStart"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Registration Start Date and Time"
+                        android:textSize="@dimen/font_subheading_size"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <Button
+                        android:id="@+id/OrganizerCreateEventRegistrationPeriodStartDate"
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="4dp"
+                        android:text="Set Date"
+                        android:textSize="@dimen/font_text_size"
+                        android:backgroundTint="@color/primary_container"
+                        android:textColor="@color/primary_container_highlighted"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventShowRegPeriodStart"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/OrganizerCreateEventRegistrationPeriodStartTime"/>
+
+                    <Button
+                        android:id="@+id/OrganizerCreateEventRegistrationPeriodStartTime"
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="4dp"
+                        android:text="Set Time"
+                        android:textSize="@dimen/font_text_size"
+                        android:backgroundTint="@color/primary_container"
+                        android:textColor="@color/primary_container_highlighted"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventShowRegPeriodStart"
+                        app:layout_constraintStart_toEndOf="@id/OrganizerCreateEventRegistrationPeriodStartDate"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- BOX 2: Registration End -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/OrganizerCreateEventRegEndCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="0dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="@color/primary_container"
+                app:strokeWidth="2dp"
+                app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventRegStartCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/OrganizerCreateEventShowRegPeriodEnd"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Registration End Date and Time"
+                        android:textSize="@dimen/font_subheading_size"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <Button
+                        android:id="@+id/OrganizerCreateEventRegistrationPeriodEndDate"
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="4dp"
+                        android:text="Set Date"
+                        android:textSize="@dimen/font_text_size"
+                        android:backgroundTint="@color/primary_container"
+                        android:textColor="@color/primary_container_highlighted"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventShowRegPeriodEnd"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/OrganizerCreateEventRegistrationPeriodEndTime"/>
+
+                    <Button
+                        android:id="@+id/OrganizerCreateEventRegistrationPeriodEndTime"
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="4dp"
+                        android:text="Set Time"
+                        android:textSize="@dimen/font_text_size"
+                        android:backgroundTint="@color/primary_container"
+                        android:textColor="@color/primary_container_highlighted"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventShowRegPeriodEnd"
+                        app:layout_constraintStart_toEndOf="@id/OrganizerCreateEventRegistrationPeriodEndDate"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- BOX 3: Event Date -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/OrganizerCreateEventDateCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="0dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="8dp"
+                app:strokeColor="@color/primary_container"
+                app:strokeWidth="2dp"
+                app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventRegEndCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/OrganizerCreateEventShowEventDateTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Event Date and Time"
+                        android:textSize="@dimen/font_subheading_size"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <Button
+                        android:id="@+id/OrganizerCreateEventDate"
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="4dp"
+                        android:text="Set Date"
+                        android:textSize="@dimen/font_text_size"
+                        android:backgroundTint="@color/primary_container"
+                        android:textColor="@color/primary_container_highlighted"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventShowEventDateTitle"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/OrganizerCreateEventTime"/>
+
+                    <Button
+                        android:id="@+id/OrganizerCreateEventTime"
+                        android:layout_width="170dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="4dp"
+                        android:text="Set Time"
+                        android:textSize="@dimen/font_text_size"
+                        android:backgroundTint="@color/primary_container"
+                        android:textColor="@color/primary_container_highlighted"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventShowEventDateTitle"
+                        app:layout_constraintStart_toEndOf="@id/OrganizerCreateEventDate"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <Button
+                android:id="@+id/OrganizerCreateEventCreateEvent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:text="Create Event"
+                android:textSize="@dimen/font_text_size"
+                android:backgroundTint="@color/primary_container"
+                android:textColor="@color/primary_container_highlighted"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventDateCard"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 
     <include
         android:id="@+id/nav_bar"
