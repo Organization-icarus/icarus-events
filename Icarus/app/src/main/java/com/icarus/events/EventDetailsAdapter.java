@@ -8,8 +8,12 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.sql.Array;
 import java.util.ArrayList;
@@ -25,15 +29,16 @@ import java.util.Locale;
  *
  * @author Bradley Bravender
  */
-public class EventDetailsAdapter extends ArrayAdapter<EventField> {
+public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapter.ViewHolder> {
 
     // To convert an XML layout into a View
     private final LayoutInflater inflater;
+    private final List<EventField> fields;
 
     public EventDetailsAdapter(@NonNull Context context, Event event) {
-        super(context, 0, new ArrayList<>());
 
         this.inflater = LayoutInflater.from(context);
+        this.fields = new ArrayList<>();
 
         // Convert Dates to Strings
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd 'at' HH:mm", Locale.getDefault());
@@ -43,38 +48,65 @@ public class EventDetailsAdapter extends ArrayAdapter<EventField> {
         String regOpen = regOpenDate != null ? sdf.format(regOpenDate) : "TBD";
         String regClose = regCloseDate != null ? sdf.format(regCloseDate) : "TBD";
         String date = eventDate != null ? sdf.format(eventDate) : "TBD";
+        String capacity = event.getCapacity() == null || event.getCapacity() < 1
+                ? "Unlimited"
+                : String.valueOf(event.getCapacity().intValue());
 
         // Convert Event fields into EventField list
-        add(new EventField("Name", event.getName()));
-        add(new EventField("Category", event.getCategory()));
-        add(new EventField("Capacity", event.getCapacity() < 1 ? "Unlimited" : String.valueOf(event.getCapacity().intValue())));
-        add(new EventField("Reg. Opens", regOpen));
-        add(new EventField("Reg. Closes", regClose));
-        add(new EventField("Date", date));
-        add(new EventField("Location", event.getLocation()));
-        add(new EventField("Image", event.getImage()));
-        add(new EventField("Organizer", event.getOrganizer()));
-        add(new EventField("User Status", event.getUser_status()));
-        add(new EventField("Waiting List Size", String.valueOf(event.getWaiting_list_size())));
+        fields.add(new EventField("Category", event.getCategory()));
+        fields.add(new EventField("Waiting List Capacity", String.valueOf(event.getWaiting_list_size()) + "/" + capacity));
+        fields.add(new EventField("Registration Opens", regOpen));
+        fields.add(new EventField("Registration Closes", regClose));
+        fields.add(new EventField("Event Date", date));
+        fields.add(new EventField("Location", event.getLocation()));
+        fields.add(new EventField("Organizer", event.getOrganizer()));
+        fields.add(new EventField("User Status", event.getUser_status()));
+
+        // To get the organizer's name from their ID
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(event.getOrganizer())
+                .get()
+                .addOnSuccessListener(doc -> {
+                    int organizerIndex = -1;
+                    // Iterate through the fields array until we find the Organizer field
+                    for (int i = 0; i < fields.size(); i++) {
+                        if (fields.get(i).getName().equals("Organizer")) {
+                            organizerIndex = i;
+                            break;
+                        }
+                    }
+                    if (organizerIndex != -1) {
+                        fields.set(organizerIndex, new EventField("Organizer", doc.getString("name")));
+                        notifyItemChanged(organizerIndex);
+                    }
+                });
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView nameView, valueView;
+        public ViewHolder(View view) {
+            super(view);
+            nameView = view.findViewById(R.id.field_name);
+            valueView = view.findViewById(R.id.field_value);
+        }
     }
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.event_details_list_content, parent, false);
-        }
-
-        EventField field = getItem(position);
-
-        TextView nameView = convertView.findViewById(R.id.field_name);
-        TextView valueView = convertView.findViewById(R.id.field_value);
-
-        if (field != null) {
-            nameView.setText(field.getName());
-            valueView.setText(field.getValue());
-        }
-
-        return convertView;
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = inflater.inflate(R.layout.event_details_list_content, parent, false);
+        return new ViewHolder(view);
     }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        EventField field = fields.get(position);
+        holder.nameView.setText(field.getName());
+        holder.valueView.setText(field.getValue());
+    }
+
+    @Override
+    public int getItemCount() { return fields.size(); }
+
 }
