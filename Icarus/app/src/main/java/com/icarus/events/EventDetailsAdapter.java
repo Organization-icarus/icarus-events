@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,6 +61,26 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
         fields.add(new EventField("Location", event.getLocation()));
         fields.add(new EventField("Organizer", event.getOrganizer()));
         fields.add(new EventField("User Status", event.getUser_status()));
+
+        // To get the organizer's name from their ID
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(event.getOrganizer())
+                .get()
+                .addOnSuccessListener(doc -> {
+                    int organizerIndex = -1;
+                    // Iterate through the fields array until we find the Organizer field
+                    for (int i = 0; i < fields.size(); i++) {
+                        if (fields.get(i).getName().equals("Organizer")) {
+                            organizerIndex = i;
+                            break;
+                        }
+                    }
+                    if (organizerIndex != -1) {
+                        fields.set(organizerIndex, new EventField("Organizer", doc.getString("name")));
+                        notifyItemChanged(organizerIndex);
+                    }
+                });
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
