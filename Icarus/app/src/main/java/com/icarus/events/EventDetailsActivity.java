@@ -86,11 +86,14 @@ public class EventDetailsActivity extends NavigationBarActivity {
                 .document(finalEventId).get()
                 .addOnSuccessListener(snapshot -> {
                     if (snapshot.exists()) {
-                        if (snapshot.getString("image") != null) {
+                        String imageURL = snapshot.getString("image");
+                        if (imageURL != null && !imageURL.isEmpty()) {
                             Picasso.get()
                                     .load(snapshot.getString("image"))
                                     .error(R.drawable.poster)           // Optional: shows if link fails
                                     .into(posterView);
+                        } else {
+                            posterView.setImageResource(R.drawable.poster);
                         }
                     }
                 })

@@ -1,6 +1,7 @@
 package com.icarus.events;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -70,6 +71,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
     private Spinner categoryNameList;
     private ActivityResultLauncher<String> imagePickerLauncher;
     private String posterURL;
+    private Uri posterURI;
 
     /**
      * Initializes the event creation interface.
@@ -91,10 +93,12 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         String userId = user.getId();
 
         db = FirebaseFirestore.getInstance();
+
         //Create EditText
         eventName = findViewById(R.id.OrganizerCreateEventEventTitle);
         EventLimit= findViewById(R.id.OrganizerCreateEventLimitWaitingListLimit);
         locationName = findViewById(R.id.OrganizerCreateEventEventLocation);
+
         //Create Spinner
         categoryNameList = findViewById(R.id.OrganizerCreateEventCategory);
         ArrayList<String> dbCategories = new ArrayList<>();
@@ -120,36 +124,20 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load categories: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
-        //Create Image Picker Launcher
+
+        //Create Image Picker Launcher an initialize posterURI
+        posterURI = null;
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(), uri -> {
                     if (uri != null) {
-                        MediaManager.get().upload(uri)
-                                .option("upload_preset", "ml_default")
-                                .callback(new UploadCallback() {
-                                    @Override
-                                    public void onSuccess(String requestId, Map resultData) {
-                                        posterURL = (String) resultData.get("secure_url");
-                                    }
-
-                                    @Override
-                                    public void onError(String requestId, ErrorInfo error) {
-                                        posterURL = "";
-                                        Toast.makeText(OrganizerCreateEventActivity.this,
-                                                "Failed to Upload Image.", Toast.LENGTH_SHORT).show();
-                                        Log.e("UPLOAD_ERROR", error.getDescription());
-                                    }
-
-                                    @Override public void onStart(String requestId) {}
-                                    @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
-                                    @Override public void onReschedule(String requestId, ErrorInfo error) {}
-                                })
-                                .dispatch();
+                        posterURI = uri;
                     }
                 }
         );
+
         //Create Switch
         geolocationSwitch = findViewById(R.id.OrganizerCreateEventGeolocationSwitch);
+
         //Create Buttons
         UploadPosterButton = findViewById(R.id.OrganizerCreateEventUploadPosterButton);
         EventDate = findViewById(R.id.OrganizerCreateEventDate);
@@ -178,7 +166,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             });
         });
         EventDate.setOnClickListener(v -> {
-            // Set Registration end date
+            // Set event date
             showDatePicker(date -> {
                 this.eventDate = date;
                 String eventDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
@@ -187,7 +175,6 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         });
         CreateEvent.setOnClickListener(v -> {
             // Confirm creation of event
-
             String name = eventName.getText().toString().trim();
             String category = categoryNameList.getSelectedItem().toString().trim();
             String location = locationName.getText().toString().trim();
@@ -211,28 +198,79 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             }
             location = location.substring(0,1).toUpperCase() + location.substring(1).toLowerCase();
 
-            Map<String, Object> eventData = new HashMap<>();
-            eventData.put("name", name);
-            eventData.put("category", category);
-            eventData.put("capacity",numberOfPeople);
-            eventData.put("open", startDate);
-            eventData.put("close", endDate);
-            eventData.put("date", eventDate);
-            eventData.put("image", posterURL);
-            eventData.put("location", location);
-            eventData.put("geolocation",geolocationSwitch.isChecked());
-            eventData.put("organizer", userId);
+            // Upload image to cloudinary and save event to database
+            final String finalName = name;
+            final String finalCategory = category;
+            final String finalLocation = location;
+            final Double finalCapacity = numberOfPeople;
+            final String finalUserId = userId;
+            if (posterURI != null) {
+                MediaManager.get().upload(posterURI)
+                        .option("upload_preset", "ml_default")
+                        .callback(new UploadCallback() {
+                            @Override
+                            public void onSuccess(String requestId, Map resultData) {
+                                posterURL = (String) resultData.get("secure_url");
+                                String publicId = (String) resultData.get("public_id");
+                                // Create new firebase document for the image
+                                Map<String, Object> imageData = new HashMap<>();
+                                imageData.put("URL", posterURL);
+                                db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                                        .document(publicId)
+                                        .set(imageData)
+                                        .addOnSuccessListener(unused -> {
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(OrganizerCreateEventActivity.this,
+                                                    "Failed to add image to firestore", Toast.LENGTH_SHORT).show();
+                                        });
+                                // Save event to firestore
+                                saveEvent(finalName, finalCategory, finalCapacity, posterURL, finalLocation, finalUserId);
+                            }
 
-            //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
-            db.collection(FirestoreCollections.EVENTS_COLLECTION).add(eventData)
-                    .addOnSuccessListener(unused -> {
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Failed to create event", Toast.LENGTH_SHORT).show();
-                    });
+                            @Override
+                            public void onError(String requestId, ErrorInfo error) {
+                                posterURL = "";
+                                Toast.makeText(OrganizerCreateEventActivity.this,
+                                        "Failed to Upload Image.", Toast.LENGTH_SHORT).show();
+                                Log.e("UPLOAD_ERROR", error.getDescription());
+                                // Save event to firestore with empty poster
+                                saveEvent(finalName, finalCategory, finalCapacity, posterURL, finalLocation, finalUserId);
+                            }
 
+                            @Override public void onStart(String requestId) {}
+                            @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
+                            @Override public void onReschedule(String requestId, ErrorInfo error) {}
+                        })
+                        .dispatch();
+            } else {
+                // Save event to firestore with empty poster
+                saveEvent(finalName, finalCategory, finalCapacity, "", finalLocation, finalUserId);
+            }
         });
+    }
+
+    private void saveEvent(String name, String category, Double capacity, String posterURL, String location, String userId) {
+        Map<String, Object> eventData = new HashMap<>();
+        eventData.put("name", name);
+        eventData.put("category", category);
+        eventData.put("capacity",capacity);
+        eventData.put("open", startDate);
+        eventData.put("close", endDate);
+        eventData.put("date", eventDate);
+        eventData.put("image", posterURL);
+        eventData.put("location", location);
+        eventData.put("geolocation",geolocationSwitch.isChecked());
+        eventData.put("organizer", userId);
+
+        //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
+        db.collection(FirestoreCollections.EVENTS_COLLECTION).add(eventData)
+                .addOnSuccessListener(unused -> {
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to create event", Toast.LENGTH_SHORT).show();
+                });
     }
 
     /**
