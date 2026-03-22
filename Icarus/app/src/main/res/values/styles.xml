@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:textSize">@dimen/font_text_size</item>
+        <item name="android:textColor">@color/primary_container_highlighted</item>
+        <item name="backgroundTint">@color/primary_container</item>
+        <item name="cornerRadius">0dp</item>
+        <item name="iconTint">@color/primary_container_highlighted</item>
+        <item name="iconPadding">8dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="iconGravity">start</item>
+        <item name="android:gravity">start|center_vertical</item>
+    </style>
+</resources>

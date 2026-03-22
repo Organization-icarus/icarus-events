@@ -9,13 +9,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- The bottom padding must be at least the height of the nav bar /-->
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingHorizontal="24dp"
             android:paddingTop="16dp"
-            android:paddingBottom="16dp"
+            android:paddingBottom="60dp"
             android:clipToPadding="false"
             android:gravity="center_horizontal">
 
@@ -71,152 +72,220 @@
                 android:clickable="true"
                 android:focusable="true" />
 
+            <!-- DIVIDER -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"/>
+
 
             <!--####################-->
             <!-- ADMIN -->
             <!--####################-->
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/event_organizer_button"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:padding="0dp"-->
+<!--                android:text="Organizer"-->
+<!--                android:textColor="@color/primary_container_highlighted"-->
+<!--                android:backgroundTint="@color/primary_container"-->
+<!--                app:cornerRadius="0dp"-->
+<!--                app:icon="@drawable/profile"-->
+<!--                app:iconTint="@color/primary_container_highlighted"-->
+<!--                app:iconPadding="8dp"-->
+<!--                app:iconGravity="textStart"-->
+<!--                android:visibility="visible" />-->
+
             <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
                 android:id="@+id/event_organizer_button"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:padding="0dp"
-                android:text="Organizer"
-                android:textColor="@color/primary_container_highlighted"
-                android:backgroundTint="@color/primary_container"
-                app:cornerRadius="0dp"
+                android:text="Organize"
                 app:icon="@drawable/profile"
-                app:iconTint="@color/primary_container_highlighted"
-                app:iconPadding="8dp"
-                app:iconGravity="textStart"
-                android:visibility="gone" />
+                android:visibility="visible"/>
 
 
             <!--####################-->
             <!-- ORGANIZER -->
             <!--####################-->
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/manage_button"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:padding="0dp"-->
+<!--                android:text="Manage"-->
+<!--                android:textSize="@dimen/font_text_size"-->
+<!--                android:textColor="@color/primary_container_highlighted"-->
+<!--                android:backgroundTint="@color/primary_container"-->
+<!--                app:cornerRadius="0dp"-->
+<!--                app:icon="@drawable/gear"-->
+<!--                app:iconTint="@color/primary_container_highlighted"-->
+<!--                app:iconPadding="8dp"-->
+<!--                app:iconGravity="textStart"-->
+<!--                android:visibility="visible" />-->
+
             <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
                 android:id="@+id/manage_button"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:padding="0dp"
                 android:text="Manage"
-                android:textSize="@dimen/font_text_size"
-                android:textColor="@color/primary_container_highlighted"
-                android:backgroundTint="@color/primary_container"
-                app:cornerRadius="0dp"
                 app:icon="@drawable/gear"
-                app:iconTint="@color/primary_container_highlighted"
-                app:iconPadding="8dp"
-                app:iconGravity="textStart"
-                android:visibility="gone" />
+                android:visibility="visible"/>
 
 
             <!--####################-->
             <!--ADMIN AND ORGANIZER -->
             <!--####################-->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/notification_button"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:padding="0dp"
-                android:text="Alerts"
-                android:textColor="@color/primary_container_highlighted"
-                android:backgroundTint="@color/primary_container"
-                app:cornerRadius="0dp"
-                app:icon="@drawable/notifications"
-                app:iconTint="@color/primary_container_highlighted"
-                app:iconPadding="8dp"
-                app:iconGravity="textStart"
-                android:visibility="gone" />
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/notification_button"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:padding="0dp"-->
+<!--                android:text="Alerts"-->
+<!--                android:textColor="@color/primary_container_highlighted"-->
+<!--                android:backgroundTint="@color/primary_container"-->
+<!--                app:cornerRadius="0dp"-->
+<!--                app:icon="@drawable/notifications"-->
+<!--                app:iconTint="@color/primary_container_highlighted"-->
+<!--                app:iconPadding="8dp"-->
+<!--                app:iconGravity="textStart"-->
+<!--                android:visibility="visible" />-->
 
             <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
+                android:id="@+id/notification_button"
+                android:text="Notifications"
+                app:icon="@drawable/notifications"
+                android:visibility="visible"/>
+
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/delete_button"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:padding="0dp"-->
+<!--                android:text="Delete"-->
+<!--                android:textSize="@dimen/font_text_size"-->
+<!--                android:textColor="@color/primary_container_highlighted"-->
+<!--                android:backgroundTint="@color/primary_container"-->
+<!--                app:cornerRadius="0dp"-->
+<!--                app:icon="@drawable/delete"-->
+<!--                app:iconTint="@color/primary_container_highlighted"-->
+<!--                app:iconPadding="8dp"-->
+<!--                app:iconGravity="textStart"-->
+<!--                android:visibility="visible" />-->
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
                 android:id="@+id/delete_button"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:padding="0dp"
                 android:text="Delete"
-                android:textSize="@dimen/font_text_size"
-                android:textColor="@color/primary_container_highlighted"
-                android:backgroundTint="@color/primary_container"
-                app:cornerRadius="0dp"
                 app:icon="@drawable/delete"
-                app:iconTint="@color/primary_container_highlighted"
-                app:iconPadding="8dp"
-                app:iconGravity="textStart"
-                android:visibility="gone" />
+                android:visibility="visible"/>
 
 
             <!--####################-->
             <!-- USER UNINITIALIZED -->
             <!--####################-->
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/join_waiting_list_button"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Join Waiting List"-->
+<!--                android:textSize="@dimen/font_text_size"-->
+<!--                android:textColor="@color/primary_container_highlighted"-->
+<!--                android:backgroundTint="@color/primary_container"-->
+<!--                app:icon="@drawable/check"-->
+<!--                app:iconTint="@color/primary_container_highlighted"-->
+<!--                app:iconGravity="textStart"-->
+<!--                android:visibility="visible"/>-->
+
             <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
                 android:id="@+id/join_waiting_list_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="Join Waiting List"
-                android:textSize="@dimen/font_text_size"
-                android:textColor="@color/primary_container_highlighted"
-                android:backgroundTint="@color/primary_container"
                 app:icon="@drawable/check"
-                app:iconTint="@color/primary_container_highlighted"
-                app:iconGravity="textStart"
-                android:visibility="gone"/>
+                android:visibility="visible"/>
 
 
             <!--####################-->
             <!-- USER WAITING -->
             <!--####################-->
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/leave_waiting_list_button"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Leave Waiting List"-->
+<!--                android:textSize="@dimen/font_text_size"-->
+<!--                android:textColor="@color/primary_container_highlighted"-->
+<!--                android:backgroundTint="@color/primary_container"-->
+<!--                app:icon="@drawable/check"-->
+<!--                app:iconTint="@color/primary_container_highlighted"-->
+<!--                app:iconGravity="textStart"-->
+<!--                android:visibility="visible"/>-->
+
             <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
                 android:id="@+id/leave_waiting_list_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="Leave Waiting List"
-                android:textSize="@dimen/font_text_size"
-                android:textColor="@color/primary_container_highlighted"
-                android:backgroundTint="@color/primary_container"
-                app:icon="@drawable/check"
-                app:iconTint="@color/primary_container_highlighted"
-                app:iconGravity="textStart"
-                android:visibility="gone"/>
+                app:icon="@drawable/back"
+                android:visibility="visible"/>
 
             <!--####################-->
             <!-- USER SELECTED OR REGISTERED -->
             <!--####################-->
-            <!-- TODO: make both of these buttons have the same width -->
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/decline_button"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:text="Decline"-->
+<!--                android:textSize="@dimen/font_text_size"-->
+<!--                android:textColor="@color/primary_container_highlighted"-->
+<!--                android:backgroundTint="@color/primary_container"-->
+<!--                app:icon="@drawable/decline"-->
+<!--                app:iconTint="@color/primary_container_highlighted"-->
+<!--                app:iconGravity="textStart"-->
+<!--                android:visibility="visible"/>-->
+
             <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
                 android:id="@+id/decline_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:text="Decline"
-                android:textSize="@dimen/font_text_size"
-                android:textColor="@color/primary_container_highlighted"
-                android:backgroundTint="@color/primary_container"
                 app:icon="@drawable/decline"
-                app:iconTint="@color/primary_container_highlighted"
-                app:iconGravity="textStart"
                 android:visibility="visible"/>
 
 
             <!--####################-->
             <!-- USER SELECTED -->
             <!--####################-->
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/register_button"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Register"-->
+<!--                android:textSize="@dimen/font_text_size"-->
+<!--                android:textColor="@color/primary_container_highlighted"-->
+<!--                android:backgroundTint="@color/primary_container"-->
+<!--                app:icon="@drawable/check"-->
+<!--                app:iconTint="@color/primary_container_highlighted"-->
+<!--                app:iconGravity="textStart"-->
+<!--                android:visibility="visible"/>-->
+
             <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
                 android:id="@+id/register_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="Register"
-                android:textSize="@dimen/font_text_size"
-                android:textColor="@color/primary_container_highlighted"
-                android:backgroundTint="@color/primary_container"
                 app:icon="@drawable/check"
-                app:iconTint="@color/primary_container_highlighted"
-                app:iconGravity="textStart"
                 android:visibility="visible"/>
+
+            <!-- DIVIDER -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="16dp"/>
 
         </LinearLayout>
 
