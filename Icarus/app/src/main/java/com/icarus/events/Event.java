@@ -21,6 +21,8 @@ public class Event {
     private String location;
     private String image;
     private String organizer;
+    private String description;
+    private String guidelines;
 
     private int waiting_list_size;
     private String user_status; // waitlist, selected, registered, or rejected

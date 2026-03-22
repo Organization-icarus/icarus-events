@@ -46,19 +46,19 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
         String regOpen = regOpenDate != null ? sdf.format(regOpenDate) : "TBD";
         String regClose = regCloseDate != null ? sdf.format(regCloseDate) : "TBD";
         String date = eventDate != null ? sdf.format(eventDate) : "TBD";
+        String capacity = event.getCapacity() == null || event.getCapacity() < 1
+                ? "Unlimited"
+                : String.valueOf(event.getCapacity().intValue());
 
         // Convert Event fields into EventField list
-        fields.add(new EventField("Name", event.getName()));
         fields.add(new EventField("Category", event.getCategory()));
-        fields.add(new EventField("Capacity", event.getCapacity() < 1 ? "Unlimited" : String.valueOf(event.getCapacity().intValue())));
-        fields.add(new EventField("Reg. Opens", regOpen));
-        fields.add(new EventField("Reg. Closes", regClose));
-        fields.add(new EventField("Date", date));
+        fields.add(new EventField("Waiting List Capacity", String.valueOf(event.getWaiting_list_size()) + "/" + capacity));
+        fields.add(new EventField("Registration Opens", regOpen));
+        fields.add(new EventField("Registration Closes", regClose));
+        fields.add(new EventField("Event Date", date));
         fields.add(new EventField("Location", event.getLocation()));
-        fields.add(new EventField("Image", event.getImage()));
         fields.add(new EventField("Organizer", event.getOrganizer()));
         fields.add(new EventField("User Status", event.getUser_status()));
-        fields.add(new EventField("Waiting List Size", String.valueOf(event.getWaiting_list_size())));
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
