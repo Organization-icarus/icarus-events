@@ -10,6 +10,9 @@ import android.widget.TextView;
 import android.content.Intent;
 import android.widget.Toast;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.squareup.picasso.Picasso;
@@ -381,17 +384,17 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
 
     private void refreshAdapter(String finalEventId) {
-        if (currentName == null) return; // event data not loaded yet
+        if (currentName == null) return;
 
         Event event = new Event(
                 finalEventId, currentName, currentCategory, currentCapacity,
                 currentRegOpen, currentRegClose, currentDate, currentLocation,
                 currentImage, currentOrganizer, currentStatus, currentWaitingCount
-        );
+        ); // unchanged
 
-        EventDetailsAdapter adapter = new EventDetailsAdapter(this, event);
-        ListView listView = findViewById(R.id.event_details_event_list);
-        listView.setAdapter(adapter);
+        RecyclerView recyclerView = findViewById(R.id.event_details_event_list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this)); // add this
+        recyclerView.setAdapter(new EventDetailsAdapter(this, event));
     }
 
 

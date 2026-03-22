@@ -1,30 +1,47 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
-    android:orientation="horizontal"
-    android:paddingVertical="12dp"
-    android:paddingHorizontal="16dp"
-    android:gravity="center_vertical">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <!-- Field name on left -->
-    <TextView
-        android:id="@+id/field_name"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Field Name"
-        android:textSize="@dimen/font_subheading_size"
-        android:textColor="@color/black"
-        android:textStyle="bold" />
+        android:orientation="horizontal"
+        android:paddingVertical="12dp"
+        android:gravity="center_vertical">
 
-    <!-- Field value on right -->
-    <TextView
-        android:id="@+id/field_value"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Field Data"
-        android:textSize="@dimen/font_subheading_size"
-        android:textColor="@color/black"
-        android:alpha="0.5" /> <!-- semi-transparent for greyed-out effect -->
+        <!-- Field name on left -->
+        <TextView
+            android:id="@+id/field_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Field Name"
+            android:textSize="@dimen/font_subheading_size"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+
+        <!-- Field value on right -->
+        <TextView
+            android:id="@+id/field_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="end"
+            android:text="Field Data"
+            android:textSize="@dimen/font_subheading_size"
+            android:textColor="@color/black"
+            android:alpha="0.5"
+            android:ellipsize="end"
+            android:maxLines="1"
+            /> <!-- semi-transparent for greyed-out effect -->
+
+    </LinearLayout>
+
+    <!-- DIVIDER -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"/>
 
 </LinearLayout>
