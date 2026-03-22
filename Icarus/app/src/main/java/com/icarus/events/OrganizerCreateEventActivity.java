@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -21,6 +22,8 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -53,22 +56,36 @@ import java.util.function.Consumer;
  */
 public class OrganizerCreateEventActivity extends NavigationBarActivity {
     private  FirebaseFirestore db;
+
+    private ImageView eventPoster;
     private Button UploadPosterButton;
 
-    private Button EventDate;
+    private EditText eventName;
+    private EditText eventDescription;
 
-    private Button RegistrationPeriodStartButton;
-    private Button RegistrationPeriodEndButton;
-    private Button CreateEvent;
+    private EditText locationName;
     private SwitchMaterial geolocationSwitch;
+
+    private EditText EventLimit;
+    private Spinner categoryNameList;
+
+    private Button RegistrationStartDateButton;
+    private Button RegistrationStartTimeButton;
+    private Button RegistrationEndDateButton;
+    private Button RegistrationEndTimeButton;
+
+    private Button EventDate;
+    private Button EventTime;
+    private Button CreateEvent;
+
     private Date startDate;
     private Date endDate;
     private Date eventDate;
-    private EditText EventLimit;
 
-    private EditText eventName;
-    private EditText locationName;
-    private Spinner categoryNameList;
+    private Date startTime;
+    private Date endTime;
+    private Date eventTime;
+
     private ActivityResultLauncher<String> imagePickerLauncher;
     private String posterURL;
     private Uri posterURI;
@@ -93,11 +110,6 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         String userId = user.getId();
 
         db = FirebaseFirestore.getInstance();
-
-        //Create EditText
-        eventName = findViewById(R.id.OrganizerCreateEventEventTitle);
-        EventLimit= findViewById(R.id.OrganizerCreateEventLimitWaitingListLimit);
-        locationName = findViewById(R.id.OrganizerCreateEventEventLocation);
 
         //Create Spinner
         categoryNameList = findViewById(R.id.OrganizerCreateEventCategory);
@@ -135,63 +147,129 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 }
         );
 
+
+        //Create ImageView
+        eventPoster = findViewById(R.id.OrganizerCreateEventImage);
+
+        //Create EditText
+        eventName = findViewById(R.id.OrganizerCreateEventEventTitle);
+        eventDescription = findViewById(R.id.OrganizerCreateEventDescription);
+        EventLimit= findViewById(R.id.OrganizerCreateEventLimitWaitingListLimit);
+        locationName = findViewById(R.id.OrganizerCreateEventEventLocation);
+
         //Create Switch
         geolocationSwitch = findViewById(R.id.OrganizerCreateEventGeolocationSwitch);
 
         //Create Buttons
         UploadPosterButton = findViewById(R.id.OrganizerCreateEventUploadPosterButton);
+
+        RegistrationStartDateButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodStartDate);
+        RegistrationStartTimeButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodStartTime);
+
+        RegistrationEndDateButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEndDate);
+        RegistrationEndTimeButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEndTime);
+
         EventDate = findViewById(R.id.OrganizerCreateEventDate);
-        RegistrationPeriodStartButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodStart);
-        RegistrationPeriodEndButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEnd);
+        EventDate = findViewById(R.id.OrganizerCreateEventTime);
+
         CreateEvent = findViewById(R.id.OrganizerCreateEventCreateEvent);
 
+
+        //Button Functions
         UploadPosterButton.setOnClickListener(v -> {
             //Upload event poster
             imagePickerLauncher.launch("image/*");
         });
-        RegistrationPeriodStartButton.setOnClickListener(v -> {
+
+        RegistrationStartDateButton.setOnClickListener(v -> {
             // Set Registration start date
             showDatePicker(date -> {
                 this.startDate = date;
                 String regStart = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
-                RegistrationPeriodStartButton.setText("Start:\n"+ regStart);
+                RegistrationStartDateButton.setText("Start Date: "+ regStart);
             });
         });
-        RegistrationPeriodEndButton.setOnClickListener(v -> {
+        RegistrationStartTimeButton.setOnClickListener(v -> {
+            // Set Registration start Time
+            showTimePicker(time->{
+                startTime = time;
+                String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(startTime);
+                RegistrationStartTimeButton.setText("Start Time: "+showTime );
+            });
+        });
+
+        RegistrationEndDateButton.setOnClickListener(v -> {
             // Set Registration end date
             showDatePicker(date -> {
                 this.endDate = date;
                 String regEnd = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
-                RegistrationPeriodEndButton.setText("End:\n"+ regEnd);
+                RegistrationEndDateButton.setText("End Date: "+ regEnd);
             });
         });
+        RegistrationEndTimeButton.setOnClickListener(v -> {
+            // Set Registration end Time
+            showTimePicker(time->{
+                endTime = time;
+                String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(endTime);
+                RegistrationStartTimeButton.setText("End Time: "+showTime );
+            });
+        });
+
         EventDate.setOnClickListener(v -> {
             // Set event date
             showDatePicker(date -> {
                 this.eventDate = date;
                 String eventDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
-                EventDate.setText("Event:\n"+ eventDate);
+                EventDate.setText("Event Date: "+ eventDate);
             });
         });
+        EventTime.setOnClickListener(v -> {
+            // Set Registration end Time
+            showDatePicker(date -> {
+                this.eventTime = date;
+                String showTime = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(eventTime);
+                EventTime.setText("Event Time: "+ showTime);
+            });
+        });
+
         CreateEvent.setOnClickListener(v -> {
             // Confirm creation of event
             String name = eventName.getText().toString().trim();
+            String description = eventDescription.getText().toString().trim();
             String category = categoryNameList.getSelectedItem().toString().trim();
             String location = locationName.getText().toString().trim();
 
+            // Check if user filled in all dates before proceeding
+            if (startDate == null || startTime == null || endDate == null || endTime == null || eventDate == null || eventTime == null) {
+                Toast.makeText(this, "Please select all dates", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            this.startDate = mergeDateAndTime(startDate,startTime);
+            this.endDate = mergeDateAndTime(endDate,endTime);
+            this.eventDate = mergeDateAndTime(eventDate,eventTime);
+
+            if (startDate.before(new Date())) {
+                Toast.makeText(this, "Registration Start Date cannot be in the past.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(startDate.after(endDate)){
+                Toast.makeText(this, "Registration Start Date cannot be after Registration End Date.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(endDate.after(eventDate)){
+                Toast.makeText(this, "Registration End Date cannot be after Event Date.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             // Check if user filled all text fields before proceeding
             if (name.isEmpty() || category.isEmpty() || location.isEmpty()) {
                 Toast.makeText(this, "Please fill in name, category, and location fields.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // Check if user filled in all dates before proceeding
-            if (startDate == null || endDate == null || eventDate == null) {
-                Toast.makeText(this, "Please select all dates", Toast.LENGTH_SHORT).show();
-                return;
-            }
+
+
 
             //Uppercase first letter and lowercase rest of string
-            category = category.substring(0, 1).toUpperCase() + category.substring(1).toLowerCase();
             Double numberOfPeople = null;
             if (!EventLimit.getText().toString().trim().isEmpty()) {
                 numberOfPeople = Double.parseDouble(EventLimit.getText().toString().trim());
@@ -200,6 +278,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
 
             // Upload image to cloudinary and save event to database
             final String finalName = name;
+            final String finalDescription = description;
             final String finalCategory = category;
             final String finalLocation = location;
             final Double finalCapacity = numberOfPeople;
@@ -225,7 +304,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                                                     "Failed to add image to firestore", Toast.LENGTH_SHORT).show();
                                         });
                                 // Save event to firestore
-                                saveEvent(finalName, finalCategory, finalCapacity, posterURL, finalLocation, finalUserId);
+                                saveEvent(finalName, finalDescription, finalCategory, finalCapacity, posterURL, finalLocation, finalUserId);
                             }
 
                             @Override
@@ -235,7 +314,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                                         "Failed to Upload Image.", Toast.LENGTH_SHORT).show();
                                 Log.e("UPLOAD_ERROR", error.getDescription());
                                 // Save event to firestore with empty poster
-                                saveEvent(finalName, finalCategory, finalCapacity, posterURL, finalLocation, finalUserId);
+                                saveEvent(finalName, finalDescription,finalCategory, finalCapacity, posterURL, finalLocation, finalUserId);
                             }
 
                             @Override public void onStart(String requestId) {}
@@ -245,14 +324,15 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                         .dispatch();
             } else {
                 // Save event to firestore with empty poster
-                saveEvent(finalName, finalCategory, finalCapacity, "", finalLocation, finalUserId);
+                saveEvent(finalName, finalDescription, finalCategory, finalCapacity, "", finalLocation, finalUserId);
             }
         });
     }
 
-    private void saveEvent(String name, String category, Double capacity, String posterURL, String location, String userId) {
+    private void saveEvent(String name, String description, String category, Double capacity, String posterURL, String location, String userId) {
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("name", name);
+        eventData.put("description", description);
         eventData.put("category", category);
         eventData.put("capacity",capacity);
         eventData.put("open", startDate);
@@ -281,7 +361,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
      * before being returned through the provided callback.
      * <p>
      * This was created by claude AI, March 10, 2026 "How can I create a
-     * popup calendar with creating a new XML file"
+     * popup calendar without creating a new XML file"
      *
      * @param onDatePicked callback executed when the user selects a date
      */
@@ -306,4 +386,66 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         });
         datePicker.show(getSupportFragmentManager(), "DATE_PICKER");
     }
+
+    /**
+     * Displays a material design time picker and returns the selected time.
+     * <p>
+     * The picker uses a clock input mode and returns the selected hour and
+     * minute through the provided callback as a Date object set to today's
+     * date at the chosen time in the device's local time zone.
+     * <p>
+     * This was created by claude AI, March 22, 2026 "How can I create a
+     * popup clock without creating a new XML file"
+     *
+     * @param onTimePicked callback executed when the user selects a time
+     */
+    private void showTimePicker(Consumer<Date> onTimePicked) {
+        MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
+                .setMinute(Calendar.getInstance().get(Calendar.MINUTE))
+                .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
+                .build();
+
+        timePicker.addOnPositiveButtonClickListener(v -> {
+            Calendar local = Calendar.getInstance();
+            local.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+            local.set(Calendar.MINUTE, timePicker.getMinute());
+            local.set(Calendar.SECOND, 0);
+            local.set(Calendar.MILLISECOND, 0);
+
+            onTimePicked.accept(local.getTime());
+        });
+
+        timePicker.show(getSupportFragmentManager(), "TIME_PICKER");
+    }
+
+    /**
+     * Merges the date components from one Date and the time components
+     * from another into a single combined Date object.
+     *<p>
+     * @param date the Date to take year, month, and day from
+     * @param time the Date to take hour and minute from
+     * @return a new Date combining both, or null if either is null
+     *<p>
+     * This was created by claude AI, March 22, 2026 "How can I combine the Date
+     * and Time from 2 different Date objects"
+     */
+    private Date mergeDateAndTime(Date date, Date time) {
+        if (date == null || time == null) return null;
+
+        Calendar dateCal = Calendar.getInstance();
+        dateCal.setTime(date);
+
+        Calendar timeCal = Calendar.getInstance();
+        timeCal.setTime(time);
+
+        dateCal.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
+        dateCal.set(Calendar.MINUTE,      timeCal.get(Calendar.MINUTE));
+        dateCal.set(Calendar.SECOND, 0);
+        dateCal.set(Calendar.MILLISECOND, 0);
+
+        return dateCal.getTime();
+    }
 }
+
