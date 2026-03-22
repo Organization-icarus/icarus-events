@@ -143,6 +143,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 new ActivityResultContracts.GetContent(), uri -> {
                     if (uri != null) {
                         posterURI = uri;
+                        eventPoster.setImageURI(uri);
                     }
                 }
         );
@@ -170,7 +171,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         RegistrationEndTimeButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEndTime);
 
         EventDate = findViewById(R.id.OrganizerCreateEventDate);
-        EventDate = findViewById(R.id.OrganizerCreateEventTime);
+        EventTime = findViewById(R.id.OrganizerCreateEventTime);
 
         CreateEvent = findViewById(R.id.OrganizerCreateEventCreateEvent);
 
@@ -211,7 +212,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             showTimePicker(time->{
                 endTime = time;
                 String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(endTime);
-                RegistrationStartTimeButton.setText("End Time: "+showTime );
+                RegistrationEndTimeButton.setText("End Time: "+showTime );
             });
         });
 
@@ -225,10 +226,10 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         });
         EventTime.setOnClickListener(v -> {
             // Set Registration end Time
-            showDatePicker(date -> {
-                this.eventTime = date;
-                String showTime = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(eventTime);
-                EventTime.setText("Event Time: "+ showTime);
+            showTimePicker(time->{
+                eventTime = time;
+                String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(eventTime);
+                EventTime.setText("Event Time: "+showTime );
             });
         });
 

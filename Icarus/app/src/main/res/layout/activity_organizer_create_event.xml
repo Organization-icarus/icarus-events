@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    activity_organizer_create_event.xml
+    Author: Ben Salmon
+
+    AI was used the creation of the cards. Not in the buttons, editTexts, imageViews, or spinners.
+    Claude AI, March 22,2026 "How can I separate a XML file into separate cards that
+    will make the screen more visually pleasing for users. What is the layout for cards and how
+    they used?"
+-->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -34,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- CARD 1: Event Image -->
+            <!-- Image -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/OrganizerCreateEventImageCard"
                 android:layout_width="0dp"
@@ -81,7 +91,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- CARD 2: Event Details (Name + Description) -->
+            <!-- Name and Description -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/OrganizerCreateEventDetailsCard"
                 android:layout_width="0dp"
@@ -143,7 +153,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- CARD 3: Location + Geolocation -->
+            <!-- Location and Geolocation -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/OrganizerCreateEventLocationCard"
                 android:layout_width="0dp"
@@ -204,7 +214,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- CARD 4: Participants + Category -->
+            <!-- Participants and Category -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/OrganizerCreateEventSettingsCard"
                 android:layout_width="0dp"
@@ -265,7 +275,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- BOX 1: Registration Start -->
+            <!-- Registration Start -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/OrganizerCreateEventRegStartCard"
                 android:layout_width="0dp"
@@ -330,7 +340,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- BOX 2: Registration End -->
+            <!-- Registration End -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/OrganizerCreateEventRegEndCard"
                 android:layout_width="0dp"
@@ -395,7 +405,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- BOX 3: Event Date -->
+            <!-- Event Date -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/OrganizerCreateEventDateCard"
                 android:layout_width="0dp"
@@ -460,6 +470,7 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Create Event Button -->
             <Button
                 android:id="@+id/OrganizerCreateEventCreateEvent"
                 android:layout_width="300dp"
