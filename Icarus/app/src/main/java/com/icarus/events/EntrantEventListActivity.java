@@ -82,20 +82,15 @@ public class EntrantEventListActivity extends NavigationBarActivity {
 
         // Retrieve current user role
         User currentUser = UserSession.getInstance().getCurrentUser();
-        String role = (currentUser != null) ? currentUser.getRole() : "entrant";
+        Boolean isAdmin = (currentUser != null) ? currentUser.getIsAdmin() : false;
 
         // Show/hide buttons based on users role
-        if ("organizer".equals(role)) {
-            addEvent.setVisibility(VISIBLE);
-        } else {
-            addEvent.setVisibility(GONE);
-        }
-
-        if ("administrator".equals(role)) {
+        if (isAdmin) {
             adminDashboard.setVisibility(VISIBLE);
         } else {
             adminDashboard.setVisibility(GONE);
         }
+
 
         //Initialize text filter
         searchTextFilter = findViewById(R.id.entrant_event_list_search_filter);

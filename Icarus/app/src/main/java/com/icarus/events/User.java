@@ -16,8 +16,9 @@ public class User {
     private String name;
     private String email;
     private String phone;
-    private String role;
+    private Boolean isAdmin;
     private ArrayList<String> events;
+    private ArrayList<String> organizedEvents;
     private Map<String, Object> settings;
 
     /**
@@ -27,18 +28,20 @@ public class User {
      * @param name user's display name
      * @param email user's email address
      * @param phone user's phone number
-     * @param role role assigned to the user (e.g., entrant, organizer, admin)
+     * @param isAdmin role assigned to the user (e.g., entrant, organizer, admin)
      * @param events list of event IDs associated with the user
      * @param settings map of user-specific configuration settings
      */
-    public User(String id, String name, String email, String phone, String role,
-                ArrayList<String> events, Map<String, Object> settings) {
+    public User(String id, String name, String email, String phone, Boolean isAdmin,
+                ArrayList<String> events, ArrayList<String> organizedEvents,
+                Map<String, Object> settings) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
-        this.role = role;
+        this.isAdmin = isAdmin;
         this.events = events;
+        this.organizedEvents = organizedEvents;
         this.settings = settings;
     }
 
@@ -106,21 +109,21 @@ public class User {
     }
 
     /**
-     * Returns the role of the user
+     * Returns if the user is an admin
      *
-     * @return the user's role
+     * @return if the user is an admin
      */
-    public String getRole() {
-        return role;
+    public Boolean getIsAdmin() {
+        return isAdmin;
     }
 
     /**
-     * Sets the role of the user
+     * Sets whether the user is an admin
      *
-     * @param role the user's new role
+     * @param isAdmin the user's new admin status
      */
-    public void setRole(String role) {
-        this.role = role;
+    public void setIsAdmin(Boolean isAdmin) {
+        this.isAdmin = isAdmin;
     }
 
     /**
@@ -139,6 +142,24 @@ public class User {
      */
     public void setEvents(ArrayList<String> events) {
         this.events = events;
+    }
+
+    /**
+     * Returns the events that the user has organized
+     *
+     * @return events the user has organized
+     */
+    public ArrayList<String> getOrganizedEvents() {
+        return organizedEvents;
+    }
+
+    /**
+     * Sets the events that the user has organized
+     *
+     * @param organizedEvents events the user has organized
+     */
+    public void setOrganizedEvents(ArrayList<String> organizedEvents) {
+        this.organizedEvents = organizedEvents;
     }
 
     /**

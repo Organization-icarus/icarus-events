@@ -33,7 +33,6 @@ import java.util.Map;
  */
 public class UserRegistrationActivity extends AppCompatActivity {
     private EditText nameEditText;
-    private RadioGroup roleRadioGroup;
     private Button registerButton;
     private FirebaseFirestore db;
     private String deviceId;
@@ -62,9 +61,6 @@ public class UserRegistrationActivity extends AppCompatActivity {
         // Initialize text field
         nameEditText = findViewById(R.id.user_register_name_field);
 
-        // Initialize radio group
-        roleRadioGroup = findViewById(R.id.user_register_role_radio_group);
-
         // Retrieve device Id
         deviceId = getIntent().getStringExtra("deviceId");
 
@@ -78,16 +74,7 @@ public class UserRegistrationActivity extends AppCompatActivity {
                 return;
             }
 
-            // Check if user selected role in radio buttons
-            int selectedId= roleRadioGroup.getCheckedRadioButtonId();
-            if (selectedId == -1) {
-                Toast.makeText(this, "Please select a role", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            RadioButton selectedRole = findViewById(selectedId);
-            String role = selectedRole.getText().toString().toLowerCase();
-
+            Boolean isAdmin = false;
 
             // Initialize default settings map
             Map<String, Object> settings = new HashMap<>();
@@ -97,13 +84,13 @@ public class UserRegistrationActivity extends AppCompatActivity {
             // Send user data to database
             Map<String, Object> userData = new HashMap<>();
             userData.put("name", name);
-            userData.put("role", role);
+            userData.put("isAdmin", isAdmin);
             userData.put("settings", settings);
 
             db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).set(userData)
                     .addOnSuccessListener(unused -> {
                         // Add information into global session and return user to event list
-                        User user = new User(deviceId, name, null, null, role, null, null);
+                        User user = new User(deviceId, name, null, null, isAdmin, null, null, null);
                         UserSession.getInstance().setCurrentUser(user);
                         startActivity(new Intent(this, EntrantEventListActivity.class));
                         finish();

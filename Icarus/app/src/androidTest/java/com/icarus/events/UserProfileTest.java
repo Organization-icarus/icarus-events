@@ -59,10 +59,10 @@ public class UserProfileTest {
         FirestoreCollections.startTest();
 
         CountDownLatch latch = new CountDownLatch(1);
-        Map<String, String> entrant = new HashMap<>();
+        Map<String, Object> entrant = new HashMap<>();
         entrant.put("name", "Test Entrant");
         entrant.put("email", "entrant@email.com");
-        entrant.put("role", "entrant");
+        entrant.put("isAdmin", false);
         entrant.put("phone", "123456789");
 
         db.collection("users_test")
@@ -73,7 +73,8 @@ public class UserProfileTest {
                             "Test Entrant",
                             "entrant@email.com",
                             "123456789",
-                            "entrant",
+                            false,
+                            new ArrayList<>(),
                             new ArrayList<>(),
                             new HashMap<>()
                     );

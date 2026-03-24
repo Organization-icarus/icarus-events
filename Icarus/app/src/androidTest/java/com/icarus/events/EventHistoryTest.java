@@ -68,7 +68,7 @@ public class EventHistoryTest {
         CountDownLatch organizerLatch = new CountDownLatch(1);
         Map<String, Object> organizer = Map.of(
                 "name", "Test Organizer",
-                "role", "organizer"
+                "isAdmin", false
         );
 
         db.collection("users_test")
@@ -97,7 +97,7 @@ public class EventHistoryTest {
         CountDownLatch entrantLatch = new CountDownLatch(1);
         Map<String, Object> entrant = new HashMap<>();
         entrant.put("name", "Test Entrant");
-        entrant.put("role", "entrant");
+        entrant.put("isAdmin", false);
 
         db.collection("users_test")
                 .add(entrant)
@@ -107,8 +107,12 @@ public class EventHistoryTest {
                             .document(entrantId)
                             .set(Map.of("events", List.of(eventId)), SetOptions.merge())
                             .addOnSuccessListener(unused -> {
-                                testUser = new User(entrantId, "Test Entrant", "testentrant@email.com",
-                                        "1234567890", "entrant", new ArrayList<>(List.of(eventId)), new HashMap<>());
+                                testUser = new User(entrantId, "Test Entrant",
+                                        "testentrant@email.com",
+                                        "1234567890", false,
+                                        new ArrayList<>(List.of(eventId)),
+                                        new ArrayList<>(),
+                                        new HashMap<>());
                                 UserSession.getInstance().setCurrentUser(testUser);
                                 entrantLatch.countDown();
                             });

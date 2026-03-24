@@ -70,7 +70,8 @@ public class AdministratorDashboardTest {
         FirestoreCollections.startTest();
 
         // Create admin user
-        adminUser = new User("admin1", "Admin User", null, null, null, null, null);
+        adminUser = new User("admin1", "Admin User", null,
+                null, null, null, null,null);
         UserSession.getInstance().setCurrentUser(adminUser);
         CountDownLatch latch = new CountDownLatch(2);
 

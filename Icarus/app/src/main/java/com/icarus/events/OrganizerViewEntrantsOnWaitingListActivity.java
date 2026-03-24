@@ -15,7 +15,7 @@ import java.util.Objects;
  * Activity that allows organizers to view the entrants on the waiting,
  * selected, rejected, and registered list .
  * <p>
- * Organziers can filter the entrant list by selecting a
+ * Organziers can filter the entrant list by selecting an
  * option at the top of the activity. The list shown is refreshed
  * when the Organizer selects a filter type
  *
@@ -115,7 +115,8 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
                                     .get()
                                     .addOnSuccessListener(userSnapshot -> {
                                         String name = userSnapshot.getString("name");
-                                        entrantList.add(new User(deviceId, name, null, null, null, null, null));
+                                        entrantList.add(new User(deviceId, name, null, null,
+                                                null, null, null, null));
                                         eventListArrayAdapter.notifyDataSetChanged();
                                     });
                         }

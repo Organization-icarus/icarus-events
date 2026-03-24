@@ -55,17 +55,18 @@ public class UserSettingsTest {
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        Map<String, String> userMap = new HashMap<>();
+        Map<String, Object> userMap = new HashMap<>();
         userMap.put("name", "Test Entrant");
-        userMap.put("role", "entrant");
+        userMap.put("isAdmin", false);
         userMap.put("email", "testentrant@email.com");
         userMap.put("phone", "1234567890");
 
         db.collection("users_test")
                 .add(userMap)
                 .addOnSuccessListener(doc -> {
-                    testUser = new User(doc.getId(), "Test Entrant", "testentrant@email.com",
-                            "1234567890", "entrant", new ArrayList<>(),
+                    testUser = new User(doc.getId(), "Test Entrant",
+                            "testentrant@email.com", "1234567890",
+                            false, new ArrayList<>(), new ArrayList<>(),
                             Map.of("adminNotifications", true, "organizerNotifications", true));
                     UserSession.getInstance().setCurrentUser(testUser);
                     latch.countDown();
