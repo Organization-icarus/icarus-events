@@ -1,6 +1,7 @@
 package com.icarus.events;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -277,6 +278,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
                         eventImage = doc.getString("image");
                         eventOrganizer = doc.getString("organizer");
                         isOrganizer = userId.equals(eventOrganizer);
+                        setupButtons(isAdmin, isOrganizer, currentStatus);
 
                         TextView eventName = findViewById(R.id.eventName);
                         eventName.setText(this.eventName);
@@ -319,16 +321,19 @@ public class EventDetailsActivity extends NavigationBarActivity {
                     refreshAdapter(finalEventId);
                 });
 
+        isAdmin = user.getIsAdmin();
+        Log.d("DEBUG", "isAdmin from session: " + isAdmin);
 
         //---------------------------
         // LISTEN TO USER DOCUMENT
-        // Handles role changes while app is running
+        // Handles admin changes while app is running
         //---------------------------
 
         userListener = db.collection(FirestoreCollections.USERS_COLLECTION).document(userId)
                 .addSnapshotListener((doc, e) -> {
                     if (doc != null && doc.exists()) {
                         isAdmin = Objects.requireNonNullElse(doc.getBoolean("isAdmin"), false);
+                        Log.d("DEBUG", "isAdmin from firestore: " + isAdmin);
                         setupButtons(isAdmin, isOrganizer, currentStatus);
                     }
                 });
@@ -336,8 +341,9 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
 
     private void setupButtons(Boolean isAdmin, Boolean isOrganizer, String status) {
-        // TODO: only treat a user like an organizer if they created the specific event
         // Runs every time the firebase document changes
+
+        Log.d("DEBUG", "setupButtons called — isAdmin: " + isAdmin + ", isOrganizer: " + isOrganizer);
 
         // Hide all first
         organizerBtn.setVisibility(View.GONE);
@@ -349,7 +355,8 @@ public class EventDetailsActivity extends NavigationBarActivity {
         declineBtn.setVisibility(View.GONE);
         registerBtn.setVisibility(View.GONE);
 
-        if (isAdmin == null) return; // safety check
+        // Don't proceed until everything is ready
+        if (isAdmin == null || isOrganizer == null) return;
 
         /* NOTE: Admins and Organizers are users by default. Admins can also be
         organizers. */
@@ -368,24 +375,23 @@ public class EventDetailsActivity extends NavigationBarActivity {
             manageBtn.setVisibility(View.VISIBLE);
         }
 
-        // TODO: don't let the event organizer join the event
+        // An event organizer cannot join their own event
+        if (!isOrganizer) {
 
-        // Allow new (i.e. not rejected) users to join the waiting list
-        if (status == null || status.equals("uninitialized")) {
-            joinBtn.setVisibility(View.VISIBLE);
-        }
+            // Allow new (i.e. not rejected) users to join the waiting list
+            if (status == null || status.equals("uninitialized")) {
+                joinBtn.setVisibility(View.VISIBLE);
+            } else if (status.equals("waiting")) {
+                leaveBtn.setVisibility(View.VISIBLE);
+            } else if (status.equals("selected")) {
+                declineBtn.setVisibility(View.VISIBLE);
+                registerBtn.setVisibility(View.VISIBLE);
+            }
 
-        else if (status.equals("waiting")) {
-            leaveBtn.setVisibility(View.VISIBLE);
-        }
-
-        else if (status.equals("selected")) {
-            declineBtn.setVisibility(View.VISIBLE);
-            registerBtn.setVisibility(View.VISIBLE);
-        }
-
-        else if (status.equals("registered")) {
-            declineBtn.setVisibility(View.VISIBLE);
+            // TODO: don't let entrants register after the registration period
+            else if (status.equals("registered")) {
+                declineBtn.setVisibility(View.VISIBLE);
+            }
         }
     }
 

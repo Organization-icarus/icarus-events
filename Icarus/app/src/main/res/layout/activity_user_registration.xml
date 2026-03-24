@@ -27,44 +27,6 @@
         android:hint="Enter your name"
         android:inputType="textPersonName" />
 
-    <!-- Role selection textview and radio group -->
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Select your role"
-        android:textColor="@color/primary_container_highlighted"
-        android:textSize="@dimen/font_subheading_size"
-        android:textStyle="bold" />
-
-    <RadioGroup
-        android:id="@+id/user_register_role_radio_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:gravity="center">
-
-        <RadioButton
-            android:id="@+id/registration_role_entrant"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Entrant" />
-
-        <RadioButton
-            android:id="@+id/registration_role_organizer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Organizer" />
-
-        <RadioButton
-            android:id="@+id/registration_role_administrator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Administrator" />
-
-    </RadioGroup>
-
     <Button
         android:id="@+id/user_register_button"
         android:layout_width="wrap_content"
