@@ -1,10 +1,12 @@
 package com.icarus.events;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,12 +14,16 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+
 import android.provider.Settings;
+
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+
 import java.util.ArrayList;
 import java.util.Map;
+
 
 /**
  * Entry activity for the application.
@@ -30,6 +36,7 @@ import java.util.Map;
  * @author Alex Alves
  */
 public class MainActivity extends AppCompatActivity {
+
 
     /**
      * Initializes the main activity and determines the appropriate screen
@@ -50,10 +57,13 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+
         TextView deviceIdText = findViewById(R.id.main_device_id_text);
+
 
         String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
         deviceIdText.setText("Device ID: " + deviceId);
+
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").document(deviceId).get()
@@ -79,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     finish();
                 });
+
 
     }
 }

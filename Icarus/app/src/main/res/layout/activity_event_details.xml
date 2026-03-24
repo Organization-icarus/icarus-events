@@ -29,6 +29,16 @@
             android:text="Event Name"
             android:textSize="@dimen/font_heading_size" />
 
+        <!-- status -->
+        <TextView
+            android:id="@+id/event_status_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/status_none"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            android:padding="8dp"/>
+
         <!-- EVENT DETAILS LIST -->
         <FrameLayout
             android:id="@+id/eventListFrameLayout"

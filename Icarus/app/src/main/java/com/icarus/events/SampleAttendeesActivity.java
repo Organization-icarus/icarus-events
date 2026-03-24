@@ -145,8 +145,14 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
 
                     WriteBatch batch = db.batch();
 
+// Selected entrants
                     for (int i = 0; i < numberToMove; i++) {
                         batch.update(waitingEntrants.get(i).getReference(), "status", "selected");
+                    }
+
+// Not selected entrants
+                    for (int i = numberToMove; i < waitingEntrants.size(); i++) {
+                        batch.update(waitingEntrants.get(i).getReference(), "status", "rejected");
                     }
 
                     batch.commit()

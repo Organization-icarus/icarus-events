@@ -10,4 +10,11 @@
         Entrants who win a spot in the lottery are then able to register for the event they signed up
         for.
     </string>
+    <string name="status_none">Status: None</string>
+    <string name="status_not_joined">Status: Not joined</string>
+    <string name="status_waiting">Status: On waiting list</string>
+    <string name="status_selected">Status: Selected</string>
+    <string name="status_registered">Status: Registered</string>
+    <string name="status_not_selected">Status: Not selected</string>
+    <string name="status_unknown">Status: Unknown</string>
 </resources>

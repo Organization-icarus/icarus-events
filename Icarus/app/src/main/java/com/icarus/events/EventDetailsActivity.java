@@ -1,6 +1,6 @@
 package com.icarus.events;
 
-import static java.sql.Types.NULL;
+
 
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +17,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import android.view.Window;
 
 
 /**
@@ -27,6 +28,7 @@ import java.util.Map;
  * of the Event in a readable format.
  *
  * @author Bradley Bravender
+ * Editor Yifan Jiao
  */
 public class EventDetailsActivity extends NavigationBarActivity {
     private Button organizerBtn, manageBtn, notificationBtn, deleteBtn;
@@ -45,6 +47,8 @@ public class EventDetailsActivity extends NavigationBarActivity {
     private ListenerRegistration userListener;
     private ListenerRegistration entrantStatusListener;
     private ListenerRegistration entrantWaitlistListener;
+    private TextView statusText;
+    private String previousStatus;
 
     // Runs every time a user navigates to this intent
     @Override
@@ -77,6 +81,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
         leaveBtn = findViewById(R.id.leave_waiting_list_button);
         declineBtn = findViewById(R.id.decline_button);
         registerBtn = findViewById(R.id.register_button);
+        statusText = findViewById(R.id.event_status_text);
 
 
         //---------------------------
@@ -225,8 +230,12 @@ public class EventDetailsActivity extends NavigationBarActivity {
                     .create();
 
             dialog.show();
-            dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background);
-            dialog.getWindow().setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            Window window = dialog.getWindow();
+            if (window != null) {
+                window.setBackgroundDrawableResource(R.drawable.dialog_background);
+                window.setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
         });
 
         //---------------------------
@@ -281,15 +290,32 @@ public class EventDetailsActivity extends NavigationBarActivity {
         entrantStatusListener = db.collection("events").document(finalEventId)
                 .collection("entrants").document(userId)
                 .addSnapshotListener((doc, e) -> {
+                    String newStatus;
                     if (doc != null && doc.exists()) {
-                        currentStatus = doc.getString("status"); // could be null if field missing
+                        newStatus = doc.getString("status");
                     } else {
-                        currentStatus = null; // no document = not in event
+                        newStatus = null;
                     }
+
+                    if (previousStatus != null && !previousStatus.equals(newStatus)) {
+                        if ("selected".equals(newStatus)) {
+                            Toast.makeText(EventDetailsActivity.this,
+                                    "You were selected for this event!",
+                                    Toast.LENGTH_SHORT).show();
+                        } else if ("rejected".equals(newStatus)) {
+                            Toast.makeText(EventDetailsActivity.this,
+                                    "You were not selected for this event.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    currentStatus = newStatus;
+                    previousStatus = newStatus;
+
+                    updateStatusText(currentStatus);
                     setupButtons(currentRole, currentStatus);
                     refreshAdapter(finalEventId);
                 });
-
 
         //---------------------------
         // LISTEN TO USER DOCUMENT
@@ -337,26 +363,43 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         } else if (role.equals("entrant")) {
 
-            // Allow new (i.e. not rejected) users to join the waiting list
+            // Allow new users to join the waiting list
             if (status == null || status.equals("uninitialized")) {
                 joinBtn.setVisibility(View.VISIBLE);
-            }
-
-            else if (status.equals("waiting")) {
+            } else if (status.equals("waiting")) {
                 leaveBtn.setVisibility(View.VISIBLE);
-            }
-
-            else if (status.equals("selected")) {
+            } else if (status.equals("selected")) {
                 declineBtn.setVisibility(View.VISIBLE);
                 registerBtn.setVisibility(View.VISIBLE);
+            } else if (status.equals("registered")) {
+                declineBtn.setVisibility(View.VISIBLE);
+            } else if (status.equals("rejected")) {
+                // no buttons shown, only status text
+                joinBtn.setVisibility(View.GONE);
+                leaveBtn.setVisibility(View.GONE);
+                declineBtn.setVisibility(View.GONE);
+                registerBtn.setVisibility(View.GONE);
             }
 
-            else if (status.equals("registered")) {
-                declineBtn.setVisibility(View.VISIBLE);
-            }
         }
     }
+    private void updateStatusText(String status) {
+        if (statusText == null) return;
 
+        if (status == null || status.equals("uninitialized")) {
+            statusText.setText(getString(R.string.status_not_joined));
+        } else if (status.equals("waiting")) {
+            statusText.setText(getString(R.string.status_waiting));
+        } else if (status.equals("selected")) {
+            statusText.setText(getString(R.string.status_selected));
+        } else if (status.equals("registered")) {
+            statusText.setText(getString(R.string.status_registered));
+        } else if (status.equals("rejected")) {
+            statusText.setText(getString(R.string.status_not_selected));
+        } else {
+            statusText.setText(getString(R.string.status_unknown));
+        }
+    }
 
     private void refreshAdapter(String finalEventId) {
         if (currentName == null) return; // event data not loaded yet
