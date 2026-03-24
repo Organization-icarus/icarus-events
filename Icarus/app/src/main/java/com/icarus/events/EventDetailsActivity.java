@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.content.Intent;
 import android.widget.Toast;
@@ -20,6 +19,7 @@ import com.squareup.picasso.Picasso;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -32,16 +32,19 @@ import java.util.Map;
  * @author Bradley Bravender
  */
 public class EventDetailsActivity extends NavigationBarActivity {
+    // Initialize all the admin, organizer, and entrant buttons
     private Button organizerBtn, manageBtn, notificationBtn, deleteBtn;
     private Button joinBtn, leaveBtn, declineBtn, registerBtn;
+
     private ImageView posterView;
-    private String currentRole;
+    private Boolean isAdmin, isOrganizer;
     private String currentStatus;
     private int currentWaitingCount;
 
-    private String currentName, currentCategory, currentLocation, currentImage, currentOrganizer;
-    private double currentCapacity;
-    private Date currentRegOpen, currentRegClose, currentDate;
+    // Initialize fields to store the event's information
+    private String eventName, eventCategory, eventLocation, eventImage, eventOrganizer;
+    private double eventCapacity;
+    private Date EventRegOpen, eventRegClose, eventDate;
 
     // To prevent the firebase snapshot listener from creating memory leaks
     private ListenerRegistration eventListener;
@@ -63,7 +66,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         // Get the current user's role and status
         User user = UserSession.getInstance().getCurrentUser();
-        currentRole = user.getRole();
+        isAdmin = user.getIsAdmin();
         String userId = user.getId();
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -110,8 +113,8 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         // Lets uninitialized users join the waiting list
         joinBtn.setOnClickListener(v -> {
-            // TODO: should not capacity be 0, -1, or NULL?
-            if (currentCapacity > 0 && currentWaitingCount >= currentCapacity) {
+            // TODO: should capacity not be 0, -1, or NULL?
+            if (eventCapacity > 0 && currentWaitingCount >= eventCapacity) {
                 // No more users can enter
                 Toast.makeText(this, "This event is full", Toast.LENGTH_SHORT).show();
                 return;
@@ -135,7 +138,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
         // Lets waiting users leave the waiting list
         leaveBtn.setOnClickListener(v -> {
             currentStatus = null;
-            setupButtons(currentRole, currentStatus);
+            setupButtons(isAdmin, isOrganizer, currentStatus);
             refreshAdapter(finalEventId);
 
             // Delete the entrant from the event document
@@ -170,14 +173,14 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
                 currentStatus = "rejected";
             }
-            setupButtons(currentRole, currentStatus);
+            setupButtons(isAdmin, isOrganizer, currentStatus);
             refreshAdapter(finalEventId);
         });
 
 
         registerBtn.setOnClickListener(v -> {
             currentStatus = "registered";
-            setupButtons(currentRole, currentStatus);
+            setupButtons(isAdmin, isOrganizer, currentStatus);
             refreshAdapter(finalEventId);
 
             // Update the event's entrant document
@@ -263,19 +266,20 @@ public class EventDetailsActivity extends NavigationBarActivity {
         eventListener = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
                 .addSnapshotListener((doc, e) -> {
                     if (doc != null && doc.exists()) {
-                        currentName      = doc.getString("name");
-                        currentCategory  = doc.getString("category");
+                        eventName = doc.getString("name");
+                        eventCategory = doc.getString("category");
                         Double capacityValue = doc.getDouble("capacity");
-                        currentCapacity = capacityValue != null ? capacityValue : -1;
-                        currentRegOpen   = doc.getDate("open");
-                        currentRegClose  = doc.getDate("close");
-                        currentDate      = doc.getDate("date");
-                        currentLocation  = doc.getString("location");
-                        currentImage     = doc.getString("image");
-                        currentOrganizer = doc.getString("organizer");
+                        eventCapacity = capacityValue != null ? capacityValue : -1;
+                        EventRegOpen = doc.getDate("open");
+                        eventRegClose = doc.getDate("close");
+                        eventDate = doc.getDate("date");
+                        eventLocation = doc.getString("location");
+                        eventImage = doc.getString("image");
+                        eventOrganizer = doc.getString("organizer");
+                        isOrganizer = userId.equals(eventOrganizer);
 
                         TextView eventName = findViewById(R.id.eventName);
-                        eventName.setText(currentName);
+                        eventName.setText(this.eventName);
 
                         refreshAdapter(finalEventId);
                     }
@@ -311,7 +315,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
                     } else {
                         currentStatus = null; // no document = not in event
                     }
-                    setupButtons(currentRole, currentStatus);
+                    setupButtons(isAdmin, isOrganizer, currentStatus);
                     refreshAdapter(finalEventId);
                 });
 
@@ -324,16 +328,15 @@ public class EventDetailsActivity extends NavigationBarActivity {
         userListener = db.collection(FirestoreCollections.USERS_COLLECTION).document(userId)
                 .addSnapshotListener((doc, e) -> {
                     if (doc != null && doc.exists()) {
-                        currentRole = doc.getString("role") != null
-                                ? doc.getString("role")
-                                : currentRole;
-                        setupButtons(currentRole, currentStatus);
+                        isAdmin = Objects.requireNonNullElse(doc.getBoolean("isAdmin"), false);
+                        setupButtons(isAdmin, isOrganizer, currentStatus);
                     }
                 });
     }
 
 
-    private void setupButtons(String role, String status) {
+    private void setupButtons(Boolean isAdmin, Boolean isOrganizer, String status) {
+        // TODO: only treat a user like an organizer if they created the specific event
         // Runs every time the firebase document changes
 
         // Hide all first
@@ -346,50 +349,54 @@ public class EventDetailsActivity extends NavigationBarActivity {
         declineBtn.setVisibility(View.GONE);
         registerBtn.setVisibility(View.GONE);
 
-        if (role == null) return; // safety check
+        if (isAdmin == null) return; // safety check
+
+        /* NOTE: Admins and Organizers are users by default. Admins can also be
+        organizers. */
 
         // Shared: admin + organizer
-        if (role.equals("administrator") || role.equals("organizer")) {
+        if (isAdmin || isOrganizer) {
             notificationBtn.setVisibility(View.VISIBLE);
             deleteBtn.setVisibility(View.VISIBLE);
         }
 
-        if (role.equals("administrator")) {
+        if (isAdmin) {
             organizerBtn.setVisibility(View.VISIBLE);
+        }
 
-        } else if (role.equals("organizer")) {
+        if (isOrganizer) {
             manageBtn.setVisibility(View.VISIBLE);
+        }
 
-        } else if (role.equals("entrant")) {
+        // TODO: don't let the event organizer join the event
 
-            // Allow new (i.e. not rejected) users to join the waiting list
-            if (status == null || status.equals("uninitialized")) {
-                joinBtn.setVisibility(View.VISIBLE);
-            }
+        // Allow new (i.e. not rejected) users to join the waiting list
+        if (status == null || status.equals("uninitialized")) {
+            joinBtn.setVisibility(View.VISIBLE);
+        }
 
-            else if (status.equals("waiting")) {
-                leaveBtn.setVisibility(View.VISIBLE);
-            }
+        else if (status.equals("waiting")) {
+            leaveBtn.setVisibility(View.VISIBLE);
+        }
 
-            else if (status.equals("selected")) {
-                declineBtn.setVisibility(View.VISIBLE);
-                registerBtn.setVisibility(View.VISIBLE);
-            }
+        else if (status.equals("selected")) {
+            declineBtn.setVisibility(View.VISIBLE);
+            registerBtn.setVisibility(View.VISIBLE);
+        }
 
-            else if (status.equals("registered")) {
-                declineBtn.setVisibility(View.VISIBLE);
-            }
+        else if (status.equals("registered")) {
+            declineBtn.setVisibility(View.VISIBLE);
         }
     }
 
 
     private void refreshAdapter(String finalEventId) {
-        if (currentName == null) return;
+        if (eventName == null) return;
 
         Event event = new Event(
-                finalEventId, currentName, currentCategory, currentCapacity,
-                currentRegOpen, currentRegClose, currentDate, currentLocation,
-                currentImage, currentOrganizer, currentStatus, currentWaitingCount
+                finalEventId, eventName, eventCategory, eventCapacity,
+                EventRegOpen, eventRegClose, eventDate, eventLocation,
+                eventImage, eventOrganizer, currentStatus, currentWaitingCount
         ); // unchanged
 
         RecyclerView recyclerView = findViewById(R.id.event_details_event_list);

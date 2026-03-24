@@ -123,7 +123,8 @@ public class AdministratorDashboardActivity extends NavigationBarActivity {
                     String id = snapshot.getId();
                     String name = snapshot.getString("name");
 
-                    userArrayList.add(new User(id, name, null, null, null, null, null));
+                    userArrayList.add(new User(id, name, null, null,
+                            null, null, null, null));
                 }
                 userArrayAdapter.notifyDataSetChanged();
             }
