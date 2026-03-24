@@ -79,7 +79,7 @@ public class EventDetailsTest {
         db.collection("users_test")
                 .add(Map.of(
                         "name", "Test Organizer",
-                        "role", "organizer"))
+                        "isAdmin", false))
                 .addOnSuccessListener(doc -> {
                     organizerId = doc.getId();
                     organizerLatch.countDown();
@@ -93,7 +93,7 @@ public class EventDetailsTest {
         db.collection("users_test")
                 .add(Map.of(
                         "name", "Test Entrant",
-                        "role", "entrant"))
+                        "isAdmin", false))
                 .addOnSuccessListener(doc -> {
                     entrantId = doc.getId();
 
@@ -102,7 +102,8 @@ public class EventDetailsTest {
                             "Test Entrant",
                             "test@email.com",
                             "1234567890",
-                            "entrant",
+                            false,
+                            new java.util.ArrayList<>(),
                             new java.util.ArrayList<>(),
                             new HashMap<>());
 

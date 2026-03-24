@@ -68,12 +68,15 @@ public class OrganizerCreateEventTest {
     public void setup() {
         FirestoreCollections.startTest();
 
+        // TODO: due to updates, 'organizers' are any users with an event in
+        //  their 'organizedEvents' array
         User testUser = new User(
                 "dummyOrganizerId",
                 "Test Organizer",
                 "organizer@example.com",
                 "1234567890",
-                "organizer",
+                false,
+                new ArrayList<>(),
                 new ArrayList<>(),
                 new HashMap<>()
         );

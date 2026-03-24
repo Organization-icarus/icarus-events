@@ -11,5 +11,5 @@
     <!-- A darker background color to indicate selection -->
     <color name="primary_container_highlighted">#FF6750A4</color>
     <!-- For buttons that require sensitive action (delete, remove, etc)  -->
-    <color name="attention">#FFFF5F57</color>
+    <color name="attention">#FFB00020</color>
 </resources>

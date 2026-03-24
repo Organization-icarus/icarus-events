@@ -77,9 +77,9 @@ public class EntrantWaitlistTest {
 
         // insert organizer into the database
         CountDownLatch organizerLatch = new CountDownLatch(1);
-        Map<String, String> organizer = new HashMap<String, String>();
+        Map<String, Object> organizer = new HashMap<>();
         organizer.put("name", "Test Organizer");
-        organizer.put("role", "organizer");
+        organizer.put("isAdmin", false);
         db.collection("users_test")
                 .add(organizer)
                 .addOnSuccessListener((doc) -> {
@@ -106,15 +106,18 @@ public class EntrantWaitlistTest {
 
         CountDownLatch userLatch = new CountDownLatch(1);
 
-        Map<String, String> entrant = new HashMap<>();
+        Map<String, Object> entrant = new HashMap<>();
         entrant.put("name", "Test Entrant");
-        entrant.put("role", "entrant");
+        entrant.put("isAdmin", false);
 
         db.collection("users_test")
                 .add(entrant)
                 .addOnSuccessListener(doc -> {
                     // Create User object for session
-                    testUser = new User(doc.getId(), "Test Entrant", "entrant@email.com", "123012312", "entrant", new ArrayList<String>(), new HashMap<String, Object>());
+                    testUser = new User(doc.getId(), "Test Entrant",
+                            "entrant@email.com", "123012312",
+                            false, new ArrayList<String>(),
+                            new ArrayList<String>(), new HashMap<String, Object>());
                     UserSession.getInstance().setCurrentUser(testUser);
                     userLatch.countDown();
                 });
