@@ -70,13 +70,15 @@ public class MainActivity extends AppCompatActivity {
                 .addOnSuccessListener(snapshot -> {
                     if (snapshot.exists()) {
                         // if user exists, load that user into global session and go to event list
+                        Boolean isAdmin = snapshot.getBoolean("isAdmin");
                         User user = new User(
                                 snapshot.getId(),
                                 snapshot.getString("name"),
                                 snapshot.getString("email"),
                                 snapshot.getString("phone"),
-                                snapshot.getString("role"),
+                                isAdmin != null ? isAdmin : false,
                                 (ArrayList<String>) snapshot.get("events"),
+                                (ArrayList<String>) snapshot.get("organizedEvents"),
                                 (Map<String, Object>) snapshot.get("settings")
                         );
                         UserSession.getInstance().setCurrentUser(user);
