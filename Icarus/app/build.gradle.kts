@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation("com.cloudinary:cloudinary-android:2.2.0") // For Storing Images
     implementation("com.squareup.picasso:picasso:2.71828") // For Displaying Images via URL
+    implementation("com.google.android.gms:play-services-location:21.3.0") // For location services
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
