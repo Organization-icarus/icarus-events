@@ -136,9 +136,10 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
 
         });
         inviteSpecificEntrant.setOnClickListener(v -> {
-            // View Entrant Map
+            // Invite Entrants to a private event
             Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
             intent.putExtra("eventId", eventId);
+            intent.putExtra("ActivityName", "Entrant Search");
             startActivity(intent);
         });
         shareQRCode.setOnClickListener(v -> {
@@ -146,10 +147,11 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
 
         });
         addOrganizers.setOnClickListener(v -> {
-            // View Entrant Map
-//            Intent intent = new Intent(this, OrganizerViewEntrantsOnWaitingListActivity.class);
-//            intent.putExtra("eventId", eventId);
-//            startActivity(intent);
+            // add Organizers
+            Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
+            intent.putExtra("eventId", eventId);
+            intent.putExtra("ActivityName", "Find Co-Organizers");
+            startActivity(intent);
         });
         ReplaceDeclined.setOnClickListener(v -> {
             // Replaced Declined

@@ -2,23 +2,31 @@ package com.icarus.events;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
     private FirebaseFirestore db;
     private TextView eventName;
+    private TextView activityName;
     private EditText searchBar;
+    private Button confirmationButton;
     private ListView entrantList;
     private ArrayList<User> entrantUserList;
     private OraganizerEntrantViewListArrayAdapter eventListArrayAdapter;
@@ -35,6 +43,11 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
 
         db = FirebaseFirestore.getInstance();
 
+        //activityName
+        activityName = findViewById(R.id.OrganizerEntrantSearchTitle);
+        String screenName = getIntent().getStringExtra("ActivityName");
+        activityName.setText(screenName);
+
         //Create Event Name, Get eventID, and Get event Title from database
         eventName = findViewById(R.id.OrganizerEntrantSearchEventName);
         eventId = getIntent().getStringExtra("eventId");
@@ -50,7 +63,8 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
                 });
         //Create EditText
         searchBar = findViewById(R.id.OrganizerEntrantSearchBar);
-
+        //Create Button
+        confirmationButton = findViewById(R.id.OrganizerEntrantConfirmationButton);
         //Create ListView
         entrantList = findViewById(R.id.OrganizerEntrantList);
         entrantUserList = new ArrayList<>();
@@ -60,53 +74,133 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
         //Fill list with users not in the waiting list
         loadList();
 
+        /*TODO: THIS CURRENTLY ADDS USERS TO THE WAITING LIST. A NOTIFICATION MUST BE SENT INSTEAD
+        * AWAITING NOTIFICATION SET UP FROM KITO AND YIFAN
+        * March 25,2026 @ 4:23pm
+        */
+        confirmationButton.setOnClickListener(v -> {
+            Set<String> selectedIds = eventListArrayAdapter.getSelectedIds();
+            if (selectedIds.isEmpty()) {
+                Toast.makeText(this, "No users selected", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(screenName.equals("Entrant Search")){
+                addUsersToEvent(selectedIds);
+            } else if(screenName.equals("Find Co-Organizers")){
+                addUserstoOrganizersArray(selectedIds);
+            }
+
+            finish();
+        });
+
 
     }
+
+    /*
+     * Written by Claude, March 25,2026
+     * "Can you write a firebase query that find all users in the users
+     * collection that aren't in the "entrants" subcollection or have the isadmin bool = true.
+     *
+     * Changed and implemented by Ben Salmon
+     * */
     private void loadList() {
         entrantUserList.clear();
         eventListArrayAdapter.notifyDataSetChanged();
 
-        // Step 1: Get all entrant IDs from the subcollection
+        // Step 1: Get organizers array from event document
         db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(eventId)
-                .collection("entrants")
                 .get()
-                .addOnSuccessListener(entrantSnapshots -> {
+                .addOnSuccessListener(eventSnapshot -> {
+                    ArrayList<String> organizerIds = (ArrayList<String>) eventSnapshot.get("organizers");
+                    final Set<String> organizerSet = organizerIds != null ? new HashSet<>(organizerIds) : new HashSet<>();
 
-                    // Collect all entrant device IDs into a Set for O(1) lookup
-                    Set<String> entrantIds = new HashSet<>();
-                    for (QueryDocumentSnapshot snapshot : entrantSnapshots) {
-                        entrantIds.add(snapshot.getId());
-                    }
-                    // Step 2: Get ALL users
-                    db.collection(FirestoreCollections.USERS_COLLECTION)
+                    // Step 2: Get all entrant IDs from the subcollection
+                    db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                            .document(eventId)
+                            .collection("entrants")
                             .get()
-                            .addOnSuccessListener(userSnapshots -> {
-                                entrantUserList.clear();
-
-                                for (QueryDocumentSnapshot userSnapshot : userSnapshots) {
-                                    String deviceId = userSnapshot.getId();
-                                    String name = userSnapshot.getString("name");
-                                    Boolean isAdmin = userSnapshot.getBoolean("isAdmin");
-
-                                    boolean userIsAdmin = isAdmin != null && isAdmin;
-                                    boolean notInEntrants = !entrantIds.contains(deviceId);
-
-                                    // Include if not an entrant OR is an admin
-                                    if (notInEntrants || userIsAdmin) {
-                                        entrantUserList.add(new User(deviceId, name, null, null,
-                                                null, null, null, null));
-                                    }
+                            .addOnSuccessListener(entrantSnapshots -> {
+                                Set<String> entrantIds = new HashSet<>();
+                                for (QueryDocumentSnapshot snapshot : entrantSnapshots) {
+                                    entrantIds.add(snapshot.getId());
                                 }
 
-                                eventListArrayAdapter.notifyDataSetChanged();
+                                // Step 3: Get all users and filter
+                                db.collection(FirestoreCollections.USERS_COLLECTION)
+                                        .get()
+                                        .addOnSuccessListener(userSnapshots -> {
+                                            entrantUserList.clear();
+
+                                            for (QueryDocumentSnapshot userSnapshot : userSnapshots) {
+                                                String deviceId = userSnapshot.getId();
+                                                String name = userSnapshot.getString("name");
+                                                Boolean isAdmin = userSnapshot.getBoolean("isAdmin");
+
+                                                boolean userIsAdmin = isAdmin != null && isAdmin;
+                                                boolean notInEntrants = !entrantIds.contains(deviceId);
+                                                boolean isCurrentUser = deviceId.equals(userId);
+                                                boolean isOrganizer = organizerSet.contains(deviceId); // ← new
+
+                                                if (notInEntrants && !userIsAdmin && !isCurrentUser && !isOrganizer) {
+                                                    entrantUserList.add(new User(deviceId, name, null, null,
+                                                            null, null, null, null));
+                                                }
+                                            }
+                                            eventListArrayAdapter.notifyDataSetChanged();
+                                        })
+                                        .addOnFailureListener(e -> Log.e("loadList", "Failed to fetch users", e));
                             })
-                            .addOnFailureListener(e -> {
-                                Log.e("loadList", "Failed to fetch users", e);
-                            });
+                            .addOnFailureListener(e -> Log.e("loadList", "Failed to fetch entrants", e));
                 })
-                .addOnFailureListener(e -> {
-                    Log.e("loadList", "Failed to fetch entrants", e);
+                .addOnFailureListener(e -> Log.e("loadList", "Failed to fetch event", e));
+    }
+
+    /*
+    * Written by Claude, March 25,2026
+    * "How can I make the listView selectable to add users to an event"
+    * */
+    private void addUsersToEvent(Set<String> selectedIds) {
+        WriteBatch batch = db.batch();
+
+        for (String deviceId : selectedIds) {
+            DocumentReference ref = db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                    .document(eventId)
+                    .collection("entrants")
+                    .document(deviceId);
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("status", "waiting");
+            batch.set(ref, data);
+        }
+
+        batch.commit()
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(this, selectedIds.size() + " users added", Toast.LENGTH_SHORT).show();
+                    eventListArrayAdapter.clearSelections();
+                    loadList(); // removes newly added users from list
+                })
+                .addOnFailureListener(e -> Log.e("addUsers", "Failed to add users", e));
+    }
+
+    private void addUserstoOrganizersArray(Set<String> selectedIds){
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    ArrayList<String> organizers = (ArrayList<String>) documentSnapshot.get("organizers");
+                    organizers.addAll(selectedIds);
+                    db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                            .document(eventId)
+                            .update("organizers", organizers)
+                            .addOnSuccessListener(dummy ->{
+                               Toast.makeText(this,selectedIds.size() + " organizers added as Co-Organizers",Toast.LENGTH_SHORT).show();
+
+                               eventListArrayAdapter.clearSelections();
+                                eventListArrayAdapter.notifyDataSetChanged();
+                            });
                 });
+
+
     }
 }

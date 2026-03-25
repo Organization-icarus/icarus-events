@@ -79,7 +79,7 @@
         android:layout_marginEnd="16dp"
         android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@id/OrganizerEntrantSearchTitleCard"
-        app:layout_constraintBottom_toTopOf="@+id/nav_bar"
+        app:layout_constraintBottom_toTopOf="@+id/OrganizerEntrantConfirmationButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -93,14 +93,27 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/OrganizerEntrantConfirmationButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
 
+    <Button
+        android:id="@+id/OrganizerEntrantConfirmationButton"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:text="Confirm"
+        android:textSize="@dimen/font_text_size"
+        android:backgroundTint="@color/primary_container"
+        android:textColor="@color/primary_container_highlighted"
+        app:layout_constraintTop_toBottomOf="@id/scrollView"
+        app:layout_constraintBottom_toTopOf="@+id/nav_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
     <include
         android:id="@+id/nav_bar"
         layout="@layout/nav_bar"
