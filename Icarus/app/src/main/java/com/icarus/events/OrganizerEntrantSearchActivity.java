@@ -1,6 +1,8 @@
 package com.icarus.events;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +28,7 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
     private TextView eventName;
     private TextView activityName;
     private EditText searchBar;
+    private String currentSearch = "";
     private Button confirmationButton;
     private ListView entrantList;
     private ArrayList<User> entrantUserList;
@@ -63,6 +66,14 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
                 });
         //Create EditText
         searchBar = findViewById(R.id.OrganizerEntrantSearchBar);
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                currentSearch = s.toString().trim().toLowerCase();
+                applySearch();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
         //Create Button
         confirmationButton = findViewById(R.id.OrganizerEntrantConfirmationButton);
         //Create ListView
@@ -177,8 +188,6 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
         batch.commit()
                 .addOnSuccessListener(unused -> {
                     Toast.makeText(this, selectedIds.size() + " users added", Toast.LENGTH_SHORT).show();
-                    eventListArrayAdapter.clearSelections();
-                    loadList(); // removes newly added users from list
                 })
                 .addOnFailureListener(e -> Log.e("addUsers", "Failed to add users", e));
     }
@@ -196,11 +205,28 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
                             .addOnSuccessListener(dummy ->{
                                Toast.makeText(this,selectedIds.size() + " organizers added as Co-Organizers",Toast.LENGTH_SHORT).show();
 
-                               eventListArrayAdapter.clearSelections();
-                                eventListArrayAdapter.notifyDataSetChanged();
                             });
                 });
 
+
+    }
+    private void applySearch(){
+        if (currentSearch.isEmpty()) {
+            loadList();
+            return;
+        }
+        ArrayList<User> filteredEntrants = new ArrayList<User>();
+        for (User user : entrantUserList){
+            boolean name = user.getName().toLowerCase().contains(currentSearch);
+            boolean email = (user.getEmail() != null) && (user.getEmail().toLowerCase().contains(currentSearch));
+            boolean phone = (user.getPhone() != null) && (user.getPhone().toLowerCase().contains(currentSearch));
+            if(name || email || phone){
+                filteredEntrants.add(user);
+            }
+        }
+        entrantUserList.clear();
+        entrantUserList.addAll(filteredEntrants);
+        eventListArrayAdapter.notifyDataSetChanged();
 
     }
 }
