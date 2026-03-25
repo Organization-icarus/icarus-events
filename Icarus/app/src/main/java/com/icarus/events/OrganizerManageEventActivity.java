@@ -137,9 +137,9 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         });
         inviteSpecificEntrant.setOnClickListener(v -> {
             // View Entrant Map
-//            Intent intent = new Intent(this, UserRegistrationActivity.class);
-//            intent.putExtra("deviceId", deviceId);
-//            startActivity(intent);
+            Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
+            intent.putExtra("eventId", eventId);
+            startActivity(intent);
         });
         shareQRCode.setOnClickListener(v -> {
             // Sample Attendees
@@ -147,8 +147,8 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         });
         addOrganizers.setOnClickListener(v -> {
             // View Entrant Map
-//            Intent intent = new Intent(this, UserRegistrationActivity.class);
-//            intent.putExtra("deviceId", deviceId);
+//            Intent intent = new Intent(this, OrganizerViewEntrantsOnWaitingListActivity.class);
+//            intent.putExtra("eventId", eventId);
 //            startActivity(intent);
         });
         ReplaceDeclined.setOnClickListener(v -> {
