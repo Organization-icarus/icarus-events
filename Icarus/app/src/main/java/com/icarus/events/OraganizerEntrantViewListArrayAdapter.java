@@ -32,8 +32,12 @@ public class OraganizerEntrantViewListArrayAdapter extends ArrayAdapter<User> {
 
         User entrant = entrants.get(position);
         TextView entrantName = view.findViewById(R.id.OrganizerEntrantNameOnViewList);
+        TextView entrantEmail = view.findViewById(R.id.OrganizerEntrantEmailOnViewList);
+        TextView entrantPhone = view.findViewById(R.id.OrganizerEntrantPhoneOnViewList);
 
         entrantName.setText(entrant.getName());
+        entrantEmail.setText(entrant.getEmail() != null ? "Email: " + entrant.getEmail() : "Email: Not Given");
+        entrantPhone.setText(entrant.getPhone() != null ? "Phone: " + entrant.getPhone() : "Phone: Not Given");
 
         return view;
     }

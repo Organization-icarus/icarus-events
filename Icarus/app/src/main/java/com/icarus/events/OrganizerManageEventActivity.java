@@ -46,6 +46,7 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
     private Button SampleAttendees;
     private Button addOrganizers;
     private Button ReplaceDeclined;
+    private Button shareQRCode;
     private TextView eventTitle;
     private String eventId;
     private String posterURL;
@@ -68,6 +69,7 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         SampleAttendees = findViewById(R.id.OrganizerManageEventSampleAttendees);
         addOrganizers = findViewById(R.id.OrganizerManageEventAddOrganizer);
         ReplaceDeclined = findViewById(R.id.OrganizerManageEventReplaceDeclined);
+        shareQRCode = findViewById(R.id.OrganizerManageEventShareQRCode);
         //Create textView
         eventTitle = findViewById(R.id.OrganizerManageEventTitle);
 
@@ -126,17 +128,21 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
             intent.putExtra("eventId", eventId);
             startActivity(intent);
         });
+        SampleAttendees.setOnClickListener(v -> {
+            // Sample Attendees
+            Intent intent = new Intent(this, SampleAttendeesActivity.class);
+            intent.putExtra("eventId", eventId);
+            startActivity(intent);
+
+        });
         inviteSpecificEntrant.setOnClickListener(v -> {
             // View Entrant Map
 //            Intent intent = new Intent(this, UserRegistrationActivity.class);
 //            intent.putExtra("deviceId", deviceId);
 //            startActivity(intent);
         });
-        SampleAttendees.setOnClickListener(v -> {
+        shareQRCode.setOnClickListener(v -> {
             // Sample Attendees
-            Intent intent = new Intent(this, SampleAttendeesActivity.class);
-            intent.putExtra("eventId", eventId);
-            startActivity(intent);
 
         });
         addOrganizers.setOnClickListener(v -> {
