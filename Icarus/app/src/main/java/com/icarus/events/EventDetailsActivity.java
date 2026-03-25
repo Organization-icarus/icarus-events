@@ -48,7 +48,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
     private Button joinBtn, leaveBtn, declineBtn, registerBtn;
 
     private ImageView posterView;
-    private Boolean isAdmin, isOrganizer;
+    private Boolean isAdmin, isOrganizer, locationEnabled;
     private String currentStatus;
     private int currentWaitingCount;
 
@@ -87,6 +87,11 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         // Get location services client
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        // Check if event has geolocation enabled
+        db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId).get()
+                .addOnSuccessListener(snapshot -> {
+                    locationEnabled = snapshot.getBoolean("geolocation");
+                });
 
         //---------------------------
         // GET ALL BUTTONS
@@ -136,41 +141,46 @@ public class EventDetailsActivity extends NavigationBarActivity {
                 Toast.makeText(this, "This event is full", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            if (ContextCompat.checkSelfPermission(
-                    this, Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                // Permission already granted
-                try {
-                    fusedLocationClient.getLastLocation()
-                            .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                                @Override
-                                public void onSuccess(Location location) {
-                                    if (location != null) {
-                                        double latitude = location.getLatitude();
-                                        double longitude = location.getLongitude();
-                                        GeoPoint geopoint = new GeoPoint(latitude, longitude);
-                                        addUserToWaitingList(finalEventId, userId, geopoint);
-                                    } else {
-                                        Toast.makeText(EventDetailsActivity.this,
-                                                "Error getting location, try again later",
-                                                Toast.LENGTH_SHORT).show();
+            if (locationEnabled) {
+                // Event requires geolocation, check permission and add user if they allow it.
+                if (ContextCompat.checkSelfPermission(
+                        this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    // Permission already granted
+                    try {
+                        fusedLocationClient.getLastLocation()
+                                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                                    @Override
+                                    public void onSuccess(Location location) {
+                                        if (location != null) {
+                                            double latitude = location.getLatitude();
+                                            double longitude = location.getLongitude();
+                                            GeoPoint geopoint = new GeoPoint(latitude, longitude);
+                                            addUserToWaitingList(finalEventId, userId, geopoint);
+                                        } else {
+                                            Toast.makeText(EventDetailsActivity.this,
+                                                    "Error getting location, try again later",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
                                     }
-                                }
-                            });
-                } catch (SecurityException e) {
-                    // Handle exception: Log, notify user, or request permission again
-                    Toast.makeText(this,
-                            "Error getting location, try again later",
-                            Toast.LENGTH_SHORT).show();
+                                });
+                    } catch (SecurityException e) {
+                        // Handle exception: Log, notify user, or request permission again
+                        Toast.makeText(this,
+                                "Error getting location, try again later",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    // Request permission
+                    ActivityCompat.requestPermissions(
+                            this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            LOCATION_PERMISSION_REQUEST
+                    );
                 }
             } else {
-                // Request permission
-                ActivityCompat.requestPermissions(
-                        this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        LOCATION_PERMISSION_REQUEST
-                );
+                // Add user to waiting list with no geopoint
+                addUserToWaitingList(finalEventId, userId, null);
             }
         });
 
@@ -504,7 +514,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
         currentStatus = "waiting";
         Map<String, Object> entrant = new HashMap<>();
         entrant.put("status", currentStatus);
-        entrant.put("location", geopoint);
+        if (geopoint != null) entrant.put("location", geopoint);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         // Add user ID to event with status: "waiting" and location
         db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId)
