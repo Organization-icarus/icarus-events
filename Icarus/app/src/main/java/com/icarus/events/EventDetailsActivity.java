@@ -17,6 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +44,8 @@ public class EventDetailsActivity extends NavigationBarActivity {
     private int currentWaitingCount;
 
     // Initialize fields to store the event's information
-    private String eventName, eventCategory, eventLocation, eventImage, eventOrganizer;
+    private String eventName, eventCategory, eventLocation, eventImage;
+    private ArrayList<String> eventOrganizers;
     private double eventCapacity;
     private Date EventRegOpen, eventRegClose, eventDate;
 
@@ -59,7 +61,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
         setupNavBar();
-
+        eventOrganizers = new ArrayList<String>();
         // Retrieve data passed to the intent
         String eventId = getIntent().getStringExtra("eventId");
         if (eventId == null) eventId = "hL8pW5lK9gDloqcWlmqx"; // For testing
@@ -276,8 +278,8 @@ public class EventDetailsActivity extends NavigationBarActivity {
                         eventDate = doc.getDate("date");
                         eventLocation = doc.getString("location");
                         eventImage = doc.getString("image");
-                        eventOrganizer = doc.getString("organizer");
-                        isOrganizer = userId.equals(eventOrganizer);
+                        eventOrganizers = (ArrayList<String>) doc.get("organizers");
+                        isOrganizer = eventOrganizers.contains(userId);
                         setupButtons(isAdmin, isOrganizer, currentStatus);
 
                         TextView eventName = findViewById(R.id.eventName);
@@ -402,7 +404,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
         Event event = new Event(
                 finalEventId, eventName, eventCategory, eventCapacity,
                 EventRegOpen, eventRegClose, eventDate, eventLocation,
-                eventImage, eventOrganizer, currentStatus, currentWaitingCount
+                eventImage, eventOrganizers, currentStatus, currentWaitingCount
         ); // unchanged
 
         RecyclerView recyclerView = findViewById(R.id.event_details_event_list);
