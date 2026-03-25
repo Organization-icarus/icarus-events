@@ -24,10 +24,11 @@ import java.util.Map;
 /**
  * Activity that allows organizers to manage a event.
  * <p>
- * Users can enter change event poster, location,
- * registration period, event date, participant limit, and whether
- * geolocation tracking is enabled. Event information is validated
- * and then stored in the Firestore "events" collection.
+ * This activity lets an organizer manage an event by loading its data from Firestore.
+ * It displays the event title and poster, using a default image if none exists.
+ * Buttons allow viewing entrants, sampling attendees, or navigating to other screens.
+ * The poster can be updated: chosen images upload to Cloudinary and update Firestore.
+ * Old images are deleted, and the UI refreshes to show the new poster.
  * <p>
  * This activity extends {@link NavigationBarActivity} to include
  * the application's reusable navigation bar.
