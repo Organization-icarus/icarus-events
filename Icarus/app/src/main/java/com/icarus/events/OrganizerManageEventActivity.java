@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,11 +21,30 @@ import com.squareup.picasso.Picasso;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Activity that allows organizers to manage a event.
+ * <p>
+ * This activity lets an organizer manage an event by loading its data from Firestore.
+ * It displays the event title and poster, using a default image if none exists.
+ * Buttons allow viewing entrants, sampling attendees, or navigating to other screens.
+ * The poster can be updated: chosen images upload to Cloudinary and update Firestore.
+ * Old images are deleted, and the UI refreshes to show the new poster.
+ * <p>
+ * This activity extends {@link NavigationBarActivity} to include
+ * the application's reusable navigation bar.
+ *
+ * @author Ben Salmon
+ */
+
 public class OrganizerManageEventActivity extends NavigationBarActivity{
+
+    private ImageView eventPoster;
+    private Button UpdatePoster;
     private Button ViewEntrantMap;
     private Button ViewEntrantList;
-    private Button UpdatePoster;
+    private Button inviteSpecificEntrant;
     private Button SampleAttendees;
+    private Button addOrganizers;
     private Button ReplaceDeclined;
     private TextView eventTitle;
     private String eventId;
@@ -38,13 +58,16 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         setContentView(R.layout.activity_organizer_manage_event);
         setupNavBar();
 
+        //Create Image
+        eventPoster = findViewById(R.id.OrganizerManageEventViewImage);
         //Create Buttons
+        UpdatePoster = findViewById(R.id.OrganizerManageEventUpdatePoster);
         ViewEntrantMap = findViewById(R.id.OrganizerManageEventViewEntrantMap);
         ViewEntrantList = findViewById(R.id.OrganizerManageEventViewEntrantList);
-        UpdatePoster = findViewById(R.id.OrganizerManageEventUpdatePoster);
+        inviteSpecificEntrant = findViewById(R.id.OrganizerManageEventInviteEntrant);
         SampleAttendees = findViewById(R.id.OrganizerManageEventSampleAttendees);
+        addOrganizers = findViewById(R.id.OrganizerManageEventAddOrganizer);
         ReplaceDeclined = findViewById(R.id.OrganizerManageEventReplaceDeclined);
-
         //Create textView
         eventTitle = findViewById(R.id.OrganizerManageEventTitle);
 
@@ -62,6 +85,35 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         // Initialize imagePickerLauncher
         ActivityResultLauncher<String> imagePickerLauncher = createImagePicker();
 
+        //Upload image into activity
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .document(eventId).get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot.exists()) {
+                        String imageURL = snapshot.getString("image");
+                        if (imageURL != null && !imageURL.isEmpty()) {
+                            Picasso.get()
+                                    .load(snapshot.getString("image"))
+                                    .error(R.drawable.poster)           // Optional: shows if link fails
+                                    .into(eventPoster);
+                        } else {
+                            eventPoster.setImageResource(R.drawable.poster);
+                        }
+                    }
+                })
+                .addOnFailureListener( e -> {
+                    Toast.makeText(this, "Failed to load poster", Toast.LENGTH_SHORT).show();
+                });
+
+        UpdatePoster.setOnClickListener(v -> {
+            // Get old poster url
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).get()
+                    .addOnSuccessListener(document -> {
+                        posterURL = document.getString("image");
+                    });
+            // Update Poster
+            imagePickerLauncher.launch("image/*");
+        });
         ViewEntrantMap.setOnClickListener(v -> {
             // View Entrant Map
 //            Intent intent = new Intent(this, UserRegistrationActivity.class);
@@ -74,14 +126,11 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
             intent.putExtra("eventId", eventId);
             startActivity(intent);
         });
-        UpdatePoster.setOnClickListener(v -> {
-            // Get old poster url
-            db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).get()
-                    .addOnSuccessListener(document -> {
-                        posterURL = document.getString("image");
-                    });
-            // Update Poster
-            imagePickerLauncher.launch("image/*");
+        inviteSpecificEntrant.setOnClickListener(v -> {
+            // View Entrant Map
+//            Intent intent = new Intent(this, UserRegistrationActivity.class);
+//            intent.putExtra("deviceId", deviceId);
+//            startActivity(intent);
         });
         SampleAttendees.setOnClickListener(v -> {
             // Sample Attendees
@@ -89,6 +138,12 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
             intent.putExtra("eventId", eventId);
             startActivity(intent);
 
+        });
+        addOrganizers.setOnClickListener(v -> {
+            // View Entrant Map
+//            Intent intent = new Intent(this, UserRegistrationActivity.class);
+//            intent.putExtra("deviceId", deviceId);
+//            startActivity(intent);
         });
         ReplaceDeclined.setOnClickListener(v -> {
             // Replaced Declined
@@ -110,7 +165,6 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
                     }
                 });
     }
-
     private ActivityResultLauncher<String> createImagePicker() {
         return registerForActivityResult(
                 new ActivityResultContracts.GetContent(), uri -> {
@@ -135,6 +189,7 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
                                                             .document(eventId)
                                                             .update("image", newPosterURL);
                                                     posterURL = newPosterURL;
+                                                    eventPoster.setImageURI(uri);
                                                 })
                                                 .addOnFailureListener(e -> {
                                                     Toast.makeText(OrganizerManageEventActivity.this,
