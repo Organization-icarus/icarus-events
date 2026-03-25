@@ -1,5 +1,6 @@
 package com.icarus.events;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -20,7 +21,7 @@ public class Event {
     private Date date;
     private String location;
     private String image;
-    private String organizer;
+    private ArrayList<String> organizers;
     private String description;
     private String guidelines;
 
@@ -40,10 +41,10 @@ public class Event {
      * @param date the date the event takes place
      * @param location the location where the event is held
      * @param image the image associated with the event
-     * @param organizer the identifier of the event organizer
+     * @param organizers the identifier of the event organizer
      */
     public Event(String id, String name, String category, Double capacity, Date regOpen,
-                 Date regClose, Date date, String location, String image, String organizer) {
+                 Date regClose, Date date, String location, String image, ArrayList<String> organizers) {
         this.id = id;
         this.name = name;
         this.category = category;
@@ -53,12 +54,12 @@ public class Event {
         this.date = date;
         this.location = location;
         this.image = image;
-        this.organizer = organizer;
+        this.organizers = organizers;
     }
 
     // A full constructor
     public Event(String id, String name, String category, Double capacity, Date regOpen,
-                 Date regClose, Date date, String location, String image, String organizer,
+                 Date regClose, Date date, String location, String image, ArrayList<String> organizers,
                  String user_status, int waiting_list_size) {
         this.id = id;
         this.name = name;
@@ -69,7 +70,7 @@ public class Event {
         this.date = date;
         this.location = location;
         this.image = image;
-        this.organizer = organizer;
+        this.organizers = organizers;
         this.user_status = user_status;
         this.waiting_list_size = waiting_list_size;
     }
@@ -236,18 +237,18 @@ public class Event {
     /**
      * Returns the id of the organizer of the event.
      *
-     * @return the event organizer's id
+     * @return the event's organizers id
      */
-    public String getOrganizer() {
-        return organizer;
+    public ArrayList<String> getOrganizers() {
+        return organizers;
     }
 
     /**
      * Sets the id of the organizer of the event.
      *
-     * @param organizer the new event organizer's id
+     * @param organizers the new event's organizers ids
      */
-    public void setOrganizer(String organizer) {
-        this.organizer = organizer;
+    public void setOrganizer(ArrayList<String> organizers) {
+        this.organizers = organizers;
     }
 }

@@ -108,7 +108,6 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         setupNavBar();
         User user = UserSession.getInstance().getCurrentUser();
         String userId = user.getId();
-
         db = FirebaseFirestore.getInstance();
 
         //Create Spinner
@@ -239,6 +238,9 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             String description = eventDescription.getText().toString().trim();
             String category = categoryNameList.getSelectedItem().toString().trim();
             String location = locationName.getText().toString().trim();
+            ArrayList<String> organizerIds = new ArrayList<>();
+            organizerIds.add(userId);
+
 
             // Check if user filled in all dates before proceeding
             if (startDate == null || startTime == null || endDate == null || endTime == null || eventDate == null || eventTime == null) {
@@ -268,8 +270,6 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 return;
             }
 
-
-
             //Uppercase first letter and lowercase rest of string
             Double numberOfPeople = null;
             if (!EventLimit.getText().toString().trim().isEmpty()) {
@@ -283,7 +283,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             final String finalCategory = category;
             final String finalLocation = location;
             final Double finalCapacity = numberOfPeople;
-            final String finalUserId = userId;
+            final ArrayList<String> finalOrganizerIds = organizerIds;
             if (posterURI != null) {
                 MediaManager.get().upload(posterURI)
                         .option("upload_preset", "ml_default")
@@ -305,7 +305,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                                                     "Failed to add image to firestore", Toast.LENGTH_SHORT).show();
                                         });
                                 // Save event to firestore
-                                saveEvent(finalName, finalDescription, finalCategory, finalCapacity, posterURL, finalLocation, finalUserId);
+                                saveEvent(finalName, finalDescription, finalCategory, finalCapacity, posterURL, finalLocation, finalOrganizerIds);
                             }
 
                             @Override
@@ -315,7 +315,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                                         "Failed to Upload Image.", Toast.LENGTH_SHORT).show();
                                 Log.e("UPLOAD_ERROR", error.getDescription());
                                 // Save event to firestore with empty poster
-                                saveEvent(finalName, finalDescription,finalCategory, finalCapacity, posterURL, finalLocation, finalUserId);
+                                saveEvent(finalName, finalDescription,finalCategory, finalCapacity, posterURL, finalLocation, finalOrganizerIds);
                             }
 
                             @Override public void onStart(String requestId) {}
@@ -325,12 +325,12 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                         .dispatch();
             } else {
                 // Save event to firestore with empty poster
-                saveEvent(finalName, finalDescription, finalCategory, finalCapacity, "", finalLocation, finalUserId);
+                saveEvent(finalName, finalDescription, finalCategory, finalCapacity, "", finalLocation, finalOrganizerIds);
             }
         });
     }
 
-    private void saveEvent(String name, String description, String category, Double capacity, String posterURL, String location, String userId) {
+    private void saveEvent(String name, String description, String category, Double capacity, String posterURL, String location, ArrayList<String> organizerIds) {
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("name", name);
         eventData.put("description", description);
@@ -342,7 +342,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         eventData.put("image", posterURL);
         eventData.put("location", location);
         eventData.put("geolocation",geolocationSwitch.isChecked());
-        eventData.put("organizer", userId);
+        eventData.put("organizers", organizerIds);
 
         //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
         db.collection(FirestoreCollections.EVENTS_COLLECTION).add(eventData)

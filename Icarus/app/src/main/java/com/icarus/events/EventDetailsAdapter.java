@@ -59,13 +59,13 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
         fields.add(new EventField("Registration Closes", regClose));
         fields.add(new EventField("Event Date", date));
         fields.add(new EventField("Location", event.getLocation()));
-        fields.add(new EventField("Organizer", event.getOrganizer()));
+        fields.add(new EventField("Organizer", event.getOrganizers().get(0)));
         fields.add(new EventField("User Status", event.getUser_status()));
 
         // To get the organizer's name from their ID
         FirebaseFirestore.getInstance()
                 .collection("users")
-                .document(event.getOrganizer())
+                .document(event.getOrganizers().get(0))
                 .get()
                 .addOnSuccessListener(doc -> {
                     int organizerIndex = -1;

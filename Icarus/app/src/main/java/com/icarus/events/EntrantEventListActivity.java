@@ -143,7 +143,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
                     Date date = snapshot.getDate("date");
                     String location = snapshot.getString("location");
                     String image = snapshot.getString("image");
-                    String organizer = snapshot.getString("organizer");
+                    ArrayList<String> organizers = (ArrayList<String>) snapshot.get("organizers");
 
                     eventArrayList.add(
                             new Event(
@@ -156,7 +156,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
                                     date,
                                     location,
                                     image,
-                                    organizer));
+                                    organizers));
                 }
                 applyFilters();
             }

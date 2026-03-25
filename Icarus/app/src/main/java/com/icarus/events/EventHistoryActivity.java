@@ -152,11 +152,11 @@ public class EventHistoryActivity extends NavigationBarActivity {
                                 Date date = snapshot.getDate("date");
                                 String location = snapshot.getString("location");
                                 String image = snapshot.getString("image");
-                                String organizer = snapshot.getString("organizer");
+                                ArrayList<String> organizers = (ArrayList<String>) snapshot.get("organizers");
 
                                 eventHistoryArrayList.add(new Event(
                                         id, name, category, capacity,
-                                        regOpen, regClose, date, location, image, organizer));
+                                        regOpen, regClose, date, location, image, organizers));
                             }
                             applyFilters();
                         }
