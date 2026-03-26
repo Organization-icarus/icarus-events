@@ -8,6 +8,8 @@
     <color name="primary">#FFFFFFFF</color>
     <!-- A light background color for buttons -->
     <color name="primary_container">#FFE8DEF8</color>
+    <!-- colors.xml -->
+    <color name="primary_container_glass">#F2E8DEF8</color>
     <!-- A darker background color to indicate selection -->
     <color name="primary_container_highlighted">#FF6750A4</color>
     <!-- For buttons that require sensitive action (delete, remove, etc)  -->
