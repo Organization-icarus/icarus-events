@@ -48,6 +48,8 @@
 
         <activity android:name=".OrganizerManageEventActivity"/>
 
+        <activity android:name=".OrganizerEntrantSearchActivity"/>
+
         <activity android:name=".SampleAttendeesActivity"/>
 
         <activity android:name=".EntrantMapActivity"/>
