@@ -9,11 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- The bottom padding must be at least the height of the nav bar /-->
         <LinearLayout
             style="@style/LinearLayoutForNavBar" >
 
+
+            <!-- -->
             <!-- EVENT POSTER -->
+            <!-- -->
             <ImageView
                 android:id="@+id/eventPoster"
                 android:layout_width="match_parent"
@@ -22,62 +24,81 @@
                 android:layout_marginTop="32dp"
                 android:src="@drawable/poster" />
 
-            <!-- EVENT NAME -->
-            <TextView
-                android:id="@+id/eventName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Event Name"
-                android:textSize="@dimen/font_heading_size"
-                android:layout_marginTop="16dp" />
 
-            <!-- EVENT DESCRIPTION -->
-            <TextView
-                android:id="@+id/eventDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/paragraph_placeholder"
-                android:textSize="@dimen/font_text_size" />
+            <!-- -->
+            <!-- TITLE AND DESCRIPTION -->
+            <!-- -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/TitleAndDescriptionCard"
+                style="@style/ViewCard"
+                android:layout_marginTop="16dp" >
 
-            <!-- DIVIDER -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"
-                android:layout_marginTop="16dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-            <!-- EVENT DETAILS LIST -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/event_details_event_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"/>
+                    <!-- EVENT NAME -->
+                    <TextView
+                        android:id="@+id/eventName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Event Name"
+                        android:textSize="@dimen/font_heading_size" />
 
-            <!-- LOTTERY GUIDELINES -->
-            <TextView
-                android:id="@+id/lottery_guidelines"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Lottery Guidelines"
-                android:textColor="@color/primary_container_highlighted"
-                android:clickable="true"
-                android:focusable="true" />
+                    <!-- EVENT DESCRIPTION -->
+                    <TextView
+                        android:id="@+id/eventDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/paragraph_placeholder"
+                        android:textSize="@dimen/font_text_size" />
 
-            <!-- DIVIDER -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
 
-            <!--####################-->
+            <!-- -->
+            <!-- EVENT DETAILS LIST AND GUIDELINES -->
+            <!-- -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/OrganizerCreateEventImageCard"
+                style="@style/ViewCard"
+                android:layout_marginTop="16dp" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/event_details_event_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"/>
+
+                <!-- LOTTERY GUIDELINES -->
+                <TextView
+                    android:id="@+id/lottery_guidelines"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Lottery Guidelines"
+                    android:textColor="@color/primary_container_highlighted"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- -->
+            <!-- BUTTONS -->
+            <!-- -->
+
             <!-- ADMIN -->
-            <!--####################-->
-
             <com.google.android.material.button.MaterialButton
                 style="@style/AppButton"
                 android:id="@+id/event_organizer_button"
@@ -85,11 +106,7 @@
                 app:icon="@drawable/profile"
                 android:visibility="visible"/>
 
-
-            <!--####################-->
             <!-- ORGANIZER -->
-            <!--####################-->
-
             <com.google.android.material.button.MaterialButton
                 style="@style/AppButton"
                 android:id="@+id/manage_button"
@@ -97,18 +114,13 @@
                 app:icon="@drawable/gear"
                 android:visibility="visible"/>
 
-
-            <!--####################-->
             <!--ADMIN AND ORGANIZER -->
-            <!--####################-->
-
             <com.google.android.material.button.MaterialButton
                 style="@style/AppButton"
                 android:id="@+id/notification_button"
                 android:text="Notifications"
                 app:icon="@drawable/notifications"
                 android:visibility="visible"/>
-
 
             <com.google.android.material.button.MaterialButton
                 style="@style/AppButton"
@@ -117,11 +129,7 @@
                 app:icon="@drawable/delete"
                 android:visibility="visible"/>
 
-
-            <!--####################-->
             <!-- USER UNINITIALIZED -->
-            <!--####################-->
-
             <com.google.android.material.button.MaterialButton
                 style="@style/AppButton"
                 android:id="@+id/join_waiting_list_button"
@@ -129,11 +137,7 @@
                 app:icon="@drawable/check"
                 android:visibility="visible"/>
 
-
-            <!--####################-->
             <!-- USER WAITING -->
-            <!--####################-->
-
             <com.google.android.material.button.MaterialButton
                 style="@style/AppButton"
                 android:id="@+id/leave_waiting_list_button"
@@ -141,10 +145,7 @@
                 app:icon="@drawable/back"
                 android:visibility="visible"/>
 
-            <!--####################-->
             <!-- USER SELECTED -->
-            <!--####################-->
-
             <com.google.android.material.button.MaterialButton
                 style="@style/AppButton"
                 android:id="@+id/register_button"
@@ -159,10 +160,7 @@
                 app:icon="@drawable/decline"
                 android:visibility="visible"/>
 
-            <!--####################-->
             <!-- USER REGISTERED -->
-            <!--####################-->
-
             <com.google.android.material.button.MaterialButton
                 style="@style/AppButton"
                 android:id="@+id/cancel_registration"
@@ -170,13 +168,13 @@
                 app:icon="@drawable/decline"
                 android:visibility="visible"/>
 
+
             <!-- DIVIDER -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="16dp"/>
 
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
 
     <!-- NAVIGATION BAR -->

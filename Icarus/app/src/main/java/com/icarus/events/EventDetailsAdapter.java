@@ -54,7 +54,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
 
         // Convert Event fields into EventField list
         fields.add(new EventField("Category", event.getCategory()));
-        fields.add(new EventField("Waiting List Capacity", String.valueOf(event.getWaiting_list_size()) + "/" + capacity));
+        fields.add(new EventField("Waiting List", String.valueOf(event.getWaiting_list_size()) + "/" + capacity));
         fields.add(new EventField("Registration Opens", regOpen));
         fields.add(new EventField("Registration Closes", regClose));
         fields.add(new EventField("Event Date", date));
