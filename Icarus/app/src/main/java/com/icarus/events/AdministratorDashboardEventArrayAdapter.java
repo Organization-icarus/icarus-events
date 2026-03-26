@@ -122,6 +122,17 @@ public class AdministratorDashboardEventArrayAdapter extends ArrayAdapter<Event>
                     batch.delete(userDoc.getReference());
                 }
 
+                // remove the events poster from the database
+                db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                        .whereEqualTo("URL", event.getImage())
+                        .get()
+                        .addOnSuccessListener(querySnapshot -> {
+                            for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                Image poster = new Image(event.getImage(), doc.getId());
+                                poster.delete(context, db);
+                            }
+                        });
+
                 // remove event document
                 DocumentReference eventRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(event.getId());
                 batch.delete(eventRef);
