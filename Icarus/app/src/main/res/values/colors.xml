@@ -5,7 +5,7 @@
     <!-- For text displayed on a highlighted background -->
     <color name="white">#FFFFFFFF</color>
     <!-- The main background color, and the color for text in dark text boxes -->
-    <color name="primary">#FFFFFFFF</color>
+    <color name="primary">#FF212121</color>
     <!-- A light background color for buttons -->
     <color name="primary_container">#FFE8DEF8</color>
     <!-- A darker background color to indicate selection -->
