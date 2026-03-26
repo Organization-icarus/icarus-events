@@ -18,6 +18,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,9 +47,11 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
     private Button SampleAttendees;
     private Button addOrganizers;
     private Button ReplaceDeclined;
+    private Button shareQRCode;
     private TextView eventTitle;
     private String eventId;
     private String posterURL;
+    private Boolean isPrivate;
 
     private FirebaseFirestore db;
 
@@ -68,6 +71,7 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         SampleAttendees = findViewById(R.id.OrganizerManageEventSampleAttendees);
         addOrganizers = findViewById(R.id.OrganizerManageEventAddOrganizer);
         ReplaceDeclined = findViewById(R.id.OrganizerManageEventReplaceDeclined);
+        shareQRCode = findViewById(R.id.OrganizerManageEventShareQRCode);
         //Create textView
         eventTitle = findViewById(R.id.OrganizerManageEventTitle);
 
@@ -80,6 +84,8 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
                 .addOnSuccessListener(document -> {
                     String eventName = document.getString("name");
                     eventTitle.setText(eventName);
+                    isPrivate = document.getBoolean("isPrivate");
+                    if(isPrivate == null){isPrivate = false;}
                 });
 
         // Initialize imagePickerLauncher
@@ -116,21 +122,15 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         });
         ViewEntrantMap.setOnClickListener(v -> {
             // View Entrant Map
-//            Intent intent = new Intent(this, UserRegistrationActivity.class);
-//            intent.putExtra("deviceId", deviceId);
-//            startActivity(intent);
+            Intent intent = new Intent(this, EntrantMapActivity.class);
+            intent.putExtra("eventId", eventId);
+            startActivity(intent);
         });
         ViewEntrantList.setOnClickListener(v -> {
             // View Entrant List
             Intent intent = new Intent(this, OrganizerViewEntrantsOnWaitingListActivity.class);
             intent.putExtra("eventId", eventId);
             startActivity(intent);
-        });
-        inviteSpecificEntrant.setOnClickListener(v -> {
-            // View Entrant Map
-//            Intent intent = new Intent(this, UserRegistrationActivity.class);
-//            intent.putExtra("deviceId", deviceId);
-//            startActivity(intent);
         });
         SampleAttendees.setOnClickListener(v -> {
             // Sample Attendees
@@ -139,11 +139,29 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
             startActivity(intent);
 
         });
+        inviteSpecificEntrant.setOnClickListener(v -> {
+            // Invite Entrants to a private event
+            if(isPrivate){
+                Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
+                intent.putExtra("eventId", eventId);
+                intent.putExtra("ActivityName", "Entrant Search");
+                startActivity(intent);
+            }else{
+                Toast.makeText(OrganizerManageEventActivity.this,
+                        "Event is not Private", Toast.LENGTH_SHORT).show();
+            }
+
+        });
+        shareQRCode.setOnClickListener(v -> {
+            // Open Share menu to Share QRcode
+
+        });
         addOrganizers.setOnClickListener(v -> {
-            // View Entrant Map
-//            Intent intent = new Intent(this, UserRegistrationActivity.class);
-//            intent.putExtra("deviceId", deviceId);
-//            startActivity(intent);
+            // add Organizers as Co-Organzers
+            Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
+            intent.putExtra("eventId", eventId);
+            intent.putExtra("ActivityName", "Find Co-Organizers");
+            startActivity(intent);
         });
         ReplaceDeclined.setOnClickListener(v -> {
             // Replaced Declined

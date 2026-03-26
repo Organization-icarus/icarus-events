@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- -->
+    <!-- For full-width buttons -->
+    <!-- -->
     <style name="AppButton" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -24,4 +28,41 @@
         <item name="cornerSizeBottomRight">0dp</item>
     </style>
 
+
+
+    <!-- -->
+    <!-- For cards to wrap views -->
+    <!-- -->
+    <style name="ViewCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+
+        <item name="contentPadding">16dp</item>
+
+        <item name="cardElevation">0dp</item>
+        <item name="cardCornerRadius">8dp</item>
+        <item name="strokeColor">#313131</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="cardBackgroundColor">#313131</item>
+    </style>
+
+
+    <!-- -->
+    <!-- For linear layouts inside top-level scroll views -->
+    <!-- -->
+    <style name="LinearLayoutForNavBar">
+        <!-- Layout -->
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <!-- Orientation -->
+        <item name="android:orientation">vertical</item>
+        <!-- Padding -->
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">@dimen/nav_bar_height_plus_padding</item>
+        <!-- Behavior -->
+        <item name="android:clipToPadding">false</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
 </resources>
