@@ -39,7 +39,6 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
     private MaterialButtonToggleGroup filterButtons;
     private ArrayList<User> entrantList;
     private OraganizerEntrantViewListArrayAdapter eventListArrayAdapter;
-
     private String eventId;
 
     @Override
@@ -47,7 +46,6 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_view_entrants_on_waiting_list);
         setupNavBar();
-
         db = FirebaseFirestore.getInstance();
 
         //Create TextView
@@ -82,23 +80,20 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
                 });
 
         filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) ->{
-            String status = null;
+            if (!isChecked) return; // ← ignore uncheck events entirely
             backButton.setText("Go Back");
+            String status = null;
             if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_waiting)){
                 status = "waiting";
-                loadList(status);
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_chosen)){
                 status = "selected";
-                loadList(status);
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_cancelled)){
                 status = "rejected";
-                loadList(status);
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_final)){
                 status = "registered";
-                loadList(status);
                 backButton.setText("Export CSV");
             }
-
+            loadList(status);
         });
 
         backButton.setOnClickListener(v -> {
