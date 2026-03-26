@@ -18,6 +18,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
     private String eventName, eventCategory, eventLocation, eventImage;
     private ArrayList<String> eventOrganizers;
     private double eventCapacity;
-    private Date EventRegOpen, eventRegClose, eventDate;
+    private Date eventRegOpen, eventRegClose, eventDate;
 
     // To prevent the firebase snapshot listener from creating memory leaks
     private ListenerRegistration eventListener;
@@ -182,6 +183,32 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
 
         registerBtn.setOnClickListener(v -> {
+            // First make sure that the user is in the registration window
+            Date now = new Date();
+
+            // For testing:
+            /* Calendar cal = Calendar.getInstance();
+            cal.set(2026, Calendar.APRIL, 1, 14, 30, 0); // Year, Month, Day, Hour, Min, Sec
+            Date now = cal.getTime(); */
+
+            if (eventRegOpen != null && now.before(eventRegOpen)) {
+                Toast.makeText(
+                        v.getContext(),
+                        "Registration has not opened yet.",
+                        Toast.LENGTH_SHORT
+                ).show();
+                return;
+            }
+
+            if (eventRegClose != null && now.after(eventRegClose)) {
+                Toast.makeText(
+                        v.getContext(),
+                        "Registration is closed.",
+                        Toast.LENGTH_SHORT
+                ).show();
+                return;
+            }
+
             currentStatus = "registered";
             setupButtons(isAdmin, isOrganizer, currentStatus);
             refreshAdapter(finalEventId);
@@ -189,8 +216,10 @@ public class EventDetailsActivity extends NavigationBarActivity {
             // Update the event's entrant document
             Map<String, Object> entrant = new HashMap<>();
             entrant.put("status", currentStatus);
-            db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
-                    .collection("entrants").document(userId)
+            db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                    .document(finalEventId)
+                    .collection("entrants")
+                    .document(userId)
                     .set(entrant);
         });
 
@@ -273,7 +302,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
                         eventCategory = doc.getString("category");
                         Double capacityValue = doc.getDouble("capacity");
                         eventCapacity = capacityValue != null ? capacityValue : -1;
-                        EventRegOpen = doc.getDate("open");
+                        eventRegOpen = doc.getDate("open");
                         eventRegClose = doc.getDate("close");
                         eventDate = doc.getDate("date");
                         eventLocation = doc.getString("location");
@@ -403,7 +432,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         Event event = new Event(
                 finalEventId, eventName, eventCategory, eventCapacity,
-                EventRegOpen, eventRegClose, eventDate, eventLocation,
+                eventRegOpen, eventRegClose, eventDate, eventLocation,
                 eventImage, eventOrganizers, currentStatus, currentWaitingCount
         ); // unchanged
 
