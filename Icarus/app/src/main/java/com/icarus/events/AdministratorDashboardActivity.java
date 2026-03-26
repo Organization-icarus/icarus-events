@@ -106,8 +106,9 @@ public class AdministratorDashboardActivity extends NavigationBarActivity {
                     String name = snapshot.getString("name");
                     String category = snapshot.getString("category");
                     Date date = snapshot.getDate("date");
+                    String posterURL = snapshot.getString("image");
 
-                    eventArrayList.add(new Event(id, name, category, null, null, null, date, null, null, null));
+                    eventArrayList.add(new Event(id, name, category, null, null, null, date, null, posterURL, null));
                 }
                 eventArrayAdapter.notifyDataSetChanged();
             }

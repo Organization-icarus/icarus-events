@@ -122,9 +122,9 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         });
         ViewEntrantMap.setOnClickListener(v -> {
             // View Entrant Map
-//            Intent intent = new Intent(this, UserRegistrationActivity.class);
-//            intent.putExtra("deviceId", deviceId);
-//            startActivity(intent);
+            Intent intent = new Intent(this, EntrantMapActivity.class);
+            intent.putExtra("eventId", eventId);
+            startActivity(intent);
         });
         ViewEntrantList.setOnClickListener(v -> {
             // View Entrant List
