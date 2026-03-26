@@ -31,6 +31,10 @@ import java.util.HashMap;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.button.MaterialButton;
+
+import android.content.res.ColorStateList;
+
 
 //@TODO Put filter button on same horizontal level as searhc events, open a pop up menu
 // with options for capacity, and other things CHECK ALL US
@@ -48,7 +52,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     private RecyclerView eventListView;
     private EditText searchTextFilter;
     private String currentSearch = "";
-    private Button filterCategoryButton;
+    private MaterialButton filterCategoryButton;
     private FloatingActionButton addEvent;
     private FloatingActionButton adminDashboard;
     private ArrayList<Event> eventArrayList;
@@ -57,6 +61,8 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     private EntrantEventListArrayAdapter eventListArrayAdapter;
     private CollectionReference eventsRef;
     private FirebaseFirestore db;
+    private Double maxCapacityFilter = null;
+    private Date dateFilter = null;
 
     /**
      * Initializes the entrant event list activity.
@@ -257,6 +263,12 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         }
         // Update filtered list
         eventListArrayAdapter.notifyDataSetChanged();
+        boolean filtersActive = currentFilters.containsValue(true);
+
+        filterCategoryButton.setBackgroundTintList(ColorStateList.valueOf(
+                filtersActive
+                        ? getColor(R.color.accent_second)
+                        : getColor(R.color.white)));
     }
 
     /**

@@ -75,7 +75,7 @@
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
                 style="@style/Widget.Material3.Button.TonalButton"
-                app:iconTint="@color/filter_button_tint"
+                app:iconTint="@color/primary"
                 app:backgroundTint="@color/filter_button_tint"/>
 
             <com.google.android.material.button.MaterialButton
@@ -94,7 +94,7 @@
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
                 style="@style/Widget.Material3.Button.TonalButton"
-                app:iconTint="@color/filter_button_tint"
+                app:iconTint="@color/primary"
                 app:backgroundTint="@color/filter_button_tint"/>
 
         </LinearLayout>
