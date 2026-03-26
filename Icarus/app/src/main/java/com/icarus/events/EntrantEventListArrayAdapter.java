@@ -1,14 +1,17 @@
 package com.icarus.events;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,9 +25,14 @@ import java.util.Locale;
  *
  * @author Alex Alves
  */
-public class EntrantEventListArrayAdapter extends ArrayAdapter<Event> {
+public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEventListArrayAdapter.ViewHolder> {
     private ArrayList<Event> events;
     private Context context;
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
 
     /**
      * Constructs an adapter for displaying Event objects in the entrant event list.
@@ -32,10 +40,18 @@ public class EntrantEventListArrayAdapter extends ArrayAdapter<Event> {
      * @param context the context used to inflate views and access resources
      * @param events the list of events to be displayed by the adapter
      */
-    public EntrantEventListArrayAdapter(Context context, ArrayList<Event> events) {
-        super(context, 0, events);
+    public EntrantEventListArrayAdapter(Context context, ArrayList<Event> events, OnItemClickListener listener) {
         this.events = events;
         this.context = context;
+        this.listener = listener;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.entrant_event_list_content, parent, false);
+        return new ViewHolder(view);
     }
 
     /**
@@ -43,40 +59,52 @@ public class EntrantEventListArrayAdapter extends ArrayAdapter<Event> {
      * Inflates the list item layout if necessary and binds the event's
      * name, category, and formatted date to the corresponding UI elements.
      *
+     * @param holder the ViewHolder to bind data to
      * @param position the position of the event in the adapter's data set
-     * @param convertView a recycled view to reuse if available
-     * @param parent the parent view that this view will be attached to
-     * @return the view representing the event at the specified position
      */
-    @NonNull
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent){
-        View view = convertView;
-        if (view == null){
-            view = LayoutInflater.from(context)
-                    .inflate(R.layout.entrant_event_list_content, parent, false);
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Event event = events.get(position);
+
+        Log.d("PICASSO_DEBUG", "image=" + event.getImage());
+
+        // Load poster image
+        if (event.getImage() != null && !event.getImage().trim().isEmpty()) {
+            Picasso.get()
+                    .load(event.getImage())
+                    .error(R.drawable.poster)           // Optional: shows if link fails
+                    .into(holder.posterView);
         }
 
-        Event event = events.get(position);
-        TextView eventName = view
-                .findViewById(R.id.entrant_event_list_event_name);
-        TextView eventCategory = view
-                .findViewById(R.id.entrant_event_list_event_category);
-        TextView eventDate = view
-                .findViewById(R.id.entrant_event_list_event_date);
-
-        eventName.setText(event.getName());
-        eventCategory.setText(event.getCategory());
+        holder.eventName.setText(event.getName());
+        holder.eventCategory.setText(event.getCategory());
         // Reformatting date to be more readable and convert to string
         if (event.getDate() != null) {
             SimpleDateFormat formatter = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
             String dateString = formatter.format(event.getDate());
-            eventDate.setText(dateString);
+            holder.eventDate.setText(dateString);
         } else {
-            eventDate.setText(R.string.entrant_event_list_missing_date);
+            holder.eventDate.setText(R.string.entrant_event_list_missing_date);
         }
 
-        return view;
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(position));
     }
 
+    @Override
+    public int getItemCount() {
+        return events.size();
+    }
 
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView eventName, eventCategory, eventDate;
+        ImageView posterView;
+
+        public ViewHolder(@NonNull View view) {
+            super(view);
+            eventName = view.findViewById(R.id.entrant_event_list_event_name);
+            eventCategory = view.findViewById(R.id.entrant_event_list_event_category);
+            eventDate = view.findViewById(R.id.entrant_event_list_event_date);
+            posterView = view.findViewById(R.id.entrant_event_list_poster);
+        }
+    }
 }
