@@ -46,7 +46,6 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_view_entrants_on_waiting_list);
         setupNavBar();
-        ArrayList<String> status = new ArrayList<>();
         db = FirebaseFirestore.getInstance();
 
         //Create TextView
@@ -66,8 +65,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
 
         //Set default as waiting
         filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
-        status.add("waiting");
-        loadList(status);
+        loadList("waiting");
 
         //Set event Title
         db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId)
@@ -84,16 +82,15 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
         filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) ->{
             if (!isChecked) return; // ← ignore uncheck events entirely
             backButton.setText("Go Back");
-            status.clear();
+            String status = null;
             if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_waiting)){
-                status.add("waiting");
+                status = "waiting";
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_chosen)){
-                status.add("selected");
+                status = "selected";
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_cancelled)){
-                status.add("rejected");
-                status.add("replaced");
+                status = "rejected";
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_final)){
-                status.add("registered");
+                status = "registered";
                 backButton.setText("Export CSV");
             }
             loadList(status);
@@ -109,7 +106,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
 
         });
     }
-    private void loadList(ArrayList<String> listStatus) {
+    private void loadList(String listStatus) {
         //events -> eventID -> entrants -> entrantId -> status
         entrantList.clear();
         eventListArrayAdapter.notifyDataSetChanged();
@@ -121,7 +118,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
                         String deviceId = snapshot.getId();
                         String status = snapshot.getString("status");
 
-                        if (listStatus.contains(status)) {
+                        if (Objects.equals(status, listStatus)) {
                             //If user has waiting role look for name in user collection
                             db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId)
                                     .get()
