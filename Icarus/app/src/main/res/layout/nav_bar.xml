@@ -25,7 +25,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/registered"
-            app:tint="@color/primary_container_highlighted"
+            app:tint="@color/white"
             android:contentDescription="Registered Events"/>
 
         <TextView
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:text="Registered"
             android:textSize="@dimen/font_text_size"
-            android:textColor="@color/primary_container_highlighted"/>
+            android:textColor="@color/white"/>
     </LinearLayout>
 
     <!-- Event List -->
@@ -52,7 +52,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/event_list"
-            app:tint="@color/primary_container_highlighted"
+            app:tint="@color/white"
             android:contentDescription="Event List"/>
 
         <TextView
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:text="Events"
             android:textSize="@dimen/font_text_size"
-            android:textColor="@color/primary_container_highlighted"/>
+            android:textColor="@color/white"/>
     </LinearLayout>
 
     <!-- Profile -->
@@ -79,7 +79,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/profile"
-            app:tint="@color/primary_container_highlighted"
+            app:tint="@color/white"
             android:contentDescription="Profile"/>
 
         <TextView
@@ -87,7 +87,7 @@
             android:layout_height="wrap_content"
             android:text="Profile"
             android:textSize="@dimen/font_text_size"
-            android:textColor="@color/primary_container_highlighted"/>
+            android:textColor="@color/white"/>
     </LinearLayout>
 
 </LinearLayout>
