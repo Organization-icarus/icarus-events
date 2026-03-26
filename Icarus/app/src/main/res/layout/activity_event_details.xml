@@ -9,166 +9,178 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            style="@style/LinearLayoutForNavBar" >
-
 
             <!-- -->
             <!-- EVENT POSTER -->
             <!-- -->
-            <ImageView
-                android:id="@+id/eventPoster"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:scaleType="centerCrop"
-                android:layout_marginTop="32dp"
-                android:src="@drawable/poster" />
+                android:layout_height="wrap_content">
 
-
-            <!-- -->
-            <!-- TITLE AND DESCRIPTION -->
-            <!-- -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/TitleAndDescriptionCard"
-                style="@style/ViewCard"
-                android:layout_marginTop="16dp" >
-
-                <LinearLayout
+                <!-- POSTER: edge-to-edge -->
+                <ImageView
+                    android:id="@+id/eventPoster"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_height="300dp"
+                    android:scaleType="centerCrop"
+                    android:layout_marginTop="32dp"
+                    android:src="@drawable/poster" />
 
-                    <!-- EVENT NAME -->
+
+            <!-- -->
+            <!-- OTHER CONTENT -->
+            <!-- -->
+            <LinearLayout
+                style="@style/LinearLayoutForNavBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <!-- -->
+                <!-- TITLE AND DESCRIPTION -->
+                <!-- -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/TitleAndDescriptionCard"
+                    style="@style/ViewCard"
+                    android:layout_marginTop="16dp" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <!-- EVENT NAME -->
+                        <TextView
+                            android:id="@+id/eventName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Event Name"
+                            android:textSize="@dimen/font_heading_size" />
+
+                        <!-- EVENT DESCRIPTION -->
+                        <TextView
+                            android:id="@+id/eventDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="@string/paragraph_placeholder"
+                            android:textSize="@dimen/font_text_size" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <!-- -->
+                <!-- EVENT DETAILS LIST AND GUIDELINES -->
+                <!-- -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/OrganizerCreateEventImageCard"
+                    style="@style/ViewCard"
+                    android:layout_marginTop="16dp" >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/event_details_event_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"/>
+
+                    <!-- LOTTERY GUIDELINES -->
                     <TextView
-                        android:id="@+id/eventName"
+                        android:id="@+id/lottery_guidelines"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Event Name"
-                        android:textSize="@dimen/font_heading_size" />
+                        android:layout_marginTop="12dp"
+                        android:text="Lottery Guidelines"
+                        android:textColor="@color/primary_container_highlighted"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center" />
 
-                    <!-- EVENT DESCRIPTION -->
-                    <TextView
-                        android:id="@+id/eventDescription"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="@string/paragraph_placeholder"
-                        android:textSize="@dimen/font_text_size" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
 
-            <!-- -->
-            <!-- EVENT DETAILS LIST AND GUIDELINES -->
-            <!-- -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/OrganizerCreateEventImageCard"
-                style="@style/ViewCard"
-                android:layout_marginTop="16dp" >
+                <!-- -->
+                <!-- BUTTONS -->
+                <!-- -->
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                <!-- ADMIN -->
+                <com.google.android.material.button.MaterialButton
+                    style="@style/AppButton"
+                    android:id="@+id/event_organizer_button"
+                    android:text="Organize"
+                    app:icon="@drawable/profile"
+                    android:visibility="visible"/>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/event_details_event_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"/>
+                <!-- ORGANIZER -->
+                <com.google.android.material.button.MaterialButton
+                    style="@style/AppButton"
+                    android:id="@+id/manage_button"
+                    android:text="Manage"
+                    app:icon="@drawable/gear"
+                    android:visibility="visible"/>
 
-                <!-- LOTTERY GUIDELINES -->
-                <TextView
-                    android:id="@+id/lottery_guidelines"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Lottery Guidelines"
-                    android:textColor="@color/primary_container_highlighted"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center" />
+                <!--ADMIN AND ORGANIZER -->
+                <com.google.android.material.button.MaterialButton
+                    style="@style/AppButton"
+                    android:id="@+id/notification_button"
+                    android:text="Notifications"
+                    app:icon="@drawable/notifications"
+                    android:visibility="visible"/>
 
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.button.MaterialButton
+                    style="@style/AppButton"
+                    android:id="@+id/delete_button"
+                    android:text="Delete"
+                    app:icon="@drawable/delete"
+                    android:visibility="visible"/>
 
+                <!-- USER UNINITIALIZED -->
+                <com.google.android.material.button.MaterialButton
+                    style="@style/AppButton"
+                    android:id="@+id/join_waiting_list_button"
+                    android:text="Join Waiting List"
+                    app:icon="@drawable/check"
+                    android:visibility="visible"/>
 
-            <!-- -->
-            <!-- BUTTONS -->
-            <!-- -->
+                <!-- USER WAITING -->
+                <com.google.android.material.button.MaterialButton
+                    style="@style/AppButton"
+                    android:id="@+id/leave_waiting_list_button"
+                    android:text="Leave Waiting List"
+                    app:icon="@drawable/back"
+                    android:visibility="visible"/>
 
-            <!-- ADMIN -->
-            <com.google.android.material.button.MaterialButton
-                style="@style/AppButton"
-                android:id="@+id/event_organizer_button"
-                android:text="Organize"
-                app:icon="@drawable/profile"
-                android:visibility="visible"/>
+                <!-- USER SELECTED -->
+                <com.google.android.material.button.MaterialButton
+                    style="@style/AppButton"
+                    android:id="@+id/register_button"
+                    android:text="Register"
+                    app:icon="@drawable/check"
+                    android:visibility="visible"/>
 
-            <!-- ORGANIZER -->
-            <com.google.android.material.button.MaterialButton
-                style="@style/AppButton"
-                android:id="@+id/manage_button"
-                android:text="Manage"
-                app:icon="@drawable/gear"
-                android:visibility="visible"/>
+                <com.google.android.material.button.MaterialButton
+                    style="@style/AppButton"
+                    android:id="@+id/decline_invitation"
+                    android:text="Decline Invitation"
+                    app:icon="@drawable/decline"
+                    android:visibility="visible"/>
 
-            <!--ADMIN AND ORGANIZER -->
-            <com.google.android.material.button.MaterialButton
-                style="@style/AppButton"
-                android:id="@+id/notification_button"
-                android:text="Notifications"
-                app:icon="@drawable/notifications"
-                android:visibility="visible"/>
+                <!-- USER REGISTERED -->
+                <com.google.android.material.button.MaterialButton
+                    style="@style/AppButton"
+                    android:id="@+id/cancel_registration"
+                    android:text="Cancel Registration"
+                    app:icon="@drawable/decline"
+                    android:visibility="visible"/>
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/AppButton"
-                android:id="@+id/delete_button"
-                android:text="Delete"
-                app:icon="@drawable/delete"
-                android:visibility="visible"/>
-
-            <!-- USER UNINITIALIZED -->
-            <com.google.android.material.button.MaterialButton
-                style="@style/AppButton"
-                android:id="@+id/join_waiting_list_button"
-                android:text="Join Waiting List"
-                app:icon="@drawable/check"
-                android:visibility="visible"/>
-
-            <!-- USER WAITING -->
-            <com.google.android.material.button.MaterialButton
-                style="@style/AppButton"
-                android:id="@+id/leave_waiting_list_button"
-                android:text="Leave Waiting List"
-                app:icon="@drawable/back"
-                android:visibility="visible"/>
-
-            <!-- USER SELECTED -->
-            <com.google.android.material.button.MaterialButton
-                style="@style/AppButton"
-                android:id="@+id/register_button"
-                android:text="Register"
-                app:icon="@drawable/check"
-                android:visibility="visible"/>
-
-            <com.google.android.material.button.MaterialButton
-                style="@style/AppButton"
-                android:id="@+id/decline_invitation"
-                android:text="Decline Invitation"
-                app:icon="@drawable/decline"
-                android:visibility="visible"/>
-
-            <!-- USER REGISTERED -->
-            <com.google.android.material.button.MaterialButton
-                style="@style/AppButton"
-                android:id="@+id/cancel_registration"
-                android:text="Cancel Registration"
-                app:icon="@drawable/decline"
-                android:visibility="visible"/>
-
-
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
