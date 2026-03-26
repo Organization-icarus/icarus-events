@@ -7,14 +7,14 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
@@ -44,7 +44,7 @@ import androidx.appcompat.app.AlertDialog;
  */
 public class EntrantEventListActivity extends NavigationBarActivity {
     //Define attributes
-    private ListView eventListView;
+    private RecyclerView eventListView;
     private EditText searchTextFilter;
     private String currentSearch = "";
     private Button filterCategoryButton;
@@ -112,7 +112,13 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         eventArrayList = new ArrayList<>();
         filteredEventArrayList = new ArrayList<>();
         eventListArrayAdapter = new EntrantEventListArrayAdapter(this,
-                filteredEventArrayList);
+                filteredEventArrayList, position -> {
+            // Set navigation on click listeners
+            Event selected = filteredEventArrayList.get(position);
+            Intent intent = new Intent(this, EventDetailsActivity.class);
+            intent.putExtra("eventId", selected.getId());
+            startActivity(intent);
+        });
 
         // Initialize current filters
         currentFilters = new HashMap<>();
@@ -167,16 +173,9 @@ public class EntrantEventListActivity extends NavigationBarActivity {
             }
         });
 
-        // Set ListView adapter
+        // Set RecyclerView adapter
+        eventListView.setLayoutManager(new LinearLayoutManager(this));
         eventListView.setAdapter(eventListArrayAdapter);
-
-        // Set navigation on click listeners
-        eventListView.setOnItemClickListener((parent, view, position, id) -> {
-            Event selected = filteredEventArrayList.get(position);
-            Intent intent = new Intent(this, EventDetailsActivity.class);
-            intent.putExtra("eventId", selected.getId());
-            startActivity(intent);
-        });
 
         // Set buttons on click listeners
         addEvent.setOnClickListener(v -> {
@@ -206,27 +205,27 @@ public class EntrantEventListActivity extends NavigationBarActivity {
             //Set button to be normal colour
             button.setBackgroundColor(
                     androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container
+                            this,
+                            R.color.primary_container
                     )
             );
             button.setTextColor(
                     androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container_highlighted
+                            this,
+                            R.color.primary_container_highlighted
                     )
             );
         } else {
             //Set button to be selected colour
             button.setBackgroundColor(
                     androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container_highlighted
+                            this,
+                            R.color.primary_container_highlighted
                     )
             );
             button.setTextColor(androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container
+                            this,
+                            R.color.primary_container
                     )
             );
         }
@@ -287,6 +286,4 @@ public class EntrantEventListActivity extends NavigationBarActivity {
                 })
                 .show();
     }
-
-
 }
