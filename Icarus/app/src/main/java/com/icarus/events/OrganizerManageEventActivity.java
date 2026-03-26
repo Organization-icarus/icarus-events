@@ -18,6 +18,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +51,7 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
     private TextView eventTitle;
     private String eventId;
     private String posterURL;
+    private Boolean isPrivate;
 
     private FirebaseFirestore db;
 
@@ -82,6 +84,8 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
                 .addOnSuccessListener(document -> {
                     String eventName = document.getString("name");
                     eventTitle.setText(eventName);
+                    isPrivate = document.getBoolean("isPrivate");
+                    if(isPrivate == null){isPrivate = false;}
                 });
 
         // Initialize imagePickerLauncher
@@ -137,17 +141,23 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         });
         inviteSpecificEntrant.setOnClickListener(v -> {
             // Invite Entrants to a private event
-            Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
-            intent.putExtra("eventId", eventId);
-            intent.putExtra("ActivityName", "Entrant Search");
-            startActivity(intent);
+            if(isPrivate){
+                Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
+                intent.putExtra("eventId", eventId);
+                intent.putExtra("ActivityName", "Entrant Search");
+                startActivity(intent);
+            }else{
+                Toast.makeText(OrganizerManageEventActivity.this,
+                        "Event is not Private", Toast.LENGTH_SHORT).show();
+            }
+
         });
         shareQRCode.setOnClickListener(v -> {
-            // Sample Attendees
+            // Open Share menu to Share QRcode
 
         });
         addOrganizers.setOnClickListener(v -> {
-            // add Organizers
+            // add Organizers as Co-Organzers
             Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
             intent.putExtra("eventId", eventId);
             intent.putExtra("ActivityName", "Find Co-Organizers");

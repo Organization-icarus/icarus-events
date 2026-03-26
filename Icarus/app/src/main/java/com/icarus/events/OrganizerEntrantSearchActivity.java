@@ -23,6 +23,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Activity that allows organizers to view the entrants they can invite to
+ * a private event or to add as a Co-Organizer.
+ * <p>
+ * This activity extends {@link NavigationBarActivity} to include
+ * the application's reusable navigation bar.
+ *
+ * @author Ben Salmon
+ */
+
 public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
     private FirebaseFirestore db;
     private TextView eventName;
@@ -146,6 +156,8 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
                                             for (QueryDocumentSnapshot userSnapshot : userSnapshots) {
                                                 String deviceId = userSnapshot.getId();
                                                 String name = userSnapshot.getString("name");
+                                                String email = userSnapshot.getString("email");
+                                                String phone = userSnapshot.getString("phone");
                                                 Boolean isAdmin = userSnapshot.getBoolean("isAdmin");
 
                                                 boolean userIsAdmin = isAdmin != null && isAdmin;
@@ -154,7 +166,7 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
                                                 boolean isOrganizer = organizerSet.contains(deviceId); // ← new
 
                                                 if (notInEntrants && !userIsAdmin && !isCurrentUser && !isOrganizer) {
-                                                    entrantUserList.add(new User(deviceId, name, null, null,
+                                                    entrantUserList.add(new User(deviceId, name, email, phone,
                                                             null, null, null, null));
                                                 }
                                             }
@@ -203,12 +215,10 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
                             .document(eventId)
                             .update("organizers", organizers)
                             .addOnSuccessListener(dummy ->{
-                               Toast.makeText(this,selectedIds.size() + " organizers added as Co-Organizers",Toast.LENGTH_SHORT).show();
-
+                               Toast.makeText(this,selectedIds.size()
+                                       + " organizers added as Co-Organizers",Toast.LENGTH_SHORT).show();
                             });
                 });
-
-
     }
     private void applySearch(){
         if (currentSearch.isEmpty()) {
@@ -227,6 +237,5 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
         entrantUserList.clear();
         entrantUserList.addAll(filteredEntrants);
         eventListArrayAdapter.notifyDataSetChanged();
-
     }
 }
