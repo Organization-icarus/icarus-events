@@ -34,7 +34,11 @@ import java.util.Objects;
  * @author Bradley Bravender
  */
 public class EventDetailsActivity extends NavigationBarActivity {
-    // Initialize all the admin, organizer, and entrant buttons
+
+    //---------------------------
+    // BUTTONS
+    //---------------------------
+
     private Button
             organizerBtn,
             manageBtn,
@@ -46,16 +50,32 @@ public class EventDetailsActivity extends NavigationBarActivity {
             registerBtn,
             cancelRegistrationBtn;
 
-    private ImageView posterView;
+    //---------------------------
+    // USER DETAILS
+    //---------------------------
+
     private Boolean isAdmin, isOrganizer;
     private String currentStatus;
-    private int currentWaitingCount;
 
-    // Initialize fields to store the event's information
-    private String eventName, eventCategory, eventLocation, eventImage;
+    //---------------------------
+    // EVENT DETAILS
+    //---------------------------
+
+    private ImageView posterView;
+    private int currentWaitingCount;
     private ArrayList<String> eventOrganizers;
     private double eventCapacity;
     private Date eventRegOpen, eventRegClose, eventDate;
+    private String
+            eventName,
+            eventCategory,
+            eventLocation,
+            eventImage,
+            eventDescription;
+
+    //---------------------------
+    // LISTENERS
+    //---------------------------
 
     // To prevent the firebase snapshot listener from creating memory leaks
     private ListenerRegistration eventListener;
@@ -310,8 +330,14 @@ public class EventDetailsActivity extends NavigationBarActivity {
         eventListener = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
                 .addSnapshotListener((doc, e) -> {
                     if (doc != null && doc.exists()) {
+
+                        //---------------------------
+                        // READ THE FIREBASE VALUES
+                        //---------------------------
+
                         eventName = doc.getString("name");
                         eventCategory = doc.getString("category");
+                        eventDescription = doc.getString("description");
                         Double capacityValue = doc.getDouble("capacity");
                         eventCapacity = capacityValue != null ? capacityValue : -1;
                         eventRegOpen = doc.getDate("open");
@@ -323,8 +349,15 @@ public class EventDetailsActivity extends NavigationBarActivity {
                         isOrganizer = eventOrganizers.contains(userId);
                         setupButtons(isAdmin, isOrganizer, currentStatus);
 
-                        TextView eventName = findViewById(R.id.eventName);
-                        eventName.setText(this.eventName);
+                        //---------------------------
+                        // SET TEXT FIELDS
+                        //---------------------------
+
+                        TextView eventNameView = findViewById(R.id.eventName);
+                        eventNameView.setText(this.eventName);
+
+                        TextView descriptionView = findViewById(R.id.eventDescription);
+                        descriptionView.setText(this.eventDescription);
 
                         refreshAdapter(finalEventId);
                     }
