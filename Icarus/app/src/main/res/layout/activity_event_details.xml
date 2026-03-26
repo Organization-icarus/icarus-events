@@ -11,14 +11,7 @@
 
         <!-- The bottom padding must be at least the height of the nav bar /-->
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="24dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="60dp"
-            android:clipToPadding="false"
-            android:gravity="center_horizontal">
+            style="@style/LinearLayoutForNavBar" >
 
             <!-- EVENT POSTER -->
             <ImageView
