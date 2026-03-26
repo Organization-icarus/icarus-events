@@ -31,8 +31,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/OrganizerEntrantOnWaitingListEventText"/>
 
-
-
     <ListView
         android:id="@+id/OrganizerEntrantOnWaitingList"
         android:layout_width="340dp"
@@ -70,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Chosen"
+            android:text="Selected"
             android:textSize="12sp" />
 
         <com.google.android.material.button.MaterialButton
