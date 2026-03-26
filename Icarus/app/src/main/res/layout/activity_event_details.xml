@@ -149,18 +149,6 @@
                 android:visibility="visible"/>
 
             <!--####################-->
-            <!-- USER SELECTED OR REGISTERED -->
-            <!--####################-->
-
-            <com.google.android.material.button.MaterialButton
-                style="@style/AppButton"
-                android:id="@+id/decline_button"
-                android:text="Decline"
-                app:icon="@drawable/decline"
-                android:visibility="visible"/>
-
-
-            <!--####################-->
             <!-- USER SELECTED -->
             <!--####################-->
 
@@ -169,6 +157,24 @@
                 android:id="@+id/register_button"
                 android:text="Register"
                 app:icon="@drawable/check"
+                android:visibility="visible"/>
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
+                android:id="@+id/decline_invitation"
+                android:text="Decline Invitation"
+                app:icon="@drawable/decline"
+                android:visibility="visible"/>
+
+            <!--####################-->
+            <!-- USER REGISTERED -->
+            <!--####################-->
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/AppButton"
+                android:id="@+id/cancel_registration"
+                android:text="Cancel Registration"
+                app:icon="@drawable/decline"
                 android:visibility="visible"/>
 
             <!-- DIVIDER -->

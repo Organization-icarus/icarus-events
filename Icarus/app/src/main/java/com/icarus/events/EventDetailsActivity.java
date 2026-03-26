@@ -18,7 +18,6 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +35,16 @@ import java.util.Objects;
  */
 public class EventDetailsActivity extends NavigationBarActivity {
     // Initialize all the admin, organizer, and entrant buttons
-    private Button organizerBtn, manageBtn, notificationBtn, deleteBtn;
-    private Button joinBtn, leaveBtn, declineBtn, registerBtn;
+    private Button
+            organizerBtn,
+            manageBtn,
+            notificationBtn,
+            deleteBtn,
+            joinWaitingBtn,
+            leaveWaitingBtn,
+            declineInviteBtn,
+            registerBtn,
+            cancelRegistrationBtn;
 
     private ImageView posterView;
     private Boolean isAdmin, isOrganizer;
@@ -83,10 +90,11 @@ public class EventDetailsActivity extends NavigationBarActivity {
         manageBtn = findViewById(R.id.manage_button);
         notificationBtn = findViewById(R.id.notification_button);
         deleteBtn = findViewById(R.id.delete_button);
-        joinBtn = findViewById(R.id.join_waiting_list_button);
-        leaveBtn = findViewById(R.id.leave_waiting_list_button);
-        declineBtn = findViewById(R.id.decline_button);
+        joinWaitingBtn = findViewById(R.id.join_waiting_list_button);
+        leaveWaitingBtn = findViewById(R.id.leave_waiting_list_button);
+        declineInviteBtn = findViewById(R.id.decline_invitation);
         registerBtn = findViewById(R.id.register_button);
+        cancelRegistrationBtn = findViewById(R.id.cancel_registration);
 
         //---------------------------
         // SET UP POSTER
@@ -116,7 +124,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
         //---------------------------
 
         // Lets uninitialized users join the waiting list
-        joinBtn.setOnClickListener(v -> {
+        joinWaitingBtn.setOnClickListener(v -> {
             // TODO: should capacity not be 0, -1, or NULL?
             if (eventCapacity > 0 && currentWaitingCount >= eventCapacity) {
                 // No more users can enter
@@ -140,7 +148,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
 
         // Lets waiting users leave the waiting list
-        leaveBtn.setOnClickListener(v -> {
+        leaveWaitingBtn.setOnClickListener(v -> {
             currentStatus = null;
             setupButtons(isAdmin, isOrganizer, currentStatus);
             refreshAdapter(finalEventId);
@@ -156,32 +164,22 @@ public class EventDetailsActivity extends NavigationBarActivity {
         });
 
 
-        // Lets selected users reject their invitation, or already registered users leave an event.
-        declineBtn.setOnClickListener(v -> {
-            if (currentStatus.equals("registered")) {
-                // Remove from event's entrant list
-                Map<String, Object> entrant = new HashMap<>();
-                entrant.put("status", "rejected");
-                db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
-                        .collection("entrants").document(userId)
-                        .set(entrant);
+        // Lets users decline an invitation to register
+        declineInviteBtn.setOnClickListener(v -> {
+            Map<String, Object> entrant = new HashMap<>();
+            entrant.put("status", "rejected");
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
+                    .collection("entrants").document(userId)
+                    .set(entrant);
 
-                currentStatus = "rejected";
-            } else {
-                // Selected → rejected
-                Map<String, Object> entrant = new HashMap<>();
-                entrant.put("status", "rejected");
-                db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
-                        .collection("entrants").document(userId)
-                        .set(entrant);
+            currentStatus = "rejected";
 
-                currentStatus = "rejected";
-            }
             setupButtons(isAdmin, isOrganizer, currentStatus);
             refreshAdapter(finalEventId);
         });
 
 
+        // Lets users register for an event they've been sampled for
         registerBtn.setOnClickListener(v -> {
             // First make sure that the user is in the registration window
             Date now = new Date();
@@ -222,6 +220,21 @@ public class EventDetailsActivity extends NavigationBarActivity {
                     .document(userId)
                     .set(entrant);
         });
+
+
+        // Lets users cancel their registration
+        cancelRegistrationBtn.setOnClickListener(v-> {
+            Map<String, Object> entrant = new HashMap<>();
+            entrant.put("status", "rejected");
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
+                    .collection("entrants").document(userId)
+                    .set(entrant);
+
+            currentStatus = "rejected";
+            setupButtons(isAdmin, isOrganizer, currentStatus);
+            refreshAdapter(finalEventId);
+        });
+
 
 
         // TODO: adjust intent destination
@@ -291,7 +304,6 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         //---------------------------
         // LISTEN TO EVENT DOCUMENT
-        // Fires on load + anytime the event document changes
         //---------------------------
 
         // Will run anytime the database event document changes
@@ -321,10 +333,10 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         //---------------------------
         // COUNT THE EVENT'S WAITING LIST
-        // Fires on load + anytime the user's entrant document changes
         //---------------------------
 
-        entrantWaitlistListener = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
+        entrantWaitlistListener = db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .document(finalEventId)
                 .collection("entrants")
                 .whereEqualTo("status", "waiting")
                 .addSnapshotListener((query, e) -> {
@@ -337,7 +349,6 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         //---------------------------
         // LISTEN TO USER'S ENTRANT STATUS FOR THIS EVENT
-        // Fires on load + anytime the user's entrant document changes
         //---------------------------
 
         entrantStatusListener = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId)
@@ -374,17 +385,16 @@ public class EventDetailsActivity extends NavigationBarActivity {
     private void setupButtons(Boolean isAdmin, Boolean isOrganizer, String status) {
         // Runs every time the firebase document changes
 
-        Log.d("DEBUG", "setupButtons called — isAdmin: " + isAdmin + ", isOrganizer: " + isOrganizer);
-
         // Hide all first
         organizerBtn.setVisibility(View.GONE);
         manageBtn.setVisibility(View.GONE);
         notificationBtn.setVisibility(View.GONE);
         deleteBtn.setVisibility(View.GONE);
-        joinBtn.setVisibility(View.GONE);
-        leaveBtn.setVisibility(View.GONE);
-        declineBtn.setVisibility(View.GONE);
+        joinWaitingBtn.setVisibility(View.GONE);
+        leaveWaitingBtn.setVisibility(View.GONE);
+        declineInviteBtn.setVisibility(View.GONE);
         registerBtn.setVisibility(View.GONE);
+        cancelRegistrationBtn.setVisibility(View.GONE);
 
         // Don't proceed until everything is ready
         if (isAdmin == null || isOrganizer == null) return;
@@ -411,17 +421,16 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
             // Allow new (i.e. not rejected) users to join the waiting list
             if (status == null || status.equals("uninitialized")) {
-                joinBtn.setVisibility(View.VISIBLE);
+                joinWaitingBtn.setVisibility(View.VISIBLE);
             } else if (status.equals("waiting")) {
-                leaveBtn.setVisibility(View.VISIBLE);
+                leaveWaitingBtn.setVisibility(View.VISIBLE);
             } else if (status.equals("selected")) {
-                declineBtn.setVisibility(View.VISIBLE);
                 registerBtn.setVisibility(View.VISIBLE);
+                declineInviteBtn.setVisibility(View.VISIBLE);
             }
 
-            // TODO: don't let entrants register after the registration period
             else if (status.equals("registered")) {
-                declineBtn.setVisibility(View.VISIBLE);
+                cancelRegistrationBtn.setVisibility(View.VISIBLE);
             }
         }
     }
