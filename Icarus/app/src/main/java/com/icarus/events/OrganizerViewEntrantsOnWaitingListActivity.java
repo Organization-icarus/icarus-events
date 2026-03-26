@@ -1,14 +1,20 @@
 package com.icarus.events;
 
+import android.content.ContentValues;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Objects;
 /**
@@ -77,6 +83,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
 
         filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) ->{
             String status = null;
+            backButton.setText("Go Back");
             if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_waiting)){
                 status = "waiting";
                 loadList(status);
@@ -89,12 +96,19 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_final)){
                 status = "registered";
                 loadList(status);
+                backButton.setText("Export CSV");
             }
 
         });
 
         backButton.setOnClickListener(v -> {
-            finish();
+            if(backButton.getText().toString().equals("Export CSV")){
+                createCSV();
+            }
+            else{
+                finish();
+            }
+
         });
     }
     private void loadList(String listStatus) {
@@ -124,5 +138,35 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
                         }
                     }
                 });
+    }
+
+    private void createCSV(){
+        //CSV file
+        //row seperated by '\n', columns seperated by ','
+        if(entrantList.size() == 0){
+            Toast.makeText(this, "List is Empty. Wait for Users to Accept Invite", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        StringBuilder newCSV = new StringBuilder();
+        newCSV.append("Name, Email, Phone\n");
+        //list is already filtered
+        for(User user : entrantList){
+            newCSV.append(user.getName()).append(",");
+            newCSV.append(user.getEmail() != null ? user.getEmail() : "").append(",");
+            newCSV.append(user.getPhone() != null ? user.getPhone() : "").append("\n");
+        }
+        String filename = "entrant_final_list_for_" + eventName.getText().toString()+ ".csv";
+        filename = filename.replace(" ", "_");
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Downloads.DISPLAY_NAME, filename);
+        values.put(MediaStore.Downloads.MIME_TYPE, "text/csv");
+        Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+
+        try (OutputStream outputStream = getContentResolver().openOutputStream(uri)) {
+            outputStream.write(newCSV.toString().getBytes());
+            Toast.makeText(this, "CSV file Exported to Downloads/" + filename, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Export failed", Toast.LENGTH_SHORT).show();
+        }
     }
 }
