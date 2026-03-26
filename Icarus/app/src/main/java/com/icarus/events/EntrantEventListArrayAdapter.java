@@ -6,17 +6,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
+// This arrayAdapter was adapted to use RecyclerView by consulting ChatGPT on March 26th, 2026,
+// " How to improve my event list page to use a different view that
+// allows better customization for scrolling and elevation"
 /**
  * Adapter used to display events in the entrant event list.
  * <p>
@@ -66,8 +71,16 @@ public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEv
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = events.get(position);
 
-        Log.d("PICASSO_DEBUG", "image=" + event.getImage());
+        // Apply rotating accent color to poster background
+        int[] accentColors = {
+                context.getColor(R.color.accent_first),
+                context.getColor(R.color.accent_second),
+                context.getColor(R.color.accent_third)
+        };
 
+        //holder.textContainer.setBackgroundColor(accentColors[position % accentColors.length]);
+        //((MaterialCardView) holder.itemView).setStrokeColor(accentColors[position % accentColors.length]);
+        //((MaterialCardView) holder.itemView).setStrokeColor(accentColors[0]);
         // Load poster image
         if (event.getImage() != null && !event.getImage().trim().isEmpty()) {
             Picasso.get()
@@ -98,6 +111,7 @@ public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEv
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView eventName, eventCategory, eventDate;
         ImageView posterView;
+        LinearLayout textContainer;
 
         public ViewHolder(@NonNull View view) {
             super(view);
@@ -105,6 +119,7 @@ public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEv
             eventCategory = view.findViewById(R.id.entrant_event_list_event_category);
             eventDate = view.findViewById(R.id.entrant_event_list_event_date);
             posterView = view.findViewById(R.id.entrant_event_list_poster);
+            textContainer = view.findViewById(R.id.entrant_event_list_text_container);
         }
     }
 }
