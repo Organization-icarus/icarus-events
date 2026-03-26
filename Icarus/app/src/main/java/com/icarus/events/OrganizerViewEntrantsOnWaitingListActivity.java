@@ -115,7 +115,9 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
                                     .get()
                                     .addOnSuccessListener(userSnapshot -> {
                                         String name = userSnapshot.getString("name");
-                                        entrantList.add(new User(deviceId, name, null, null,
+                                        String email = userSnapshot.getString("email");
+                                        String phone = userSnapshot.getString("phone");
+                                        entrantList.add(new User(deviceId, name, email, phone,
                                                 null, null, null, null));
                                         eventListArrayAdapter.notifyDataSetChanged();
                                     });
