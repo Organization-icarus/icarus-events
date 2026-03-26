@@ -1,14 +1,18 @@
 package com.icarus.events;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,12 +61,20 @@ public class EntrantEventListArrayAdapter extends ArrayAdapter<Event> {
         }
 
         Event event = events.get(position);
-        TextView eventName = view
-                .findViewById(R.id.entrant_event_list_event_name);
-        TextView eventCategory = view
-                .findViewById(R.id.entrant_event_list_event_category);
-        TextView eventDate = view
-                .findViewById(R.id.entrant_event_list_event_date);
+        TextView eventName = view.findViewById(R.id.entrant_event_list_event_name);
+        TextView eventCategory = view.findViewById(R.id.entrant_event_list_event_category);
+        TextView eventDate = view.findViewById(R.id.entrant_event_list_event_date);
+        ImageView posterView = view.findViewById(R.id.entrant_event_list_poster);
+
+        Log.d("PICASSO_DEBUG", "image=" + event.getImage());
+
+        // Load poster image
+        if (event.getImage() != null && !event.getImage().trim().isEmpty()) {
+            Picasso.get()
+                    .load(event.getImage())
+                    .error(R.drawable.poster)           // Optional: shows if link fails
+                    .into(posterView);
+        }
 
         eventName.setText(event.getName());
         eventCategory.setText(event.getCategory());

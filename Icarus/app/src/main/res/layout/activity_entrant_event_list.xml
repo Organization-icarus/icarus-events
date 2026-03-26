@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,27 +18,76 @@
         android:textSize="@dimen/font_super_heading_size"
         android:textStyle="bold" />
 
-    <!-- Search Filter -->
-    <EditText
-        android:id="@+id/entrant_event_list_search_filter"
-        android:layout_width="300dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:layout_marginTop="16dp"
-        android:hint="Search events..."
-        android:inputType="text"
-        android:maxLines="1"
-        android:textSize="@dimen/font_subheading_size" />
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:elevation="2dp">
 
-    <!-- Filter buttons -->
-    <Button
-        android:id="@+id/entrant_event_list_filter_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/primary_container_highlighted"
-        android:text="Filter Events"
-        android:textColor="@color/primary_container"
-        android:textSize="@dimen/font_text_size" />
+        <!-- Search Filter -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Search events..."
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:startIconDrawable="@android:drawable/ic_menu_search">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/entrant_event_list_search_filter"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_gravity="center_vertical"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textSize="@dimen/font_subheading_size" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Filter buttons -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/entrant_event_list_filter_button"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="12dp"
+            android:layout_gravity="center_vertical"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            android:contentDescription="Filter events"
+            android:elevation="2dp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_filter"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            style="@style/Widget.Material3.Button.TonalButton" />
+
+        <!-- Filter buttons -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/entrant_event_list_qr_button"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="12dp"
+            android:layout_gravity="center_vertical"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            android:contentDescription="QR button"
+            android:elevation="2dp"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/twotone_all_out_24"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            style="@style/Widget.Material3.Button.TonalButton" />
+
+    </LinearLayout>
 
     <!-- Message for empty list -->
     <TextView
@@ -60,7 +110,7 @@
 
         <ListView
             android:id="@+id/entrant_event_list_view"
-            android:layout_width="300dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="top|center"
             android:layout_marginTop="16dp"

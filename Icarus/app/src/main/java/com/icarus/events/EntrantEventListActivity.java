@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,6 +30,9 @@ import java.util.HashMap;
 
 import androidx.appcompat.app.AlertDialog;
 
+
+//@TODO Put filter button on same horizontal level as searhc events, open a pop up menu
+// with options for capacity, and other things CHECK ALL US
 /**
  * Activity that displays the list of available events for entrants.
  * <p>
