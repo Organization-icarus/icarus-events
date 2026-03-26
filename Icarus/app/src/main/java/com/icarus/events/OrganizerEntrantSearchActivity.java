@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -93,7 +94,12 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
         entrantList.setAdapter(eventListArrayAdapter);
 
         //Fill list with users not in the waiting list
-        loadList();
+        if(screenName.equals("Replace Declined")){
+            loadEntrantList("rejected");
+        }else {
+            loadList();
+        }
+
 
         /*TODO: THIS CURRENTLY ADDS USERS TO THE WAITING LIST. A NOTIFICATION MUST BE SENT INSTEAD
         * AWAITING NOTIFICATION SET UP FROM KITO AND YIFAN
@@ -109,11 +115,12 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
                 addUsersToEvent(selectedIds);
             } else if(screenName.equals("Find Co-Organizers")){
                 addUserstoOrganizersArray(selectedIds);
+            } else if (screenName.equals("Replace Declined")) {
+                //Find take selected Ids and replace them with replaced in database
             }
 
             finish();
         });
-
 
     }
 
@@ -237,5 +244,33 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
         entrantUserList.clear();
         entrantUserList.addAll(filteredEntrants);
         eventListArrayAdapter.notifyDataSetChanged();
+    }
+    private void loadEntrantList(String listStatus) {
+        //events -> eventID -> entrants -> entrantId -> status
+        entrantUserList.clear();
+        eventListArrayAdapter.notifyDataSetChanged();
+        db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants")
+                .get()
+                .addOnSuccessListener(value -> {
+                    entrantUserList.clear();
+                    for (QueryDocumentSnapshot snapshot : value) {
+                        String deviceId = snapshot.getId();
+                        String status = snapshot.getString("status");
+
+                        if (Objects.equals(status, listStatus)) {
+                            //If user has waiting role look for name in user collection
+                            db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId)
+                                    .get()
+                                    .addOnSuccessListener(userSnapshot -> {
+                                        String name = userSnapshot.getString("name");
+                                        String email = userSnapshot.getString("email");
+                                        String phone = userSnapshot.getString("phone");
+                                        entrantUserList.add(new User(deviceId, name, email, phone,
+                                                null, null, null, null));
+                                        eventListArrayAdapter.notifyDataSetChanged();
+                                    });
+                        }
+                    }
+                });
     }
 }

@@ -165,9 +165,10 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         });
         ReplaceDeclined.setOnClickListener(v -> {
             // Replaced Declined
-//            Intent intent = new Intent(this, UserRegistrationActivity.class);
-//            intent.putExtra("deviceId", deviceId);
-//            startActivity(intent);
+            Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
+            intent.putExtra("eventId", eventId);
+            intent.putExtra("ActivityName", "Replace Declined");
+            startActivity(intent);
 
         });
     }
