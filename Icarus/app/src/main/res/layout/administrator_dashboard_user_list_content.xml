@@ -23,7 +23,8 @@
             android:text="User Name"
             android:textAlignment="center"
             android:textSize="@dimen/font_subheading_size"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@color/lightText" />
 
         <ImageButton
             android:id="@+id/admin_dashboard_user_list_remove_user_button"

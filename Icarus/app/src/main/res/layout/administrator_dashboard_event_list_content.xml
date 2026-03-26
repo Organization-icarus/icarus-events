@@ -27,7 +27,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/font_subheading_size"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/lightText" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -46,7 +47,7 @@
                     android:paddingTop="2dp"
                     android:paddingEnd="8dp"
                     android:paddingBottom="2dp"
-                    android:textColor="@color/primary_container_highlighted"
+                    android:textColor="@color/lightText"
                     android:textSize="@dimen/font_text_size" />
 
                 <!-- Event Date -->
@@ -54,7 +55,8 @@
                     android:id="@+id/admin_dashboard_event_list_event_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/font_text_size" />
+                    android:textSize="@dimen/font_text_size"
+                    android:textColor="@color/lightText"/>
 
             </LinearLayout>
         </LinearLayout>
@@ -67,7 +69,7 @@
             android:backgroundTint="?android:attr/windowBackground"
             android:contentDescription="remove_event_button"
             app:srcCompat="@android:drawable/ic_menu_delete"
-            app:tint="@color/primary_container_highlighted" />
+            app:tint="@color/lightText" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
