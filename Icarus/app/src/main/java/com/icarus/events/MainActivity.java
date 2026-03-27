@@ -11,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import android.provider.Settings;
 
@@ -20,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Entry activity for the application.
@@ -52,6 +56,18 @@ public class MainActivity extends AppCompatActivity {
         config.put("api_key", "291231889216385");
         config.put("api_secret", "ToWWi626oI0M7Ou1pmPQx_vd5x8");
         MediaManager.init(this, config);
+
+        //Create Background Worker thread that checks Event date
+        PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(
+                EventStatusBackgroundWorker.class,
+                15, TimeUnit.MINUTES)  // 15 min is the minimum interval WorkManager allows
+                .build();
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "EventStatusCheck",
+                ExistingPeriodicWorkPolicy.KEEP,  // Don't reschedule if already running
+                workRequest
+        );
 
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
