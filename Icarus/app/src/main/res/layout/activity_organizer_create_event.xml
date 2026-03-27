@@ -238,9 +238,9 @@
 
                     <TextView
                         android:id="@+id/OrganizerCreateEventGeolocationLabel"
-                        android:layout_width="240dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="I want this to a PRIVATE Event"
+                        android:text="I want this to be a PRIVATE Event"
                         android:textColor="@color/lightText"
                         android:textSize="@dimen/font_subheading_size"
                         app:layout_constraintStart_toStartOf="parent"
