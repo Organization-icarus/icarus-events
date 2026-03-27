@@ -186,7 +186,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             showDatePicker(date -> {
                 this.startDate = date;
                 String regStart = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
-                RegistrationStartDateButton.setText("Start Date: "+ regStart);
+                RegistrationStartDateButton.setText("Start Date:\n"+ regStart);
             });
         });
         RegistrationStartTimeButton.setOnClickListener(v -> {
@@ -194,7 +194,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             showTimePicker(time->{
                 startTime = time;
                 String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(startTime);
-                RegistrationStartTimeButton.setText("Start Time: "+showTime );
+                RegistrationStartTimeButton.setText("Start Time:\n"+showTime );
             });
         });
 
@@ -203,7 +203,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             showDatePicker(date -> {
                 this.endDate = date;
                 String regEnd = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
-                RegistrationEndDateButton.setText("End Date: "+ regEnd);
+                RegistrationEndDateButton.setText("End Date:\n"+ regEnd);
             });
         });
         RegistrationEndTimeButton.setOnClickListener(v -> {
@@ -211,7 +211,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             showTimePicker(time->{
                 endTime = time;
                 String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(endTime);
-                RegistrationEndTimeButton.setText("End Time: "+showTime );
+                RegistrationEndTimeButton.setText("End Time:\n"+showTime );
             });
         });
 
@@ -220,7 +220,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             showDatePicker(date -> {
                 this.eventDate = date;
                 String eventDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
-                EventDate.setText("Event Date: "+ eventDate);
+                EventDate.setText("Event Date:\n"+ eventDate);
             });
         });
         EventTime.setOnClickListener(v -> {
@@ -228,7 +228,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             showTimePicker(time->{
                 eventTime = time;
                 String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(eventTime);
-                EventTime.setText("Event Time: "+showTime );
+                EventTime.setText("Event Time:\n"+showTime );
             });
         });
 
