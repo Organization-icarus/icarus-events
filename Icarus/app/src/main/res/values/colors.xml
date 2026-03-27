@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- For text displayed on a primary background -->
     <color name="black">#FF000000</color>
-    <!-- For text displayed on a highlighted background -->
     <color name="white">#FFFFFFFF</color>
+    <!-- For text on a light background -->
+    <color name="lightTextSemi">#80FFFFFF</color>
+    <!-- For 'greyed out' text on a light background -->
+    <color name="lightText">#FFFFFFFF</color>
+    <!-- For text on a dark background -->
+    <color name="darkText">#FFFFFFFF</color>
     <!-- The main background color, and the color for text in dark text boxes -->
     <color name="primary">#FF212121</color>
+    <!-- Secondary background color, lighter grey -->
+    <color name="secondary">#FF313131</color>
     <!-- A light background color for buttons -->
     <color name="primary_container">#FFE8DEF8</color>
     <!-- A darker background color to indicate selection -->
     <color name="primary_container_highlighted">#FF6750A4</color>
     <!-- For buttons that require sensitive action (delete, remove, etc)  -->
     <color name="attention">#FFB00020</color>
+    <!-- Rotating accent colors for lists -->
+    <color name="accent_first">#FFC6FF00</color>
+    <color name="accent_second">#FF00BCD4</color>
+    <color name="accent_third">#FFFF6F00</color>
 </resources>
