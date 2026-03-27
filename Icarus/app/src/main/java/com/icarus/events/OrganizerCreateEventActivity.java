@@ -65,7 +65,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
 
     private EditText locationName;
     private SwitchMaterial geolocationSwitch;
-
+    private SwitchMaterial privateSwitch;
     private EditText EventLimit;
     private Spinner categoryNameList;
 
@@ -159,7 +159,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
 
         //Create Switch
         geolocationSwitch = findViewById(R.id.OrganizerCreateEventGeolocationSwitch);
-
+        privateSwitch = findViewById(R.id.OrganizerCreateEventPrivateSwitch);
         //Create Buttons
         UploadPosterButton = findViewById(R.id.OrganizerCreateEventUploadPosterButton);
 
@@ -342,6 +342,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         eventData.put("image", posterURL);
         eventData.put("location", location);
         eventData.put("geolocation",geolocationSwitch.isChecked());
+        eventData.put("isPrivate", privateSwitch.isChecked());
         eventData.put("organizers", organizerIds);
 
         //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
