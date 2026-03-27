@@ -43,7 +43,7 @@
                 android:textColorHint="@color/lightText"
                 android:background="@color/primary"
                 app:boxStrokeColor="@color/search_box_stroke"
-                app:hintTextColor="@color/accent_second">
+                app:hintTextColor="@color/accent_third">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/entrant_event_list_search_filter"
@@ -75,7 +75,7 @@
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
                 style="@style/Widget.Material3.Button.TonalButton"
-                app:iconTint="@color/primary"
+                app:iconTint="@color/filter_button_icon_tint"
                 app:backgroundTint="@color/filter_button_tint"/>
 
             <com.google.android.material.button.MaterialButton
@@ -94,7 +94,7 @@
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
                 style="@style/Widget.Material3.Button.TonalButton"
-                app:iconTint="@color/primary"
+                app:iconTint="@color/filter_button_icon_tint"
                 app:backgroundTint="@color/filter_button_tint"/>
 
         </LinearLayout>
@@ -135,7 +135,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="76dp"
         android:src="@android:drawable/ic_input_add"
-        android:backgroundTint="@color/accent_third"/>
+        app:iconTint="@color/navigation_button_icon_tint"
+        android:backgroundTint="@color/navigation_button_tint"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/entrant_event_list_admin_dashboard_button"

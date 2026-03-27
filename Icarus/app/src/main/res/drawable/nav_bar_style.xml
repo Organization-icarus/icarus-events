@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adapted from a generation by Claude on March 26th 2026,
+ "How could I adjust the navbar to be a fading transparent gradient?"-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners
+        android:topLeftRadius="0dp"
+        android:topRightRadius="0dp"
+        android:bottomLeftRadius="0dp"
+        android:bottomRightRadius="0dp"/>
+    <gradient
+        android:angle="270"
+        android:startColor="#99212121"
+        android:endColor="#FF212121"
+        android:type="linear"/>
+</shape>

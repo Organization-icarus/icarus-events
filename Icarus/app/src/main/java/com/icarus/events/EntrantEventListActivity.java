@@ -267,7 +267,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
 
         filterCategoryButton.setBackgroundTintList(ColorStateList.valueOf(
                 filtersActive
-                        ? getColor(R.color.accent_second)
+                        ? getColor(R.color.accent_third)
                         : getColor(R.color.white)));
     }
 
