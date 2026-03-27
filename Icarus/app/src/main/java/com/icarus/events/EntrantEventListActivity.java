@@ -53,6 +53,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     private EditText searchTextFilter;
     private String currentSearch = "";
     private MaterialButton filterCategoryButton;
+    private MaterialButton qrButton;
     private FloatingActionButton addEvent;
     private FloatingActionButton adminDashboard;
     private ArrayList<Event> eventArrayList;
@@ -91,6 +92,11 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         filterCategoryButton = findViewById(R.id.entrant_event_list_filter_button);
         addEvent = findViewById(R.id.entrant_event_list_add_event_button);
         adminDashboard = findViewById(R.id.entrant_event_list_admin_dashboard_button);
+        qrButton = findViewById(R.id.entrant_event_list_qr_button);
+
+        // Set button colours
+        addEvent.setImageTintList(ColorStateList.valueOf(getColor(R.color.primary)));
+        adminDashboard.setImageTintList(ColorStateList.valueOf(getColor(R.color.primary)));
 
         // Retrieve current user role
         User currentUser = UserSession.getInstance().getCurrentUser();
