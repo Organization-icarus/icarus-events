@@ -160,7 +160,7 @@
                         android:inputType="textCapWords"
                         android:textColor="@color/lightTextSemi"
                         android:textColorHint="@color/lightTextSemi"
-                        android:textSize="@dimen/font_heading_size"
+                        android:textSize="@dimen/font_subheading_size"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/OrganizerCreateEventGeolocationSwitch"
                         app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventLocationLabel"/>
@@ -212,7 +212,7 @@
                         android:inputType="numberDecimal"
                         android:textColor="@color/lightTextSemi"
                         android:textColorHint="@color/lightTextSemi"
-                        android:textSize="@dimen/font_heading_size"
+                        android:textSize="@dimen/font_subheading_size"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventSettingsLabel"/>
