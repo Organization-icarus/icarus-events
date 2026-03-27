@@ -10,6 +10,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
+/**
+ * Worker Class that moves users from "selected" to "rejected" after a event's
+ * registration close date has pasted
+ * <p>
+ *
+ * @author Ben Salmon
+ */
 public class EventStatusBackgroundWorker extends Worker {
     public EventStatusBackgroundWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
@@ -21,6 +28,10 @@ public class EventStatusBackgroundWorker extends Worker {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Timestamp now = Timestamp.now();
 
+        /*This query was written by Claude, March 26, 2026
+        * "I need a query that will update a users status in the entrant subcollection
+        * from selected to rejected after a event's registration close date passes"
+        */
         // Find all events where registration has ended
         db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .whereLessThan("close", now)  // Events where close date has passed

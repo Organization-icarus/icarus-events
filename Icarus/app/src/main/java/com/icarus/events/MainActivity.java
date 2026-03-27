@@ -57,18 +57,19 @@ public class MainActivity extends AppCompatActivity {
         config.put("api_secret", "ToWWi626oI0M7Ou1pmPQx_vd5x8");
         MediaManager.init(this, config);
 
-        //Create Background Worker thread that checks Event date
+        //Create Background Worker thread that checks Event date (DO THIS ONCE)
+        //See EventStatusBackgroundWorker for task
         PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(
                 EventStatusBackgroundWorker.class,
-                15, TimeUnit.MINUTES)  // 15 min is the minimum interval WorkManager allows
+                15, TimeUnit.MINUTES)
                 .build();
-
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
                 "EventStatusCheck",
-                ExistingPeriodicWorkPolicy.KEEP,  // Don't reschedule if already running
+                ExistingPeriodicWorkPolicy.KEEP,
                 workRequest
         );
 
+        //Proceed as normal
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
