@@ -43,8 +43,7 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
     private Button UpdatePoster;
     private Button ViewEntrantMap;
     private Button ViewEntrantList;
-    private Button inviteSpecificEntrant;
-    private Button SampleAttendees;
+    private Button inviteEntrant;
     private Button addOrganizers;
     private Button ReplaceDeclined;
     private Button shareQRCode;
@@ -67,11 +66,11 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         UpdatePoster = findViewById(R.id.OrganizerManageEventUpdatePoster);
         ViewEntrantMap = findViewById(R.id.OrganizerManageEventViewEntrantMap);
         ViewEntrantList = findViewById(R.id.OrganizerManageEventViewEntrantList);
-        inviteSpecificEntrant = findViewById(R.id.OrganizerManageEventInviteEntrant);
-        SampleAttendees = findViewById(R.id.OrganizerManageEventSampleAttendees);
         addOrganizers = findViewById(R.id.OrganizerManageEventAddOrganizer);
         ReplaceDeclined = findViewById(R.id.OrganizerManageEventReplaceDeclined);
         shareQRCode = findViewById(R.id.OrganizerManageEventShareQRCode);
+        inviteEntrant = findViewById(R.id.OrganizerManageEventInviteEntrant);
+
         //Create textView
         eventTitle = findViewById(R.id.OrganizerManageEventTitle);
 
@@ -86,7 +85,13 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
                     eventTitle.setText(eventName);
                     isPrivate = document.getBoolean("isPrivate");
                     if(isPrivate == null){isPrivate = false;}
+                    if(isPrivate){
+                        inviteEntrant.setText("Invite Specific Entrant");
+                    } else {
+                        inviteEntrant.setText("Sample Attendees");
+                    }
                 });
+
 
         // Initialize imagePickerLauncher
         ActivityResultLauncher<String> imagePickerLauncher = createImagePicker();
@@ -132,14 +137,7 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
             intent.putExtra("eventId", eventId);
             startActivity(intent);
         });
-        SampleAttendees.setOnClickListener(v -> {
-            // Sample Attendees
-            Intent intent = new Intent(this, SampleAttendeesActivity.class);
-            intent.putExtra("eventId", eventId);
-            startActivity(intent);
-
-        });
-        inviteSpecificEntrant.setOnClickListener(v -> {
+        inviteEntrant.setOnClickListener(v -> {
             // Invite Entrants to a private event
             if(isPrivate){
                 Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
@@ -147,9 +145,11 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
                 intent.putExtra("ActivityName", "Entrant Search");
                 startActivity(intent);
             }else{
-                Toast.makeText(OrganizerManageEventActivity.this,
-                        "Event is not Private", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, SampleAttendeesActivity.class);
+                intent.putExtra("eventId", eventId);
+                startActivity(intent);
             }
+
 
         });
         shareQRCode.setOnClickListener(v -> {
