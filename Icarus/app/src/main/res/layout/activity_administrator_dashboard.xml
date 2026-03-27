@@ -1,7 +1,6 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/primary">
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -83,7 +82,6 @@
             android:fontFamily="@font/font"
             android:text="Dashboard"
             android:textSize="@dimen/font_heading_size"
-            android:textColor="@color/lightText"
             app:layout_constraintBottom_toTopOf="@+id/admin_dashboard_show_user_list_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

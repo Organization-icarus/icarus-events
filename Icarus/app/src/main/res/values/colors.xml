@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- For text displayed on a primary background -->
     <color name="black">#FF000000</color>
-    <!-- For text displayed on a highlighted background -->
     <color name="white">#FFFFFFFF</color>
-    <!-- For text on a dark background -->
-    <color name="lightText">#FFFFFFFF</color>
     <!-- For text on a light background -->
+    <color name="lightTextSemi">#80FFFFFF</color>
+    <!-- For 'greyed out' text on a light background -->
+    <color name="lightText">#FFFFFFFF</color>
+    <!-- For text on a dark background -->
     <color name="darkText">#FFFFFFFF</color>
     <!-- The main background color, and the color for text in dark text boxes -->
     <color name="primary">#FF212121</color>
