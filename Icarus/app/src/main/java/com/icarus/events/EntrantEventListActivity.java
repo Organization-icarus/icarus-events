@@ -24,6 +24,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -58,6 +59,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     private FirebaseFirestore db;
     private Double maxCapacityFilter = null;
     private Date dateFilter = null;
+    private Map<String, String> categoryColors;
 
     /**
      * Initializes the entrant event list activity.
@@ -118,6 +120,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         // Create normal & filtered event list
         eventArrayList = new ArrayList<>();
         filteredEventArrayList = new ArrayList<>();
+        categoryColors = new HashMap<>();
         eventListArrayAdapter = new EntrantEventListArrayAdapter(this,
                 filteredEventArrayList, position -> {
             // Set navigation on click listeners
@@ -125,20 +128,25 @@ public class EntrantEventListActivity extends NavigationBarActivity {
             Intent intent = new Intent(this, EventDetailsActivity.class);
             intent.putExtra("eventId", selected.getId());
             startActivity(intent);
-        });
+        }, categoryColors);
 
-        // Initialize current filters
+        // Initialize current filters and colors
         currentFilters = new HashMap<>();
         db.collection("event-categories")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots ->{
                     for(DocumentSnapshot doc : queryDocumentSnapshots){
                         String category = doc.getString("category");
+                        String color = doc.getString("color");
                         //check for null
-                        if(category != null){
+                        if (category != null){
                             currentFilters.put(category, false);
                         }
+                        if (category != null && color != null) {
+                            categoryColors.put(category, color);
+                        }
                     }
+                    eventListArrayAdapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load categories: " + e.getMessage(), Toast.LENGTH_SHORT).show();
