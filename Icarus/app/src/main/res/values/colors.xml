@@ -20,6 +20,6 @@
     <color name="attention">#FFB00020</color>
     <!-- Rotating accent colors for lists -->
     <color name="accent_first">#FFFFBD61</color>
-    <color name="accent_second">#FF77FF2</color>
+    <color name="accent_second">#FF77FFF2</color>
     <color name="accent_third">#FF1DB954</color>
 </resources>
