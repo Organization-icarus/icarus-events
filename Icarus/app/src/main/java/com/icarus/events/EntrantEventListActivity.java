@@ -3,32 +3,32 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import androidx.appcompat.app.AlertDialog;
+
+import com.google.android.material.button.MaterialButton;
 
 
 //@TODO Put filter button on same horizontal level as searhc events, open a pop up menu
@@ -47,7 +47,8 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     private RecyclerView eventListView;
     private EditText searchTextFilter;
     private String currentSearch = "";
-    private Button filterCategoryButton;
+    private MaterialButton filterCategoryButton;
+    private MaterialButton qrButton;
     private FloatingActionButton addEvent;
     private FloatingActionButton adminDashboard;
     private ArrayList<Event> eventArrayList;
@@ -56,6 +57,9 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     private EntrantEventListArrayAdapter eventListArrayAdapter;
     private CollectionReference eventsRef;
     private FirebaseFirestore db;
+    private Double maxCapacityFilter = null;
+    private Date dateFilter = null;
+    private Map<String, String> categoryColors;
 
     /**
      * Initializes the entrant event list activity.
@@ -84,6 +88,11 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         filterCategoryButton = findViewById(R.id.entrant_event_list_filter_button);
         addEvent = findViewById(R.id.entrant_event_list_add_event_button);
         adminDashboard = findViewById(R.id.entrant_event_list_admin_dashboard_button);
+        qrButton = findViewById(R.id.entrant_event_list_qr_button);
+
+        // Set button colours
+        addEvent.setImageTintList(ColorStateList.valueOf(getColor(R.color.primary)));
+        adminDashboard.setImageTintList(ColorStateList.valueOf(getColor(R.color.primary)));
 
         // Retrieve current user role
         User currentUser = UserSession.getInstance().getCurrentUser();
@@ -111,6 +120,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         // Create normal & filtered event list
         eventArrayList = new ArrayList<>();
         filteredEventArrayList = new ArrayList<>();
+        categoryColors = new HashMap<>();
         eventListArrayAdapter = new EntrantEventListArrayAdapter(this,
                 filteredEventArrayList, position -> {
             // Set navigation on click listeners
@@ -118,20 +128,25 @@ public class EntrantEventListActivity extends NavigationBarActivity {
             Intent intent = new Intent(this, EventDetailsActivity.class);
             intent.putExtra("eventId", selected.getId());
             startActivity(intent);
-        });
+        }, categoryColors);
 
-        // Initialize current filters
+        // Initialize current filters and colors
         currentFilters = new HashMap<>();
         db.collection("event-categories")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots ->{
                     for(DocumentSnapshot doc : queryDocumentSnapshots){
                         String category = doc.getString("category");
+                        String color = doc.getString("color");
                         //check for null
-                        if(category != null){
+                        if (category != null){
                             currentFilters.put(category, false);
                         }
+                        if (category != null && color != null) {
+                            categoryColors.put(category, color);
+                        }
                     }
+                    eventListArrayAdapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load categories: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -256,6 +271,12 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         }
         // Update filtered list
         eventListArrayAdapter.notifyDataSetChanged();
+        boolean filtersActive = currentFilters.containsValue(true);
+
+        filterCategoryButton.setBackgroundTintList(ColorStateList.valueOf(
+                filtersActive
+                        ? getColor(R.color.accent_first)
+                        : getColor(R.color.white)));
     }
 
     /**
