@@ -54,6 +54,8 @@
 
         <activity android:name=".EntrantMapActivity"/>
 
+        <activity android:name=".EventNotificationsActivity" />
+
     </application>
 
 </manifest>
