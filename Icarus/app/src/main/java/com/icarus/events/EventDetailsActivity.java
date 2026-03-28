@@ -625,13 +625,49 @@ public class EventDetailsActivity extends NavigationBarActivity {
         entrant.put("status", currentStatus);
         if (geopoint != null) entrant.put("location", geopoint);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        // Add user ID to event with status: "waiting" and location
-        db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId)
-                .collection("entrants").document(userId)
-                .set(entrant);
 
-        // Add event to user's own event collection
-        db.collection(FirestoreCollections.USERS_COLLECTION).document(userId)
-                .update("events", com.google.firebase.firestore.FieldValue.arrayUnion(eventId));
+        if (locationEnabled && geopoint != null) {
+            // Check if entrant is within valid range
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).get()
+                    .addOnSuccessListener(snapshot -> {
+                        GeoPoint eventLocation = snapshot.getGeoPoint("coordinates");
+                        Double radius = snapshot.getDouble("entrantRange") * 1000; // In meters
+                        float[] results = new float[1];
+                        Location.distanceBetween(geopoint.getLatitude(),
+                                geopoint.getLongitude(),
+                                eventLocation.getLatitude(),
+                                eventLocation.getLongitude(), results);
+                        if (results[0] <= radius) {
+                            // WITHIN RANGE
+                            // Add user ID to event with status: "waiting" and location
+                            db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId)
+                                    .collection("entrants").document(userId)
+                                    .set(entrant);
+
+                            // Add event to user's own event collection
+                            db.collection(FirestoreCollections.USERS_COLLECTION).document(userId)
+                                    .update("events", com.google.firebase.firestore.FieldValue.arrayUnion(eventId));
+                        } else {
+                            // OUT OF RANGE
+                            Toast.makeText(this,
+                                    "Sorry, you are too far from the event to join." + geopoint.toString(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this,
+                                "Error getting event coordinates, try again later",
+                                Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            // Add user ID to event with status: "waiting" and location
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId)
+                    .collection("entrants").document(userId)
+                    .set(entrant);
+
+            // Add event to user's own event collection
+            db.collection(FirestoreCollections.USERS_COLLECTION).document(userId)
+                    .update("events", com.google.firebase.firestore.FieldValue.arrayUnion(eventId));
+        }
     }
 }

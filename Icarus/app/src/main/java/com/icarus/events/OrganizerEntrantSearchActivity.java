@@ -10,17 +10,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.util.CollectionUtils;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -93,7 +97,12 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
         entrantList.setAdapter(eventListArrayAdapter);
 
         //Fill list with users not in the waiting list
-        loadList();
+        if(screenName.equals("Replace Declined")){
+            loadEntrantList("rejected");
+        }else {
+            loadList();
+        }
+
 
         /*TODO: THIS CURRENTLY ADDS USERS TO THE WAITING LIST. A NOTIFICATION MUST BE SENT INSTEAD
         * AWAITING NOTIFICATION SET UP FROM KITO AND YIFAN
@@ -106,14 +115,41 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
                 return;
             }
             if(screenName.equals("Entrant Search")){
-                addUsersToEvent(selectedIds);
+                addUsersToEvent(selectedIds, "waiting");
             } else if(screenName.equals("Find Co-Organizers")){
                 addUserstoOrganizersArray(selectedIds);
-            }
+            } else if (screenName.equals("Replace Declined")) {
+                // Check waiting list BEFORE marking anyone as replaced
+                db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants")
+                        .get()
+                        .addOnSuccessListener(document -> {
+                            ArrayList<String> waitingIds = new ArrayList<>();
+                            for (QueryDocumentSnapshot snapshot : document) {
+                                String status = snapshot.getString("status");
+                                if ("waiting".equals(status)) {
+                                    waitingIds.add(snapshot.getId());
+                                }
+                            }
 
+                            if (waitingIds.isEmpty()) {
+                                Toast.makeText(this, "Waiting list is Empty, Cannot Replace", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            if(waitingIds.size() < selectedIds.size()){
+                                Toast.makeText(this, "More Entrants Selected than in " +
+                                        "Waiting List, Cannot Replace", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            // Only now mark selected users as replaced and select new ones
+                            addUsersToEvent(selectedIds, "rejected");
+                            selectNewUsersFromWaitingList(selectedIds.size());
+                            finish();
+                        });
+                return;
+            }
             finish();
         });
-
 
     }
 
@@ -183,7 +219,7 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
     * Written by Claude, March 25,2026
     * "How can I make the listView selectable to add users to an event"
     * */
-    private void addUsersToEvent(Set<String> selectedIds) {
+    private void addUsersToEvent(Set<String> selectedIds, String newStatus) {
         WriteBatch batch = db.batch();
 
         for (String deviceId : selectedIds) {
@@ -193,13 +229,18 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
                     .document(deviceId);
 
             Map<String, Object> data = new HashMap<>();
-            data.put("status", "waiting");
+            if(newStatus.equals("rejected")){
+                data.put("isReplaced", true);
+            }
+            data.put("status", newStatus);
             batch.set(ref, data);
         }
 
         batch.commit()
                 .addOnSuccessListener(unused -> {
-                    Toast.makeText(this, selectedIds.size() + " users added", Toast.LENGTH_SHORT).show();
+                    if(newStatus.equals("waiting")){
+                        Toast.makeText(this, selectedIds.size() + " users added to waiting list", Toast.LENGTH_SHORT).show();
+                    }
                 })
                 .addOnFailureListener(e -> Log.e("addUsers", "Failed to add users", e));
     }
@@ -237,5 +278,67 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
         entrantUserList.clear();
         entrantUserList.addAll(filteredEntrants);
         eventListArrayAdapter.notifyDataSetChanged();
+    }
+    private void loadEntrantList(String listStatus) {
+        //events -> eventID -> entrants -> entrantId -> status
+        entrantUserList.clear();
+        eventListArrayAdapter.notifyDataSetChanged();
+        db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants")
+                .get()
+                .addOnSuccessListener(value -> {
+                    entrantUserList.clear();
+                    for (QueryDocumentSnapshot snapshot : value) {
+                        String deviceId = snapshot.getId();
+                        String status = snapshot.getString("status");
+                        Boolean isReplaced = snapshot.getBoolean("isReplaced");
+
+                        if (Objects.equals(status, listStatus)  && (isReplaced == null || !isReplaced)) {
+                            //If user has waiting role look for name in user collection
+                            db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId)
+                                    .get()
+                                    .addOnSuccessListener(userSnapshot -> {
+                                        String name = userSnapshot.getString("name");
+                                        String email = userSnapshot.getString("email");
+                                        String phone = userSnapshot.getString("phone");
+                                        entrantUserList.add(new User(deviceId, name, email, phone,
+                                                null, null, null, null));
+                                        eventListArrayAdapter.notifyDataSetChanged();
+                                    });
+                        }
+                    }
+                });
+    }
+    private void selectNewUsersFromWaitingList(int size) {
+        //Find users with waiting status in entrant subcollection
+        db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants")
+                .get()
+                .addOnSuccessListener(document ->{
+                    ArrayList<String> waitingIds = new ArrayList<>();
+                    for (QueryDocumentSnapshot snapshot : document){
+                        String deviceId = snapshot.getId();
+                        String status = snapshot.getString("status");
+                        if("waiting".equals(status)){
+                            waitingIds.add(deviceId);
+                        }
+                    }
+                    //Shuffle List
+                    Collections.shuffle(waitingIds);
+                    List<String> selectedUsers = waitingIds.subList(0,Math.min(size, waitingIds.size()));
+                    HashSet<String> selectedSet = new HashSet<>(selectedUsers);
+                    //Update
+                    for (QueryDocumentSnapshot snapshot : document){
+                        String deviceId = snapshot.getId();
+                        if(selectedSet.contains(deviceId)){
+                            db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                                    .document(eventId)
+                                    .collection("entrants")
+                                    .document(deviceId)
+                                    .update("status", "selected");
+                        }
+                    }
+                    Toast.makeText(this,Math.min(size, waitingIds.size())
+                            + " Entrants Selected for Event",Toast.LENGTH_SHORT).show();
+
+                });
     }
 }

@@ -16,7 +16,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
+/**
+ * Entrant Array Adapter. Shows the User's name, email, and phone number
+ * <p>
+ *
+ * @author Ben Salmon
+ */
 public class OraganizerEntrantViewListArrayAdapter extends ArrayAdapter<User> {
     private ArrayList<User> entrants;
     private Context context;
