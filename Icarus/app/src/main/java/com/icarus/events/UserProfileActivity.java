@@ -189,13 +189,13 @@ public class UserProfileActivity extends NavigationBarActivity {
             editProfileButton.setBackgroundColor(
                     androidx.core.content.ContextCompat.getColor(
                             this,
-                            R.color.primary_container
+                            R.color.white
                     )
             );
             editProfileButton.setTextColor(
                     androidx.core.content.ContextCompat.getColor(
                             this,
-                            R.color.primary_container_highlighted
+                            R.color.primary
                     )
             );
             editProfileButton.setText("Edit Profile");
@@ -211,13 +211,13 @@ public class UserProfileActivity extends NavigationBarActivity {
             editProfileButton.setBackgroundColor(
                     androidx.core.content.ContextCompat.getColor(
                             this,
-                            R.color.primary_container_highlighted
+                            R.color.accent_third
                     )
             );
             editProfileButton.setTextColor(
                     androidx.core.content.ContextCompat.getColor(
                             this,
-                            R.color.primary_container
+                            R.color.primary
                     )
             );
             editProfileButton.setText("Confirm Changes");
