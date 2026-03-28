@@ -1,5 +1,6 @@
 package com.icarus.events;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,7 +9,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -28,6 +31,15 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.icarus.events.FirestoreCollections;
+
+import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polygon;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -89,6 +101,9 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
     private ActivityResultLauncher<String> imagePickerLauncher;
     private String posterURL;
     private Uri posterURI;
+    private GeoPoint selectedEventLocation = null;
+    private Integer selectedEntrantRange = null;
+    private Polygon entrantRangeCircle = null;
 
     /**
      * Initializes the event creation interface.
@@ -179,6 +194,15 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         UploadPosterButton.setOnClickListener(v -> {
             //Upload event poster
             imagePickerLauncher.launch("image/*");
+        });
+
+        // When geolocation is enabled popup map to set event location
+        geolocationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                showEventLocationPickerDialog();
+            } else {
+                selectedEventLocation = null;
+            }
         });
 
         RegistrationStartDateButton.setOnClickListener(v -> {
@@ -344,6 +368,17 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         eventData.put("geolocation",geolocationSwitch.isChecked());
         eventData.put("isPrivate", privateSwitch.isChecked());
         eventData.put("organizers", organizerIds);
+        eventData.put("entrantRange",selectedEntrantRange);
+        if (selectedEventLocation != null) {
+            com.google.firebase.firestore.GeoPoint firestoreLocation =
+                    new com.google.firebase.firestore.GeoPoint(
+                            selectedEventLocation.getLatitude(),
+                            selectedEventLocation.getLongitude()
+                    );
+            eventData.put("coordinates", firestoreLocation);
+        } else {
+            eventData.put("coordinates", null);
+        }
 
         //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
         db.collection(FirestoreCollections.EVENTS_COLLECTION).add(eventData)
@@ -448,6 +483,135 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         dateCal.set(Calendar.MILLISECOND, 0);
 
         return dateCal.getTime();
+    }
+
+    private void showEventLocationPickerDialog() {
+        Dialog dialog = new Dialog(this, android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen);
+        dialog.setContentView(R.layout.dialog_event_location_picker);
+
+        MapView dialogMap = dialog.findViewById(R.id.event_location_picker_map);
+        TextView eventLocationCoordinates = dialog.findViewById(R.id.event_location_picker_coordinates);
+        SeekBar entrantRangeSlider = dialog.findViewById(R.id.event_location_picker_slider);
+        TextView entrantRangeValue = dialog.findViewById(R.id.event_location_picker_slider_value);
+        Button confirmButton = dialog.findViewById(R.id.event_location_picker_confirm_button);
+        Button cancelButton = dialog.findViewById(R.id.event_location_picker_cancel_button);
+
+        // Set up map
+        Configuration.getInstance().setUserAgentValue(getPackageName());
+        dialogMap.setTileSource(TileSourceFactory.MAPNIK);
+        dialogMap.setMultiTouchControls(true);
+        dialogMap.getController().setZoom(12.0);
+
+        // Default center (Edmonton) or last selected
+        GeoPoint startPoint = selectedEventLocation != null
+                ? selectedEventLocation
+                : new GeoPoint(53.5461, -113.4938);
+        dialogMap.getController().setCenter(startPoint);
+
+        // Marker for selected point
+        Marker[] selectedMarker = {null};
+
+        // Tap to place marker
+        MapEventsOverlay eventsOverlay = new MapEventsOverlay(new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                // Remove old marker
+                if (selectedMarker[0] != null) {
+                    dialogMap.getOverlays().remove(selectedMarker[0]);
+                }
+                // Place new marker
+                Marker marker = new Marker(dialogMap);
+                marker.setPosition(p);
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                dialogMap.getOverlays().add(marker);
+                dialogMap.invalidate();
+                selectedMarker[0] = marker;
+                if (selectedEntrantRange != null && selectedEntrantRange > 0) {
+                    dialogMap.getOverlays().remove(entrantRangeCircle);
+                    entrantRangeCircle = drawCircle(p.getLatitude(), p.getLongitude(), selectedEntrantRange * 1000, dialogMap);
+                }
+
+                // Update label
+                String coords = String.format(Locale.getDefault(),
+                        "%.4f, %.4f", p.getLatitude(), p.getLongitude());
+                eventLocationCoordinates.setText(coords);
+
+                return true;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) { return false; }
+        });
+
+        dialogMap.getOverlays().add(0, eventsOverlay);
+
+        // Setup slider
+        entrantRangeSlider.setMax(100);
+        entrantRangeSlider.setProgress(0);
+        entrantRangeValue.setText("0 km");
+        entrantRangeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                entrantRangeValue.setText(progress + " km");
+                if (selectedMarker[0] != null) {
+                    if (entrantRangeCircle != null) {
+                        dialogMap.getOverlays().remove(entrantRangeCircle);
+                        entrantRangeCircle = null;
+                    }
+                    if (progress > 0) {
+                        GeoPoint position = selectedMarker[0].getPosition();
+                        entrantRangeCircle = drawCircle(position.getLatitude(), position.getLongitude(), progress * 1000, dialogMap);
+                    }
+                    dialogMap.invalidate();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                selectedEntrantRange = seekBar.getProgress();
+            }
+        });
+
+        confirmButton.setOnClickListener(v -> {
+            if (selectedMarker[0] == null) {
+                Toast.makeText(this, "Please tap a location on the map", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            selectedEventLocation = selectedMarker[0].getPosition();
+            dialog.dismiss();
+        });
+
+        cancelButton.setOnClickListener(v -> {
+            geolocationSwitch.setChecked(false); // revert switch if cancelled
+            selectedEntrantRange = 0;
+            dialog.dismiss();
+        });
+
+        // Also revert switch if dialog is dismissed without confirming
+        dialog.setOnCancelListener(d -> geolocationSwitch.setChecked(false));
+
+        dialog.show();
+        dialogMap.onResume();
+    }
+
+    // Created by Claude AI, March 28, 2026
+    // "How to draw a circle around a point on the map using the osmdroid library in java"
+    private Polygon drawCircle(double lat, double lon, double radiusMeters, MapView map) {
+        Polygon circle = new Polygon();
+        circle.setPoints(Polygon.pointsAsCircle(new GeoPoint(lat, lon), radiusMeters));
+
+        // Style the circle
+        circle.getFillPaint().setColor(0x300078FF);   // semi-transparent blue fill (ARGB)
+        circle.getOutlinePaint().setColor(0xFF0078FF); // solid blue border
+        circle.getOutlinePaint().setStrokeWidth(3f);
+
+        map.getOverlays().add(circle);
+        return circle;
     }
 }
 
