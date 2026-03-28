@@ -1,7 +1,6 @@
 package com.icarus.events;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -73,9 +71,9 @@ public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEv
 
         // Apply rotating accent color to poster background
         int[] accentColors = {
-                context.getColor(R.color.accent_first),
+                context.getColor(R.color.accent_third),
                 context.getColor(R.color.accent_second),
-                context.getColor(R.color.accent_third)
+                context.getColor(R.color.accent_first)
         };
 
         //holder.textContainer.setBackgroundColor(accentColors[position % accentColors.length]);

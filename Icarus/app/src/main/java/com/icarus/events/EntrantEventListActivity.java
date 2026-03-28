@@ -10,20 +10,16 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,8 +28,6 @@ import java.util.HashMap;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.button.MaterialButton;
-
-import android.content.res.ColorStateList;
 
 
 //@TODO Put filter button on same horizontal level as searhc events, open a pop up menu
@@ -273,7 +267,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
 
         filterCategoryButton.setBackgroundTintList(ColorStateList.valueOf(
                 filtersActive
-                        ? getColor(R.color.accent_third)
+                        ? getColor(R.color.accent_first)
                         : getColor(R.color.white)));
     }
 

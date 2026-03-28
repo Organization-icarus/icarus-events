@@ -23,7 +23,7 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:backgroundTint="@color/accent_third"
+        android:backgroundTint="@color/accent_first"
         android:gravity="center"
         android:hint="Enter your name"
         android:inputType="textPersonName"
@@ -34,7 +34,7 @@
         android:id="@+id/user_register_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/accent_third"
+        android:backgroundTint="@color/accent_first"
         android:text="Register"
         android:textColor="@color/primary"
         android:textSize="@dimen/font_subheading_size" />

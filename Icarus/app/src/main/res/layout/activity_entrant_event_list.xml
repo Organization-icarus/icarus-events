@@ -43,7 +43,7 @@
                 android:textColorHint="@color/lightText"
                 android:background="@color/primary"
                 app:boxStrokeColor="@color/search_box_stroke"
-                app:hintTextColor="@color/accent_third">
+                app:hintTextColor="@color/accent_first">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/entrant_event_list_search_filter"

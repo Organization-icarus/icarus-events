@@ -19,7 +19,7 @@
     <!-- For buttons that require sensitive action (delete, remove, etc)  -->
     <color name="attention">#FFB00020</color>
     <!-- Rotating accent colors for lists -->
-    <color name="accent_first">#FF1DB954</color>
+    <color name="accent_first">#FFffbd61</color>
     <color name="accent_second">#77FFF2</color>
-    <color name="accent_third">#FFffbd61</color>
+    <color name="accent_third">#FF1DB954</color>
 </resources>
