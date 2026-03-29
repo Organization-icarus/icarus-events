@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -42,8 +43,6 @@ import java.util.Locale;
 import java.util.Map;
 
 
-//@TODO Put filter button on same horizontal level as searhc events, open a pop up menu
-// with options for capacity, and other things CHECK ALL US
 /**
  * Activity that displays the list of available events for entrants.
  * <p>
@@ -68,19 +67,30 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     private EntrantEventListArrayAdapter eventListArrayAdapter;
     private CollectionReference eventsRef;
     private FirebaseFirestore db;
-    private Double maxCapacityFilter = null;
+    private Integer maxCapacityFilter = null;
     private Date startDateFilter = null;
     private Date endDateFilter = null;
     private Boolean fullStatusFilter = null;
+    private int currentSortOption = SORT_DATE_ASC;
+    private Boolean sortOptionSelected = false;
     private Map<String, String> categoryColors;
     private HashMap<String, Long> eventWaitingCounts;
     private HashMap<String, ListenerRegistration> waitlistListeners;
     private final SimpleDateFormat filterDateFormat =
             new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
-
+// Sort options selected in the menu
     private static final int MENU_STATUS_ANY = 1;
     private static final int MENU_STATUS_FULL = 2;
     private static final int MENU_STATUS_NOT_FULL = 3;
+    private static final int MENU_SORT_DATE_ASC = 4;
+    private static final int MENU_SORT_DATE_DESC = 5;
+    private static final int MENU_SORT_NAME_ASC = 6;
+    private static final int MENU_SORT_NAME_DESC = 7;
+// Sort options currently applied
+    private static final int SORT_DATE_ASC = 1;
+    private static final int SORT_DATE_DESC = 2;
+    private static final int SORT_NAME_ASC = 3;
+    private static final int SORT_NAME_DESC = 4;
 
     /**
      * Initializes the entrant event list activity.
@@ -334,12 +344,41 @@ public class EntrantEventListActivity extends NavigationBarActivity {
             }
         }
 
+        filteredEventArrayList.sort((event1, event2) -> {
+            if (currentSortOption == SORT_NAME_ASC || currentSortOption == SORT_NAME_DESC) {
+                String name1 = event1.getName() == null ? "" : event1.getName().toLowerCase(Locale.getDefault());
+                String name2 = event2.getName() == null ? "" : event2.getName().toLowerCase(Locale.getDefault());
+
+                return currentSortOption == SORT_NAME_ASC
+                        ? name1.compareTo(name2)
+                        : name2.compareTo(name1);
+            }
+
+            Date date1 = event1.getDate();
+            Date date2 = event2.getDate();
+
+            if (date1 == null && date2 == null) {
+                return 0;
+            }
+            if (date1 == null) {
+                return 1;
+            }
+            if (date2 == null) {
+                return -1;
+            }
+
+            return currentSortOption == SORT_DATE_ASC
+                    ? date1.compareTo(date2)
+                    : date2.compareTo(date1);
+        });
+
         eventListArrayAdapter.notifyDataSetChanged();
         boolean filtersActive = currentFilters.containsValue(true)
                 || maxCapacityFilter != null
                 || startDateFilter != null
                 || endDateFilter != null
-                || fullStatusFilter != null;
+                || fullStatusFilter != null
+                || sortOptionSelected;
 
         filterCategoryButton.setBackgroundTintList(ColorStateList.valueOf(
                 filtersActive
@@ -394,7 +433,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         container.setPadding(padding, padding, padding, padding);
 
         MaterialButton categoryRow = buildDialogRow(getCategorySummaryText(), hasCategoryFilter());
-        categoryRow.setOnClickListener(v -> showCategoryDropdown(categoryRow));
+        categoryRow.setOnClickListener(v -> showCategoryMultiSelectDialog(categoryRow));
         addFilterRow(container, categoryRow);
 
         MaterialButton statusRow = buildDialogRow(getFullStatusSummaryText(), fullStatusFilter != null);
@@ -413,6 +452,10 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         endDateRow.setOnClickListener(v -> showDatePicker(false, endDateRow));
         addFilterRow(container, endDateRow);
 
+        MaterialButton sortRow = buildDialogRow(getSortSummaryText(), sortOptionSelected);
+        sortRow.setOnClickListener(v -> showSortDropdown(sortRow));
+        addFilterRow(container, sortRow);
+
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Filters")
                 .setView(container)
@@ -420,6 +463,8 @@ public class EntrantEventListActivity extends NavigationBarActivity {
                 .setNeutralButton("Clear All", (dialogInterface, which) -> {
                     currentFilters.replaceAll((c, v) -> false);
                     fullStatusFilter = null;
+                    currentSortOption = SORT_DATE_ASC;
+                    sortOptionSelected = false;
                     maxCapacityFilter = null;
                     startDateFilter = null;
                     endDateFilter = null;
@@ -463,7 +508,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         row.setTextColor(darkTextColor);
         row.setIconTint(darkTextColor);
         row.setBackgroundTintList(ColorStateList.valueOf(
-                active ? getColor(R.color.accent_third) : getColor(R.color.white)
+                active ? getColor(R.color.accent_first) : getColor(R.color.white)
         ));
         row.setStrokeWidth((int) (1 * getResources().getDisplayMetrics().density));
         row.setStrokeColor(ColorStateList.valueOf(
@@ -495,49 +540,75 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         container.addView(row);
     }
 
+
     // Taken from ChatGPT March 29th 2026,
-    // "Implement dropdown menu for multi-select category filtering"
+    // "Implement multi-select category dialog for choosing several category filters at once"
     /**
-     * Displays a dropdown menu for category selection from inside the filter dialog.
+     * Displays a multi-select dialog for category filtering.
      *
-     * @param anchor the view to anchor the dropdown to
+     * @param anchor the filter row to refresh after selection
      */
-    private void showCategoryDropdown(MaterialButton anchor) {
-        PopupMenu popupMenu = new PopupMenu(new ContextThemeWrapper(this,
-                androidx.appcompat.R.style.Theme_AppCompat_Light), anchor);
-        Menu menu = popupMenu.getMenu();
+    private void showCategoryMultiSelectDialog(MaterialButton anchor) {
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.VERTICAL);
+        int sidePadding = (int) (8 * getResources().getDisplayMetrics().density);
+        container.setPadding(sidePadding, 0, sidePadding, 0);
 
-        int index = 0;
-        for (Map.Entry<String, Boolean> entry : currentFilters.entrySet()) {
-            MenuItem item = menu.add(Menu.NONE, index, Menu.NONE, entry.getKey());
-            item.setCheckable(true);
-            item.setChecked(Boolean.TRUE.equals(entry.getValue()));
-            index++;
+        ArrayList<MaterialCheckBox> checkBoxes = new ArrayList<>();
+        ArrayList<String> categories = new ArrayList<>(currentFilters.keySet());
+
+        for (String category : categories) {
+            MaterialCheckBox checkBox = new MaterialCheckBox(this);
+            checkBox.setText(category);
+            checkBox.setChecked(Boolean.TRUE.equals(currentFilters.get(category)));
+            checkBox.setTextColor(getColor(R.color.lightText));
+            checkBox.setButtonTintList(ColorStateList.valueOf(getColor(R.color.accent_first)));
+            int verticalPadding = (int) (8 * getResources().getDisplayMetrics().density);
+            checkBox.setPadding(0, verticalPadding, 0, verticalPadding);
+            container.addView(checkBox);
+            checkBoxes.add(checkBox);
         }
 
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            SpannableString styledTitle = new SpannableString(item.getTitle());
-            styledTitle.setSpan(new ForegroundColorSpan(getColor(R.color.darkText)), 0, styledTitle.length(), 0);
-            item.setTitle(styledTitle);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Select Categories")
+                .setView(container)
+                .setPositiveButton("Apply", (dialogInterface, which) -> {
+                    for (int i = 0; i < categories.size(); i++) {
+                        currentFilters.put(categories.get(i), checkBoxes.get(i).isChecked());
+                    }
+                    anchor.setText(getCategorySummaryText());
+                    anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
+                    anchor.setBackgroundTintList(ColorStateList.valueOf(
+                            hasCategoryFilter() ? getColor(R.color.accent_first) : getColor(R.color.white)
+                    ));
+                    anchor.setStrokeColor(ColorStateList.valueOf(
+                            hasCategoryFilter() ? getColor(R.color.accent_first) : getColor(R.color.white)
+                    ));
+                })
+                .setNeutralButton("Clear All", (dialogInterface, which) -> {
+                    currentFilters.replaceAll((selectedCategory, selected) -> false);
+                    anchor.setText(getCategorySummaryText());
+                    anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
+                    anchor.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white)));
+                    anchor.setStrokeColor(ColorStateList.valueOf(getColor(R.color.white)));
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(R.color.secondary);
         }
 
-        popupMenu.setOnMenuItemClickListener(item -> {
-            String category = item.getTitle().toString();
-            boolean currentlySelected = Boolean.TRUE.equals(currentFilters.get(category));
-            currentFilters.put(category, !currentlySelected);
-            anchor.setText(getCategorySummaryText());
-            anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
-            anchor.setBackgroundTintList(ColorStateList.valueOf(
-                    hasCategoryFilter() ? getColor(R.color.accent_third) : getColor(R.color.white)
-            ));
-            anchor.setStrokeColor(ColorStateList.valueOf(
-                    hasCategoryFilter() ? getColor(R.color.accent_first) : getColor(R.color.white)
-            ));
-            return true;
-        });
+        TextView titleView = dialog.findViewById(androidx.appcompat.R.id.alertTitle);
+        if (titleView != null) {
+            titleView.setTextColor(getColor(R.color.lightText));
+        }
 
-        popupMenu.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(R.color.accent_first));
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(getColor(R.color.accent_first));
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(R.color.lightText));
     }
 
     // Taken from ChatGPT March 29th 2026,
@@ -575,7 +646,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
             anchor.setText(getFullStatusSummaryText());
             anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
             anchor.setBackgroundTintList(ColorStateList.valueOf(
-                    fullStatusFilter != null ? getColor(R.color.accent_third) : getColor(R.color.white)
+                    fullStatusFilter != null ? getColor(R.color.accent_first) : getColor(R.color.white)
             ));
             anchor.setStrokeColor(ColorStateList.valueOf(
                     fullStatusFilter != null ? getColor(R.color.accent_first) : getColor(R.color.white)
@@ -587,6 +658,57 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     }
 
     // Taken from ChatGPT March 29th 2026,
+    // "Implement dropdown menu for sorting events by date ascending or descending"
+    /**
+     * Displays a dropdown menu for date sorting from inside the filter dialog.
+     *
+     * @param anchor the view to anchor the dropdown to
+     */
+    private void showSortDropdown(MaterialButton anchor) {
+        PopupMenu popupMenu = new PopupMenu(new ContextThemeWrapper(this,
+                androidx.appcompat.R.style.Theme_AppCompat_Light), anchor);
+        Menu menu = popupMenu.getMenu();
+
+        menu.add(Menu.NONE, MENU_SORT_DATE_ASC, Menu.NONE, "Sort: Date Ascending");
+        menu.add(Menu.NONE, MENU_SORT_DATE_DESC, Menu.NONE, "Sort: Date Descending");
+        menu.add(Menu.NONE, MENU_SORT_NAME_ASC, Menu.NONE, "Sort: Event Name A-Z");
+        menu.add(Menu.NONE, MENU_SORT_NAME_DESC, Menu.NONE, "Sort: Event Name Z-A");
+
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            SpannableString styledTitle = new SpannableString(item.getTitle());
+            styledTitle.setSpan(new ForegroundColorSpan(getColor(R.color.darkText)), 0, styledTitle.length(), 0);
+            item.setTitle(styledTitle);
+        }
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == MENU_SORT_DATE_ASC) {
+                currentSortOption = SORT_DATE_ASC;
+            } else if (itemId == MENU_SORT_DATE_DESC) {
+                currentSortOption = SORT_DATE_DESC;
+            } else if (itemId == MENU_SORT_NAME_ASC) {
+                currentSortOption = SORT_NAME_ASC;
+            } else if (itemId == MENU_SORT_NAME_DESC) {
+                currentSortOption = SORT_NAME_DESC;
+            }
+            sortOptionSelected = true;
+            anchor.setText(getSortSummaryText());
+            anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
+            anchor.setBackgroundTintList(ColorStateList.valueOf(
+                    sortOptionSelected ? getColor(R.color.accent_first) : getColor(R.color.white)
+            ));
+            anchor.setStrokeColor(ColorStateList.valueOf(
+                    sortOptionSelected ? getColor(R.color.accent_first) : getColor(R.color.white)
+            ));
+            filterCategoryButton.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.accent_first)));
+            return true;
+        });
+
+        popupMenu.show();
+    }
+
+    // Adapted from a ChatGPT Generation March 29th 2026,
     // "Implement dialog input for numeric capacity filtering"
     /**
      * Displays a dialog for setting a maximum waitlist capacity filter.
@@ -594,35 +716,51 @@ public class EntrantEventListActivity extends NavigationBarActivity {
      * @param anchor the row text to refresh after selection
      */
     private void showMaxCapacityDialog(MaterialButton anchor) {
+        LinearLayout inputContainer = new LinearLayout(this);
+        inputContainer.setOrientation(LinearLayout.VERTICAL);
+        inputContainer.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
+
         final EditText input = new EditText(this);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                (int) (300 * getResources().getDisplayMetrics().density),
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        input.setLayoutParams(params);
+        input.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.accent_first)));
+
         input.setHint("Enter maximum capacity");
-        input.setHintTextColor(getColor(R.color.lightText));
+        input.setHintTextColor(getColor(R.color.lightTextSemi));
         input.setTextColor(getColor(R.color.lightText));
-        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        input.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                getResources().getDimension(R.dimen.font_subheading_size));
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
 
         if (maxCapacityFilter != null) {
             input.setText(String.valueOf(maxCapacityFilter));
         }
 
+        inputContainer.addView(input);
+
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Maximum Capacity")
-                .setView(input)
+                .setView(inputContainer)
                 .setPositiveButton("Apply", (dialogInterface, which) -> {
                     String value = input.getText().toString().trim();
                     if (value.isEmpty()) {
                         maxCapacityFilter = null;
                     } else {
                         try {
-                            maxCapacityFilter = Double.parseDouble(value);
+                            maxCapacityFilter = Integer.parseInt(value);
                         } catch (NumberFormatException e) {
-                            Toast.makeText(this, "Enter a valid number.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Enter a valid whole number.", Toast.LENGTH_SHORT).show();
                             return;
                         }
                     }
                     anchor.setText(getCapacitySummaryText());
                     anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
                     anchor.setBackgroundTintList(ColorStateList.valueOf(
-                            maxCapacityFilter != null ? getColor(R.color.accent_third) : getColor(R.color.white)
+                            maxCapacityFilter != null ? getColor(R.color.accent_first) : getColor(R.color.white)
                     ));
                     anchor.setStrokeColor(ColorStateList.valueOf(
                             maxCapacityFilter != null ? getColor(R.color.accent_first) : getColor(R.color.white)
@@ -639,6 +777,12 @@ public class EntrantEventListActivity extends NavigationBarActivity {
                 .create();
 
         dialog.show();
+
+        TextView titleView = dialog.findViewById(androidx.appcompat.R.id.alertTitle);
+        if (titleView != null) {
+            titleView.setTextColor(getColor(R.color.lightText));
+        }
+
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawableResource(R.color.secondary);
         }
@@ -677,7 +821,7 @@ public class EntrantEventListActivity extends NavigationBarActivity {
                 anchor.setText(getEndDateSummaryText());
             }
             anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
-            anchor.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.accent_third)));
+            anchor.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.accent_first)));
             anchor.setStrokeColor(ColorStateList.valueOf(getColor(R.color.accent_first)));
         },
                 calendar.get(Calendar.YEAR),
@@ -750,6 +894,25 @@ public class EntrantEventListActivity extends NavigationBarActivity {
             return "Waitlist Status: Any";
         }
         return fullStatusFilter ? "Waitlist Status: Full" : "Waitlist Status: Not Full";
+    }
+
+    /**
+     * Returns summary text for the current sort selection.
+     *
+     * @return summary text for sorting
+     */
+    private String getSortSummaryText() {
+        switch (currentSortOption) {
+            case SORT_DATE_DESC:
+                return "Sort By: Date Descending";
+            case SORT_NAME_ASC:
+                return "Sort By: Event Name A-Z";
+            case SORT_NAME_DESC:
+                return "Sort By: Event Name Z-A";
+            case SORT_DATE_ASC:
+            default:
+                return "Sort By: Date Ascending";
+        }
     }
 
     /**
