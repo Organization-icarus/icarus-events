@@ -27,8 +27,8 @@
         android:gravity="center"
         android:hint="Enter your name"
         android:inputType="textPersonName"
-        android:textColorHint="@color/secondary"
-        android:textColor="@color/lightText"/>
+        android:textColor="@color/lightText"
+        android:textColorHint="@color/lightTextSemi" />
 
     <Button
         android:id="@+id/user_register_button"

@@ -52,10 +52,12 @@
                     android:layout_gravity="center_vertical"
                     android:inputType="text"
                     android:maxLines="1"
-                    android:textSize="@dimen/font_subheading_size"
+                    android:outlineSpotShadowColor="@color/lightText"
                     android:textColor="@color/lightText"
                     android:textColorHighlight="@color/lightText"
-                    android:outlineSpotShadowColor="@color/lightText"/>
+                    android:textColorHint="@color/lightTextSemi"
+                    android:textSize="@dimen/font_subheading_size"
+                    android:textCursorDrawable="@color/accent_first"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Filter buttons -->
@@ -146,6 +148,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="76dp"
         android:src="?attr/actionModePasteDrawable"
+        android:tint="@color/navigation_button_icon_tint"
+        android:backgroundTint="@color/navigation_button_tint"
         android:translationX="-315dp" />
 
     <include

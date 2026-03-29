@@ -2,12 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <!-- For text on a light background -->
-    <color name="lightTextSemi">#80FFFFFF</color>
     <!-- For 'greyed out' text on a light background -->
-    <color name="lightText">#FFFFFFFF</color>
+    <color name="lightTextSemi">#80FFFFFF</color>
     <!-- For text on a dark background -->
-    <color name="darkText">#FFFFFFFF</color>
+    <color name="lightText">#FFFFFFFF</color>
+    <!-- For text on a light background -->
+    <color name="darkText">#FF212121</color>
     <!-- The main background color, and the color for text in dark text boxes -->
     <color name="primary">#FF212121</color>
     <!-- Secondary background color, lighter grey -->
