@@ -52,10 +52,11 @@
                     android:layout_gravity="center_vertical"
                     android:inputType="text"
                     android:maxLines="1"
-                    android:textSize="@dimen/font_subheading_size"
+                    android:outlineSpotShadowColor="@color/lightText"
                     android:textColor="@color/lightText"
                     android:textColorHighlight="@color/lightText"
-                    android:outlineSpotShadowColor="@color/lightText"/>
+                    android:textColorHint="@color/lightTextSemi"
+                    android:textSize="@dimen/font_subheading_size" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Filter buttons -->
