@@ -258,6 +258,11 @@ public class EntrantEventListActivity extends NavigationBarActivity {
             startActivity(intent);
         });
 
+        qrButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, QRCodeActivity.class);
+            startActivity(intent);
+        });
+
         filterCategoryButton.setOnClickListener(v -> showFilterDialog());
     }
 
