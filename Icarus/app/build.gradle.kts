@@ -55,6 +55,8 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation("androidx.work:work-runtime:2.9.0")
     implementation("com.google.guava:guava:31.1-android")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation("com.google.zxing:core:3.5.1")
 }
 
 tasks.register<Javadoc>("javadoc") {
