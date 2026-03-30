@@ -13,11 +13,27 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polygon;
 
+/**
+ * Activity that displays a map of where entrant have joined the event from.
+ * <p>
+ * When an event has geolocation enabled this map will display:
+ * The event location.
+ * Where each entrant has joined from.
+ * The range entrants must join from to be accepted to the waiting list.
+ *
+ * @author Benjamin Hall
+ */
 public class EntrantMapActivity extends NavigationBarActivity {
     private MapView entrantMap;
     private com.google.firebase.firestore.GeoPoint eventLocation;
     private FirebaseFirestore db;
 
+    /**
+     * Initializes the entrant map activity.
+     *
+     * @param savedInstanceState the previously saved activity state, or null if
+     *                           the activity is being created for the first time
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +89,12 @@ public class EntrantMapActivity extends NavigationBarActivity {
                 });
     }
 
+    /**
+     * Adds new marker to the enrantMap view.
+     *
+     * @param lat Latitude of the markers location
+     * @param lon Longitude of the markers location
+     */
     private void addMarker(double lat, double lon) {
         Marker marker = new Marker(entrantMap);
         marker.setPosition(new GeoPoint(lat, lon));
@@ -92,6 +114,13 @@ public class EntrantMapActivity extends NavigationBarActivity {
         entrantMap.onPause();
     }
 
+    /**
+     * Draws a transparent blue circle on the entrantMap view around a given point.
+     *
+     * @param lat           Latitude of the circle centre
+     * @param lon           Longitude of the circle centre
+     * @param radiusMeters  Radius of the circle in meters
+     */
     // Created by Claude AI, March 28, 2026
     // "How to draw a circle around a point on the map using the osmdroid library in java"
     private void drawCircle(double lat, double lon, double radiusMeters) {
