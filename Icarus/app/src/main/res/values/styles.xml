@@ -9,8 +9,8 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">8dp</item>
         <item name="android:textSize">@dimen/font_text_size</item>
-        <item name="android:textColor">@color/primary_container_highlighted</item>
-        <item name="backgroundTint">@color/primary_container</item>
+        <item name="android:textColor">@color/darkText</item>
+        <item name="backgroundTint">@color/accent_first</item>
         <item name="cornerRadius">0dp</item>
         <item name="iconTint">@color/primary_container_highlighted</item>
         <item name="iconPadding">8dp</item>
@@ -29,7 +29,6 @@
     </style>
 
 
-
     <!-- -->
     <!-- For cards to wrap views -->
     <!-- -->
@@ -37,7 +36,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
 
-        <item name="contentPadding">16dp</item>
+        <item name="contentPadding">12dp</item>
 
         <item name="cardElevation">0dp</item>
         <item name="cardCornerRadius">8dp</item>

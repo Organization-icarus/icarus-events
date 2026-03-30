@@ -1,6 +1,9 @@
 package com.icarus.events;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -10,14 +13,21 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.FileProvider;
 
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.common.BitMatrix;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,13 +53,13 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
     private Button UpdatePoster;
     private Button ViewEntrantMap;
     private Button ViewEntrantList;
-    private Button inviteSpecificEntrant;
-    private Button SampleAttendees;
+    private Button inviteEntrant;
     private Button addOrganizers;
     private Button ReplaceDeclined;
     private Button shareQRCode;
     private TextView eventTitle;
     private String eventId;
+    private String eventName;
     private String posterURL;
     private Boolean isPrivate;
 
@@ -67,11 +77,11 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         UpdatePoster = findViewById(R.id.OrganizerManageEventUpdatePoster);
         ViewEntrantMap = findViewById(R.id.OrganizerManageEventViewEntrantMap);
         ViewEntrantList = findViewById(R.id.OrganizerManageEventViewEntrantList);
-        inviteSpecificEntrant = findViewById(R.id.OrganizerManageEventInviteEntrant);
-        SampleAttendees = findViewById(R.id.OrganizerManageEventSampleAttendees);
         addOrganizers = findViewById(R.id.OrganizerManageEventAddOrganizer);
         ReplaceDeclined = findViewById(R.id.OrganizerManageEventReplaceDeclined);
         shareQRCode = findViewById(R.id.OrganizerManageEventShareQRCode);
+        inviteEntrant = findViewById(R.id.OrganizerManageEventInviteEntrant);
+
         //Create textView
         eventTitle = findViewById(R.id.OrganizerManageEventTitle);
 
@@ -82,11 +92,17 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId)
                 .get()
                 .addOnSuccessListener(document -> {
-                    String eventName = document.getString("name");
+                    eventName = document.getString("name");
                     eventTitle.setText(eventName);
                     isPrivate = document.getBoolean("isPrivate");
                     if(isPrivate == null){isPrivate = false;}
+                    if(isPrivate){
+                        inviteEntrant.setText("Invite Specific Entrant");
+                    } else {
+                        inviteEntrant.setText("Sample Attendees");
+                    }
                 });
+
 
         // Initialize imagePickerLauncher
         ActivityResultLauncher<String> imagePickerLauncher = createImagePicker();
@@ -132,14 +148,7 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
             intent.putExtra("eventId", eventId);
             startActivity(intent);
         });
-        SampleAttendees.setOnClickListener(v -> {
-            // Sample Attendees
-            Intent intent = new Intent(this, SampleAttendeesActivity.class);
-            intent.putExtra("eventId", eventId);
-            startActivity(intent);
-
-        });
-        inviteSpecificEntrant.setOnClickListener(v -> {
+        inviteEntrant.setOnClickListener(v -> {
             // Invite Entrants to a private event
             if(isPrivate){
                 Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
@@ -147,14 +156,22 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
                 intent.putExtra("ActivityName", "Entrant Search");
                 startActivity(intent);
             }else{
-                Toast.makeText(OrganizerManageEventActivity.this,
-                        "Event is not Private", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, SampleAttendeesActivity.class);
+                intent.putExtra("eventId", eventId);
+                startActivity(intent);
             }
+
 
         });
         shareQRCode.setOnClickListener(v -> {
-            // Open Share menu to Share QRcode
-
+            // Open Share menu to share a QR code containing the event ID.
+            try {
+                Bitmap qrBitmap = generateQRCodeBitmap(eventId);
+                shareQRCodeBitmap(qrBitmap);
+            } catch (Exception e) {
+                Toast.makeText(this, "Failed to generate QR code", Toast.LENGTH_SHORT).show();
+                Log.e("QR_CODE_ERROR", "Failed to generate/share QR code", e);
+            }
         });
         addOrganizers.setOnClickListener(v -> {
             // add Organizers as Co-Organzers
@@ -165,11 +182,69 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         });
         ReplaceDeclined.setOnClickListener(v -> {
             // Replaced Declined
-//            Intent intent = new Intent(this, UserRegistrationActivity.class);
-//            intent.putExtra("deviceId", deviceId);
-//            startActivity(intent);
+            Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
+            intent.putExtra("eventId", eventId);
+            intent.putExtra("ActivityName", "Replace Declined");
+            startActivity(intent);
 
         });
+    }
+
+    // Taken from ChatGPT March 29th 2026,
+    // "How do I generate a QR code bitmap from a string using ZXing"
+    /**
+     * Generates a QR code bitmap that encodes the provided event ID.
+     *
+     * @param content The event ID to encode into the QR code.
+     * @return A bitmap representation of the QR code.
+     * @throws Exception if QR generation fails.
+     */
+    private Bitmap generateQRCodeBitmap(String content) throws Exception {
+        int size = 800;
+        BitMatrix bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, size, size);
+
+        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+            }
+        }
+        return bitmap;
+    }
+
+    // Taken from ChatGPT March 29th 2026,
+    // "How do I implement sharing a generated bitmap image"
+    /**
+     * Shares the generated QR code bitmap using Android's share sheet.
+     *
+     * @param bitmap The QR code bitmap to share.
+     * @throws IOException if the bitmap cannot be written to cache.
+     */
+    private void shareQRCodeBitmap(Bitmap bitmap) throws IOException {
+        File cachePath = new File(getCacheDir(), "images");
+        if (!cachePath.exists()) {
+            cachePath.mkdirs();
+        }
+
+        File file = new File(cachePath, eventName + "_qr_code.png");
+        FileOutputStream stream = new FileOutputStream(file);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        stream.flush();
+        stream.close();
+
+        Uri contentUri = FileProvider.getUriForFile(
+                this,
+                getPackageName() + ".fileprovider",
+                file
+        );
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("image/png");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, eventName + " QR Code");
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        startActivity(Intent.createChooser(shareIntent, "Share Event QR Code"));
     }
 
     private void deleteOldPoster(String URL) {

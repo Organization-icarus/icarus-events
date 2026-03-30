@@ -13,7 +13,7 @@
         android:layout_marginBottom="24dp"
         android:gravity="center"
         android:text="Create Account"
-        android:textColor="@color/primary_container_highlighted"
+        android:textColor="@color/lightText"
         android:textSize="@dimen/font_super_heading_size"
         android:textStyle="bold" />
 
@@ -23,17 +23,20 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
+        android:backgroundTint="@color/accent_first"
         android:gravity="center"
         android:hint="Enter your name"
-        android:inputType="textPersonName" />
+        android:inputType="textPersonName"
+        android:textColor="@color/lightText"
+        android:textColorHint="@color/lightTextSemi" />
 
     <Button
         android:id="@+id/user_register_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/primary_container_highlighted"
+        android:backgroundTint="@color/accent_first"
         android:text="Register"
-        android:textColor="@color/primary_container"
+        android:textColor="@color/primary"
         android:textSize="@dimen/font_subheading_size" />
 
 </LinearLayout>

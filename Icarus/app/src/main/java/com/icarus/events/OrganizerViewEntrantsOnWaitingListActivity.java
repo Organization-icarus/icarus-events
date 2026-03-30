@@ -17,6 +17,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Set;
+
 /**
  * Activity that allows organizers to view the entrants on the waiting,
  * selected, rejected, and registered list .
@@ -35,11 +37,12 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
     private FirebaseFirestore db;
     private TextView eventName;
     private Button backButton;
+    private Button messageButton;
+    private Button selectAllButton;
     private ListView entrantsOnWaitingList;
     private MaterialButtonToggleGroup filterButtons;
     private ArrayList<User> entrantList;
     private OraganizerEntrantViewListArrayAdapter eventListArrayAdapter;
-
     private String eventId;
 
     @Override
@@ -47,7 +50,6 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_view_entrants_on_waiting_list);
         setupNavBar();
-
         db = FirebaseFirestore.getInstance();
 
         //Create TextView
@@ -55,12 +57,15 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
         //Create Buttons
         filterButtons = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar);
         backButton = findViewById(R.id.OrganizerEntrantOnWaitingListBackButton);
+        messageButton = findViewById(R.id.OrganizerEntrantOnWaitingListSendNotificationButton);
+        selectAllButton = findViewById(R.id.OrganizerEntrantOnWaitingListSelectAllButton);
         //Create ListView
         entrantsOnWaitingList = findViewById(R.id.OrganizerEntrantOnWaitingList);
         //Initialize ArrayList and ArrayAdapter
         entrantList = new ArrayList<>();
         eventListArrayAdapter = new OraganizerEntrantViewListArrayAdapter(this, entrantList);
         entrantsOnWaitingList.setAdapter(eventListArrayAdapter);
+        Set<String> selectedIds = eventListArrayAdapter.getSelectedIds();
 
         //get eventId
         eventId = getIntent().getStringExtra("eventId");
@@ -82,23 +87,22 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
                 });
 
         filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) ->{
-            String status = null;
+            if (!isChecked) return; // ← ignore uncheck events entirely
             backButton.setText("Go Back");
+            eventListArrayAdapter.clearSelections();
+            selectAllButton.setText("Select All");
+            String status = null;
             if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_waiting)){
                 status = "waiting";
-                loadList(status);
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_chosen)){
                 status = "selected";
-                loadList(status);
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_cancelled)){
                 status = "rejected";
-                loadList(status);
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_final)){
                 status = "registered";
-                loadList(status);
                 backButton.setText("Export CSV");
             }
-
+            loadList(status);
         });
 
         backButton.setOnClickListener(v -> {
@@ -109,6 +113,20 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
                 finish();
             }
 
+        });
+        messageButton.setOnClickListener(v -> {
+        //Send Message to selected users
+
+        });
+        selectAllButton.setOnClickListener(v -> {
+        //Select all users from the list
+            if (selectedIds.size() == entrantList.size() && !entrantList.isEmpty()) {
+                eventListArrayAdapter.clearSelections();
+                selectAllButton.setText("Select All");
+            } else {
+                eventListArrayAdapter.selectAll();
+                selectAllButton.setText("Deselect All");
+            }
         });
     }
     private void loadList(String listStatus) {

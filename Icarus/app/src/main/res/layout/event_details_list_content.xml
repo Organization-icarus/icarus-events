@@ -18,7 +18,7 @@
             android:layout_weight="1"
             android:text="Field Name"
             android:textSize="@dimen/font_subheading_size"
-            android:textColor="@color/white"
+            android:textColor="@color/lightText"
             android:textStyle="bold" />
 
         <!-- Field value on right -->
@@ -30,7 +30,7 @@
             android:gravity="end"
             android:text="Field Data"
             android:textSize="@dimen/font_subheading_size"
-            android:textColor="@color/white"
+            android:textColor="@color/lightText"
             android:alpha="0.5"
             android:ellipsize="end"
             android:maxLines="1"

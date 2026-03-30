@@ -6,10 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -189,13 +186,13 @@ public class UserProfileActivity extends NavigationBarActivity {
             editProfileButton.setBackgroundColor(
                     androidx.core.content.ContextCompat.getColor(
                             this,
-                            R.color.primary_container
+                            R.color.white
                     )
             );
             editProfileButton.setTextColor(
                     androidx.core.content.ContextCompat.getColor(
                             this,
-                            R.color.primary_container_highlighted
+                            R.color.primary
                     )
             );
             editProfileButton.setText("Edit Profile");
@@ -211,13 +208,13 @@ public class UserProfileActivity extends NavigationBarActivity {
             editProfileButton.setBackgroundColor(
                     androidx.core.content.ContextCompat.getColor(
                             this,
-                            R.color.primary_container_highlighted
+                            R.color.accent_first
                     )
             );
             editProfileButton.setTextColor(
                     androidx.core.content.ContextCompat.getColor(
                             this,
-                            R.color.primary_container
+                            R.color.primary
                     )
             );
             editProfileButton.setText("Confirm Changes");
