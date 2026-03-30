@@ -51,6 +51,7 @@
             android:layout_weight="1"
             android:text="Waiting"
             android:textColor="@color/white"
+            android:backgroundTint="@color/toggle_button_color"
             android:textSize="12sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -61,6 +62,7 @@
             android:layout_weight="1"
             android:text="Selected"
             android:textColor="@color/white"
+            android:backgroundTint="@color/toggle_button_color"
             android:textSize="12sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -71,6 +73,7 @@
             android:layout_weight="1"
             android:text="Cancelled"
             android:textColor="@color/white"
+            android:backgroundTint="@color/toggle_button_color"
             android:textSize="12sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -81,6 +84,7 @@
             android:layout_weight="1"
             android:text="Final"
             android:textColor="@color/white"
+            android:backgroundTint="@color/toggle_button_color"
             android:textSize="12sp" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
@@ -94,7 +98,6 @@
         app:layout_constraintBottom_toTopOf="@id/OrganizerEntrantOnWaitingListBackButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
 
     <Button
         android:id="@+id/OrganizerEntrantOnWaitingListBackButton"
