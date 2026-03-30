@@ -75,4 +75,10 @@ public class OraganizerEntrantViewListArrayAdapter extends ArrayAdapter<User> {
         selectedIds.clear();
         notifyDataSetChanged();
     }
+    public void selectAll() {
+        for (User user : entrants) {
+            selectedIds.add(user.getId());
+        }
+        notifyDataSetChanged();
+    }
 }
