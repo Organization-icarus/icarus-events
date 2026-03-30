@@ -578,6 +578,16 @@ public class EventDetailsActivity extends NavigationBarActivity {
         if (entrantWaitlistListener != null) entrantWaitlistListener.remove();
     }
 
+    /**
+     * Fires when the user allows location permissions for the app.
+     * Adds the user to the events 'entrants' sub-collection and stores their location.
+     *
+     * @param requestCode The request code passed in {@link #requestPermissions}.
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions which is either
+     *                     {@link android.content.pm.PackageManager#PERMISSION_GRANTED} or
+     *                     {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -619,6 +629,14 @@ public class EventDetailsActivity extends NavigationBarActivity {
         }
     }
 
+    /**
+     * Adds user to the events 'entrants' subcollection with the status "waiting".
+     * If geolocation is enabled, it adds the location of where the user joined the waitlist from.
+     *
+     * @param eventId   Firestore document ID of the event
+     * @param userId    Firestore document ID of the user
+     * @param geopoint  Location the user is joining the event from
+     */
     public void addUserToWaitingList(String eventId, String userId, GeoPoint geopoint) {
         currentStatus = "waiting";
         Map<String, Object> entrant = new HashMap<>();

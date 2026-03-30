@@ -13,23 +13,53 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * Represents an image in the application.
+ * <p>
+ * Stores image information retrieved from Firebase Firestore, including
+ * the imag's URL and Cloudinary publicId.
+ *
+ * @author Benjamin Hall
+ */
 public class Image {
     private String URL;
     private String publicId;
 
+    /**
+     * Creates new Image object with the provided parameters.
+     *
+     * @param URL       URL of the Image
+     * @param publicId  Cloudinary publicId of the image (for displaying with Picasso)
+     */
     public Image (String URL, String publicId) {
         this.URL = URL;
         this.publicId = publicId;
     }
 
+    /**
+     * Gets URL of the image
+     *
+     * @return  URL of the image object.
+     */
     public String getURL() {
         return URL;
     }
 
+    /**
+     * Gets publicId of the image
+     *
+     * @return  PublicId of the image object.
+     */
     public String getPublicId() {
         return publicId;
     }
 
+    /**
+     * Deletes the document corresponding to the image object from Firestore and Cloudinary
+     *
+     * @param context   Context of the activity calling the delete method
+     * @param db        Firestore database reference
+     */
     public void delete(Context context, FirebaseFirestore db) {
         // Taken from Claude AI March 21st, 2026
         // "How to delete image from cloudinary database"

@@ -25,11 +25,26 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+/**
+ * Adapter used in the administrator dashboard to display images in a ListView.
+ * <p>
+ * Binds Image objects to the image list item layout and provides administrator
+ * controls for removing images from Firebase Firestore and Cloudinary.
+ *
+ * @author Benjamin Hall
+ */
 public class AdministratorDashboardImageArrayAdapter extends ArrayAdapter<Image> {
     private ArrayList<Image> images;
     private Context context;
     private FirebaseFirestore db;
 
+    /**
+     * Constructs an adapter for displaying Image objects in the administrator
+     * dashboard image list.
+     *
+     * @param context the context used to inflate views and access resources
+     * @param images the list of images to be displayed by the adapter
+     */
     public AdministratorDashboardImageArrayAdapter(Context context, ArrayList<Image> images){
         super(context, 0, images);
         this.images = images;
@@ -37,6 +52,18 @@ public class AdministratorDashboardImageArrayAdapter extends ArrayAdapter<Image>
         this.db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Returns a view for displaying n image in the administrator image list.
+     * <p>
+     * Inflates the list item layout if necessary, binds the data to the UI
+     * components, and configures actions for viewing user details and
+     * removing the user from the database.
+     *
+     * @param position the position of the user in the adapter's data set
+     * @param convertView a view to reuse
+     * @param parent the parent view that this view will be attached to
+     * @return the view representing the image at the specified position
+     */
     @NonNull
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent){
         View view = convertView;

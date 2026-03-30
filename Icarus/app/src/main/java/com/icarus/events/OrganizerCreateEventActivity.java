@@ -354,6 +354,17 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         });
     }
 
+    /**
+     * Saves event information to a new Firestore event document.
+     *
+     * @param name          Name of the event
+     * @param description   Event description
+     * @param category      Category of the event
+     * @param capacity      Waitlist capacity of the event
+     * @param posterURL     URL of the events poster
+     * @param location      Event location coordinates (null if geolocation turned off)
+     * @param organizerIds  Array of user document ID's of users with event "organizer" permissions
+     */
     private void saveEvent(String name, String description, String category, Double capacity, String posterURL, String location, ArrayList<String> organizerIds) {
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("name", name);
@@ -485,6 +496,10 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         return dateCal.getTime();
     }
 
+    /**
+     * Sets up Dialog to let organizers select the event location on a map
+     * and set the area entrants must join from. Fires when the geolcation switch is flipped.
+     */
     private void showEventLocationPickerDialog() {
         Dialog dialog = new Dialog(this, android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen);
         dialog.setContentView(R.layout.dialog_event_location_picker);
@@ -599,6 +614,15 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         dialogMap.onResume();
     }
 
+    /**
+     * Draws a circle on a given map view.
+     *
+     * @param lat           Latitude of the circle centre
+     * @param lon           Longitude of hte circle centre
+     * @param radiusMeters  Radius of the circle in meters
+     * @param map           Map view to draw the circle on
+     * @return              Polygon object reference for deleting the circle from the map.
+     */
     // Created by Claude AI, March 28, 2026
     // "How to draw a circle around a point on the map using the osmdroid library in java"
     private Polygon drawCircle(double lat, double lon, double radiusMeters, MapView map) {
