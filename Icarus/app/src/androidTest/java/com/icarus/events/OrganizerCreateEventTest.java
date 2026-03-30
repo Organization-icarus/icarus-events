@@ -121,14 +121,14 @@ public class OrganizerCreateEventTest {
                 .perform(typeText("50"), closeSoftKeyboard());
 
         // Open registration start date picker
-        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodStart)).perform(click());
+        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodStartDate)).perform(click());
 
         // Select a date in date picker (example day)
         onView(withContentDescription(containsString("March 15"))).perform(click());
         onView(withText("OK")).perform(click());
 
         // Open registration end date picker
-        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodEnd)).perform(click());
+        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodEndDate)).perform(click());
 
         onView(withContentDescription(containsString("March 20"))).perform(click());
         onView(withText("OK")).perform(click());
@@ -208,12 +208,12 @@ public class OrganizerCreateEventTest {
                 .perform(typeText("50"), closeSoftKeyboard());
 
         // Select registration start date
-        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodStart)).perform(click());
+        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodStartDate)).perform(click());
         onView(withContentDescription(containsString("March 15"))).perform(click());
         onView(withText("OK")).perform(click());
 
         // Select registration end date
-        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodEnd)).perform(click());
+        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodEndDate)).perform(click());
         onView(withContentDescription(containsString("March 20"))).perform(click());
         onView(withText("OK")).perform(click());
 
@@ -284,12 +284,12 @@ public class OrganizerCreateEventTest {
         onView(withId(R.id.OrganizerCreateEventGeolocationSwitch)).perform(click());
 
         // Select registration start date
-        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodStart)).perform(click());
+        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodStartDate)).perform(click());
         onView(withContentDescription(containsString("March 15"))).perform(click());
         onView(withText("OK")).perform(click());
 
         // Select registration end date
-        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodEnd)).perform(click());
+        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodEndDate)).perform(click());
         onView(withContentDescription(containsString("March 20"))).perform(click());
         onView(withText("OK")).perform(click());
 
@@ -352,12 +352,12 @@ public class OrganizerCreateEventTest {
                 .perform(typeText("50"), closeSoftKeyboard());
 
         // Select registration start date
-        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodStart)).perform(click());
+        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodStartDate)).perform(click());
         onView(withContentDescription(containsString("March 15"))).perform(click());
         onView(withText("OK")).perform(click());
 
         // Select registration end date
-        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodEnd)).perform(click());
+        onView(withId(R.id.OrganizerCreateEventRegistrationPeriodEndDate)).perform(click());
         onView(withContentDescription(containsString("March 20"))).perform(click());
         onView(withText("OK")).perform(click());
 

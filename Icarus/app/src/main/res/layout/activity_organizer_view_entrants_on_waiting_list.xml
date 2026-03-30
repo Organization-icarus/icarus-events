@@ -11,7 +11,7 @@
         android:layout_marginTop="24dp"
         android:gravity="center"
         android:text="Event Name"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="@dimen/font_super_heading_size"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -24,22 +24,12 @@
         android:layout_marginTop="0dp"
         android:gravity="center"
         android:text="Entrant List"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="@dimen/font_super_heading_size"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/OrganizerEntrantOnWaitingListEventText"/>
-
-    <ListView
-        android:id="@+id/OrganizerEntrantOnWaitingList"
-        android:layout_width="340dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/OrganizerEntrantOnWaitingListFilterBar"
-        app:layout_constraintBottom_toTopOf="@id/OrganizerEntrantOnWaitingListBackButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/OrganizerEntrantOnWaitingListFilterBar"
@@ -60,6 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Waiting"
+            android:textColor="@color/white"
             android:textSize="12sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -69,6 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Selected"
+            android:textColor="@color/white"
             android:textSize="12sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -78,6 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Cancelled"
+            android:textColor="@color/white"
             android:textSize="12sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -87,21 +80,65 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Final"
+            android:textColor="@color/white"
             android:textSize="12sp" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-    <Button
-        android:id="@+id/OrganizerEntrantOnWaitingListBackButton"
-        android:layout_width="128dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="Go Back"
-        android:backgroundTint="@color/primary_container"
-        android:textColor="@color/primary_container_highlighted"
-        app:layout_constraintBottom_toTopOf="@id/nav_bar"
+    <ListView
+        android:id="@+id/OrganizerEntrantOnWaitingList"
+        android:layout_width="340dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/OrganizerEntrantOnWaitingListFilterBar"
+        app:layout_constraintBottom_toTopOf="@id/OrganizerEntrantOnWaitingListBackButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    <Button
+        android:id="@+id/OrganizerEntrantOnWaitingListBackButton"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Go Back"
+        android:textSize="@dimen/font_text_size"
+        android:backgroundTint="@color/primary_container"
+        android:textColor="@color/primary_container_highlighted"
+        app:layout_constraintTop_toBottomOf="@id/OrganizerEntrantOnWaitingList"
+        app:layout_constraintBottom_toTopOf="@id/nav_bar"
+        app:layout_constraintStart_toEndOf="@id/OrganizerEntrantOnWaitingListSelectAllButton"
+        app:layout_constraintEnd_toStartOf="@id/OrganizerEntrantOnWaitingListSendNotificationButton"/>
+    <Button
+        android:id="@+id/OrganizerEntrantOnWaitingListSendNotificationButton"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Send Message"
+        android:textSize="@dimen/font_text_size"
+        android:backgroundTint="@color/primary_container"
+        android:textColor="@color/primary_container_highlighted"
+        app:layout_constraintTop_toBottomOf="@id/OrganizerEntrantOnWaitingList"
+        app:layout_constraintBottom_toTopOf="@id/nav_bar"
+        app:layout_constraintStart_toEndOf="@id/OrganizerEntrantOnWaitingListBackButton"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <Button
+        android:id="@+id/OrganizerEntrantOnWaitingListSelectAllButton"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Select All"
+        android:textSize="@dimen/font_text_size"
+        android:backgroundTint="@color/primary_container"
+        android:textColor="@color/primary_container_highlighted"
+        app:layout_constraintTop_toBottomOf="@id/OrganizerEntrantOnWaitingList"
+        app:layout_constraintBottom_toTopOf="@id/nav_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/OrganizerEntrantOnWaitingListBackButton"/>
 
     <include
         android:id="@+id/nav_bar"
