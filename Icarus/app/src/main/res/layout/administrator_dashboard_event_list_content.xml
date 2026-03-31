@@ -1,52 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="4dp"
+    android:layout_marginTop="0dp"
+    android:layout_marginBottom="0dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="6dp"
+    app:cardUseCompatPadding="true"
+    app:strokeColor="@color/secondary">
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Event Poster -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/admin_dashboard_event_list_poster"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/poster"
+            app:shapeAppearanceOverlay="@style/EventBannerImageShape" />
 
         <LinearLayout
-            android:id="@+id/admin_dashboard_event_list_details_layout"
-            android:layout_width="wrap_content"
+            android:id="@+id/admin_dashboard_event_list_text_container"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@color/secondary">
 
+            <!-- Event Name -->
             <TextView
                 android:id="@+id/admin_dashboard_event_list_event_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/font_subheading_size"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/lightText"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp">
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp"
+                android:gravity="center_vertical">
 
+                <!-- Event Category -->
                 <TextView
                     android:id="@+id/admin_dashboard_event_list_event_category"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
-                    android:background="@color/primary_container"
-                    android:paddingStart="8dp"
-                    android:paddingTop="2dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="2dp"
-                    android:textColor="@color/primary_container_highlighted"
+                    android:background="@drawable/event_category_chip"
+                    android:paddingStart="10dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="4dp"
+                    android:textColor="@color/lightText"
                     android:textSize="@dimen/font_text_size" />
 
                 <!-- Event Date -->
@@ -54,20 +70,23 @@
                     android:id="@+id/admin_dashboard_event_list_event_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingRight="4dp"
+                    android:textColor="@color/lightText"
                     android:textSize="@dimen/font_text_size" />
 
+                <ImageButton
+                    android:id="@+id/admin_dashboard_event_list_remove_event_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/secondary"
+                    android:tint="@color/attention"
+                    app:srcCompat="@drawable/delete" />
+
             </LinearLayout>
+
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/admin_dashboard_event_list_remove_event_button"
-            android:layout_width="1dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="?android:attr/windowBackground"
-            android:contentDescription="remove_event_button"
-            app:srcCompat="@android:drawable/ic_menu_delete"
-            app:tint="@color/primary_container_highlighted" />
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

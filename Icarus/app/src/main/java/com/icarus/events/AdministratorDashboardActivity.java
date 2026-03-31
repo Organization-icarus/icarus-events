@@ -8,13 +8,23 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provides the administrator dashboard for managing application data.
@@ -37,11 +47,12 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
     private CollectionReference usersRef;
     private CollectionReference imagesRef;
     private ArrayList<Event> eventArrayList;
-    private ArrayAdapter<Event> eventArrayAdapter;
+    private RecyclerView.Adapter eventArrayAdapter;
     private ArrayList<User> userArrayList;
     private ArrayAdapter<User> userArrayAdapter;
     private ArrayList<Image> imageArrayList;
     private ArrayAdapter<Image> imageArrayAdapter;
+    private Map<String, String> categoryColors;
 
     /**
      * Initializes the administrator dashboard activity.
@@ -70,14 +81,32 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
         userListView = findViewById(R.id.admin_dashboard_user_list);
         imageListView = findViewById(R.id.admin_dashboard_image_list);
 
+        // Initialize current colors
+        categoryColors = new HashMap<>();
+        db.collection("event-categories")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots ->{
+                    for(DocumentSnapshot doc : queryDocumentSnapshots){
+                        String category = doc.getString("category");
+                        String color = doc.getString("color");
+                        //check for null
+                        if (category != null && color != null) {
+                            categoryColors.put(category, color);
+                        }
+                    }
+                    eventArrayAdapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load categories: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+
         // Initialize buttons
         showEventListButton = findViewById(R.id.admin_dashboard_show_event_list_button);
         showUserListButton = findViewById(R.id.admin_dashboard_show_user_list_button);
         showImageListButton = findViewById(R.id.admin_dashboard_show_image_list_button);
 
-        selectButton(showEventListButton);
-        deselectButton(showUserListButton);
-        deselectButton(showImageListButton);
+        MaterialButtonToggleGroup toggleGroup = findViewById(R.id.admin_dashboard_list_buttons);
+        toggleGroup.check(R.id.admin_dashboard_show_event_list_button);
         eventListView.setVisibility(VISIBLE);
         userListView.setVisibility(GONE);
         imageListView.setVisibility(GONE);
@@ -85,7 +114,7 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
         // create event, user, and image array
         eventArrayList = new ArrayList<>();
         eventArrayAdapter = new AdministratorDashboardEventArrayAdapter(this,
-                eventArrayList);
+                eventArrayList, categoryColors);
         userArrayList = new ArrayList<>();
         userArrayAdapter = new AdministratorDashboardUserArrayAdapter(this, userArrayList);
         imageArrayList = new ArrayList<>();
@@ -145,6 +174,7 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
         });
 
         // Set ListView adapters
+        eventListView.setLayoutManager(new LinearLayoutManager(this));
         eventListView.setAdapter(eventArrayAdapter);
         userListView.setAdapter(userArrayAdapter);
         imageListView.setAdapter(imageArrayAdapter);
@@ -154,63 +184,16 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
             eventListView.setVisibility(VISIBLE);
             userListView.setVisibility(GONE);
             imageListView.setVisibility(GONE);
-            selectButton(showEventListButton);
-            deselectButton(showUserListButton);
-            deselectButton(showImageListButton);
         });
         showUserListButton.setOnClickListener(v -> {
             eventListView.setVisibility(GONE);
             userListView.setVisibility(VISIBLE);
             imageListView.setVisibility(GONE);
-            deselectButton(showEventListButton);
-            selectButton(showUserListButton);
-            deselectButton(showImageListButton);
         });
         showImageListButton.setOnClickListener(v -> {
             eventListView.setVisibility(GONE);
             userListView.setVisibility(GONE);
             imageListView.setVisibility(VISIBLE);
-            deselectButton(showEventListButton);
-            deselectButton(showUserListButton);
-            selectButton(showImageListButton);
         });
-    }
-
-    /**
-     * Applies a style to a button to indicate that it is currently selected in the UI.
-     *
-     * @param button the button to apply the 'selected' styling to
-     */
-    private void selectButton(Button button) {
-        button.setBackgroundColor(
-                androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container_highlighted
-                )
-        );
-        button.setTextColor(androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container
-                )
-        );
-    }
-
-    /**
-     * Applies a style to a button to indicate that it is not currently selected in the UI.
-     *
-     * @param button the button to apply the 'deselected' styling to
-     */
-    private void deselectButton(Button button) {
-        button.setBackgroundColor(
-                androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container
-                )
-        );
-        button.setTextColor(androidx.core.content.ContextCompat.getColor(
-                        this,
-                        R.color.primary_container_highlighted
-                )
-        );
     }
 }
