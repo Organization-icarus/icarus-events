@@ -2,6 +2,7 @@ package com.icarus.events;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.EditText;
@@ -16,6 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,15 +27,21 @@ import java.util.List;
 
 public class EventCommentActivity extends NavigationBarActivity {
 
+    private static final String TAG = "EventCommentActivity";
+
     private RecyclerView recyclerView;
     private EventCommentAdapter adapter;
     private List<Comment> commentList;
 
     private String username;
     private String userId;
+    private String eventId;
 
     private EditText commentInput;
     private MaterialButton sendCommentButton;
+
+    private FirebaseFirestore db;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,7 +54,13 @@ public class EventCommentActivity extends NavigationBarActivity {
         setupHeaderBar("Comments");
         setupNavBar();
 
-        String eventId = getIntent().getStringExtra("EVENT_ID");
+        eventId = getIntent().getStringExtra("EVENT_ID");
+        if (eventId == null || eventId.isEmpty()) {
+            finish();
+            return;
+        }
+
+        db = FirebaseFirestore.getInstance();
 
         recyclerView = findViewById(R.id.event_comments_list);
         commentInput = findViewById(R.id.comment_input);
@@ -58,59 +74,76 @@ public class EventCommentActivity extends NavigationBarActivity {
         userId = user.getId();
 
         commentList = new ArrayList<>();
-
-        commentList.add(new Comment(
-                "user1",
-                "Alex Alves",
-                "This event was crazy good.",
-                new Date(),
-                false
-        ));
-
-        commentList.add(new Comment(
-                "user2",
-                "Bradley",
-                "Looking forward to the next one.",
-                new Date(),
-                false
-        ));
-
-        commentList.add(new Comment(
-                "user3",
-                "Sam",
-                "I couldn’t make it 😢",
-                new Date(),
-                false
-        ));
-
-        // Set up adapter and layout manager
         adapter = new EventCommentAdapter(commentList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        sendCommentButton.setOnClickListener(v -> {
-            String text = commentInput.getText().toString().trim();
+        loadComments();
 
-            if (TextUtils.isEmpty(text)) {
-                commentInput.setError("Enter a comment");
-                return;
-            }
-
-            Comment newComment = new Comment(
-                    userId,
-                    username,
-                    text,
-                    new Date(),
-                    false
-            );
-
-            // New comments get shown first
-            commentList.add(0, newComment);
-            adapter.notifyItemInserted(0);
-            recyclerView.scrollToPosition(0);
-            commentInput.setText("");
-        });
+        sendCommentButton.setOnClickListener(v -> postComment());
     }
+
+
+    private void postComment() {
+        String text = commentInput.getText().toString().trim();
+
+        if (TextUtils.isEmpty(text)) {
+            commentInput.setError("Enter a comment");
+            return;
+        }
+
+        Comment newComment = new Comment(
+                userId,
+                username,
+                text,
+                new Date(),
+                false
+        );
+
+        sendCommentButton.setEnabled(false);
+
+        db.collection("events")
+                .document(eventId)
+                .collection("comments")
+                .add(newComment)
+                .addOnSuccessListener(documentReference -> {
+                    commentInput.setText("");
+                    sendCommentButton.setEnabled(true);
+                })
+                .addOnFailureListener(e -> {
+                    sendCommentButton.setEnabled(true);
+                    commentInput.setError("Failed to post comment");
+                    Log.e(TAG, "Error adding comment", e);
+                });
+    }
+
+
+    private void loadComments() {
+        db.collection("events")
+                .document(eventId)
+                .collection("comments")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error loading comments", error);
+                        return;
+                    }
+
+                    commentList.clear();
+
+                    if (value != null) {
+                        for (DocumentSnapshot doc : value.getDocuments()) {
+                            Comment comment = doc.toObject(Comment.class);
+                            if (comment != null && !comment.isDeleted()) {
+                                commentList.add(comment);
+                            }
+                        }
+                    }
+
+                    adapter.notifyDataSetChanged();
+                });
+    }
+
 
     /* This code was created with the help of Claude on March 30.
     The prompt was, "How do I prevent the pop-up keyboard from blocking the input

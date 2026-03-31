@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.Intent;
@@ -36,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 
 /**
@@ -48,10 +50,10 @@ import java.util.Objects;
  * @author Bradley Bravender
  */
 public class EventDetailsActivity extends NavigationBarActivity {
+
     //---------------------------
     // BUTTONS
     //---------------------------
-
     private Button
             organizerBtn,
             manageBtn,
@@ -66,14 +68,12 @@ public class EventDetailsActivity extends NavigationBarActivity {
     //---------------------------
     // USER DETAILS
     //---------------------------
-
     private Boolean isAdmin, isOrganizer, locationEnabled;
     private String currentStatus;
 
     //---------------------------
     // EVENT DETAILS
     //---------------------------
-
     private ImageView posterView;
     private int currentWaitingCount;
     private ArrayList<String> eventOrganizers;
@@ -123,7 +123,6 @@ public class EventDetailsActivity extends NavigationBarActivity {
         //---------------------------
         // GET ALL BUTTONS
         //---------------------------
-
         organizerBtn = findViewById(R.id.event_organizer_button);
         manageBtn = findViewById(R.id.manage_button);
         notificationBtn = findViewById(R.id.notification_button);
@@ -385,24 +384,25 @@ public class EventDetailsActivity extends NavigationBarActivity {
             startActivity(intent);
         });
 
-
         //---------------------------
-        // SET UP GUIDELINES DIALOG
+        // COMMENTS
         //---------------------------
+        ImageButton commentsButton = findViewById(R.id.comments_button);
 
-        // TODO: temporary drop-in replacement
-        TextView guidelinesButton = findViewById(R.id.lottery_guidelines);
-
-        guidelinesButton.setOnClickListener(v -> {
+        commentsButton.setOnClickListener(v -> {
             Intent intent = new Intent(EventDetailsActivity.this, EventCommentActivity.class);
             intent.putExtra("EVENT_ID", finalEventId);
             startActivity(intent);
         });
 
-        /*
+        //---------------------------
+        // LOTTERY GUIDELINES DIALOG
+        //---------------------------
         // Set width to 300dp
+        // TODO: Adjust coloring, formatting
         int widthPx = (int) (300 * getResources().getDisplayMetrics().density);
-        TextView guidelinesButton = findViewById(R.id.lottery_guidelines);
+
+        ImageButton guidelinesButton = findViewById(R.id.lottery_guidelines);
         guidelinesButton.setOnClickListener(v -> {
             androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(EventDetailsActivity.this)
                     .setTitle("Lottery Guidelines")
@@ -415,7 +415,6 @@ public class EventDetailsActivity extends NavigationBarActivity {
             dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background);
             dialog.getWindow().setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT);
         });
-        */
 
 
         //---------------------------
