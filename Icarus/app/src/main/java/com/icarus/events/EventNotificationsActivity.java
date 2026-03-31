@@ -3,6 +3,7 @@ package com.icarus.events;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -19,7 +20,7 @@ public class EventNotificationsActivity extends NavigationBarActivity {
     private TextView titleText;
     private ListView notificationsList;
 
-    private final List<String> messages = new ArrayList<>();
+    private final ArrayList<NotificationItem> notifications = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,23 +42,31 @@ public class EventNotificationsActivity extends NavigationBarActivity {
     }
 
     private void loadNotifications() {
-        db.collection("events")
-                .document(eventId)
-                .collection("notifications")
+        String currentUserId = UserSession.getInstance().getCurrentUser().getId();
+        notifications.clear();
+
+        db.collection("notifications")
+                .whereEqualTo("eventId", eventId)
+                .whereArrayContains("recipients", currentUserId)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    messages.clear();
-
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        String message = doc.getString("message");
-                        if (message != null) {
-                            messages.add(message);
-                        }
+                        NotificationItem notification = new NotificationItem(
+                                eventId,
+                                doc.getString("sender"),
+                                doc.getBoolean("isEvent"),
+                                (ArrayList<String>) doc.get("recipients"),
+                                doc.getString("message")
+                        );
+                        notifications.add(notification);
                     }
 
-                    NotificationListAdapter adapter =
-                            new NotificationListAdapter(this, messages);
+                    NotificationListAdapter adapter = new NotificationListAdapter(this, notifications);
                     notificationsList.setAdapter(adapter);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to load notifications", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
                 });
     }
 }

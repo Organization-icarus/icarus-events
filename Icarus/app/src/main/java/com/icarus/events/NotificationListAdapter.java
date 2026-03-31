@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,9 +18,9 @@ import java.util.List;
 public class NotificationListAdapter extends ArrayAdapter<NotificationItem> {
 
     private final Activity context;
-    private final List<NotificationItem> notifications;
+    private final ArrayList<NotificationItem> notifications;
 
-    public NotificationListAdapter(Activity context, List<NotificationItem> notifications) {
+    public NotificationListAdapter(Activity context, ArrayList<NotificationItem> notifications) {
         super(context, R.layout.notification_list_item, notifications);
         this.context = context;
         this.notifications = notifications;

@@ -1,11 +1,13 @@
 package com.icarus.events;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -115,8 +117,44 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
 
         });
         messageButton.setOnClickListener(v -> {
-        //Send Message to selected users
+            if (selectedIds.isEmpty() && entrantList.isEmpty()) {
+                Toast.makeText(this, "No users to notify", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            String organizerId = UserSession.getInstance().getCurrentUser().getId();
+
+            NotificationItem notification = new NotificationItem(eventId, organizerId);
+            notification.setEvent();
+            notification.setRecipients(new ArrayList<>(selectedIds));
+
+            // popup to get the message
+            EditText input = new EditText(this);
+            input.setHint("Type your message here");
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Send Message")
+                    .setView(input)
+                    .setPositiveButton("Send", (dialog, which) -> {
+                        String message = input.getText().toString().trim();
+                        notification.setMessage(message);
+
+                        try {
+                            notification.sendNotification();
+                            Toast.makeText(this, "Notification sent", Toast.LENGTH_SHORT).show();
+                        } catch (IllegalArgumentException e) {
+                            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+
+            try {
+                notification.sendNotification();
+                Toast.makeText(this, "Notification sent", Toast.LENGTH_SHORT).show();
+            } catch (IllegalArgumentException e) {
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
         selectAllButton.setOnClickListener(v -> {
         //Select all users from the list
