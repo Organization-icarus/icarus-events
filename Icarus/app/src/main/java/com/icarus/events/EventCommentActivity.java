@@ -37,6 +37,8 @@ public class EventCommentActivity extends HeaderNavBarActivity {
 
     private EditText commentInput;
     private MaterialButton sendCommentButton;
+    private MaterialButton manageButton;
+    private boolean canDelete;
 
     private FirebaseFirestore db;
 
@@ -63,6 +65,8 @@ public class EventCommentActivity extends HeaderNavBarActivity {
         recyclerView = findViewById(R.id.event_comments_list);
         commentInput = findViewById(R.id.comment_input);
         sendCommentButton = findViewById(R.id.send_comment_button);
+        manageButton = findViewById(R.id.manage_button);
+        manageButton.setVisibility(View.GONE);
 
         // So the pop-up keyboard doesn't block the text input
         setupImeInsets();
@@ -71,14 +75,48 @@ public class EventCommentActivity extends HeaderNavBarActivity {
         username = user.getName();
         userId = user.getId();
 
+        canDelete = true;
+
         commentList = new ArrayList<>();
-        adapter = new EventCommentAdapter(commentList);
+
+        adapter = new EventCommentAdapter(commentList, canDelete, selectedCount -> {
+            if (selectedCount > 0) {
+                manageButton.setVisibility(View.VISIBLE);
+                manageButton.setText("Delete (" + selectedCount + ")");
+            } else {
+                manageButton.setVisibility(View.GONE);
+            }
+        });
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
         loadComments();
-
         sendCommentButton.setOnClickListener(v -> postComment());
+        manageButton.setOnClickListener(v -> deleteComment());
+
+    }
+
+    /* This code was created with the help of ChatGPT on March 31. The prompt
+    was, "How do I delete comments in Firebase using the 'isDeleted' field?". */
+    private void deleteComment() {
+        List<Comment> selectedComments = adapter.getSelectedComments();
+
+        if (selectedComments.isEmpty()) {
+            manageButton.setVisibility(View.GONE);
+            return;
+        }
+
+        for (Comment comment: selectedComments) {
+            if (comment.getDocumentId() != null) {
+                db.collection("events")
+                        .document(eventId)
+                        .collection("comments")
+                        .document(comment.getDocumentId())
+                        .update("deleted", true);
+            }
+        }
+        adapter.clearSelection();
     }
 
 
@@ -129,10 +167,12 @@ public class EventCommentActivity extends HeaderNavBarActivity {
 
                     commentList.clear();
 
+                    // Only display non-deleted comments
                     if (value != null) {
                         for (DocumentSnapshot doc : value.getDocuments()) {
                             Comment comment = doc.toObject(Comment.class);
                             if (comment != null && !comment.isDeleted()) {
+                                comment.setDocumentId(doc.getId());
                                 commentList.add(comment);
                             }
                         }
