@@ -390,6 +390,16 @@ public class EventDetailsActivity extends NavigationBarActivity {
         // SET UP GUIDELINES DIALOG
         //---------------------------
 
+        // TODO: temporary drop-in replacement
+        TextView guidelinesButton = findViewById(R.id.lottery_guidelines);
+
+        guidelinesButton.setOnClickListener(v -> {
+            Intent intent = new Intent(EventDetailsActivity.this, EventCommentActivity.class);
+            intent.putExtra("EVENT_ID", finalEventId);
+            startActivity(intent);
+        });
+
+        /*
         // Set width to 300dp
         int widthPx = (int) (300 * getResources().getDisplayMetrics().density);
         TextView guidelinesButton = findViewById(R.id.lottery_guidelines);
@@ -405,6 +415,8 @@ public class EventDetailsActivity extends NavigationBarActivity {
             dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background);
             dialog.getWindow().setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT);
         });
+        */
+
 
         //---------------------------
         // LISTEN TO EVENT DOCUMENT

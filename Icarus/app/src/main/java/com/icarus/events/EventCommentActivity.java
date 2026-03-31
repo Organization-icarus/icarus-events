@@ -21,17 +21,26 @@ public class EventCommentActivity extends AppCompatActivity {
     private EventCommentAdapter adapter;
     private List<Comment> commentList;
 
+    private String username;
+    private String userId;
+
     private EditText commentInput;
     private MaterialButton sendCommentButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event_comment); // <-- your XML file
+        setContentView(R.layout.activity_event_comment);
+
+        String eventId = getIntent().getStringExtra("EVENT_ID");
 
         recyclerView = findViewById(R.id.event_comments_list);
         commentInput = findViewById(R.id.comment_input);
         sendCommentButton = findViewById(R.id.send_comment_button);
+
+        User user = UserSession.getInstance().getCurrentUser();
+        username = user.getName();
+        userId = user.getId();
 
         commentList = new ArrayList<>();
 
@@ -77,8 +86,8 @@ public class EventCommentActivity extends AppCompatActivity {
 
             // TODO: Get real user ID and name
             Comment newComment = new Comment(
-                    "currentUserId",
-                    "Bradley",
+                    userId,
+                    username,
                     text,
                     new Date(),
                     false
