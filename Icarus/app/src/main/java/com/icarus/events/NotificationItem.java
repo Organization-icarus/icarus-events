@@ -3,6 +3,7 @@ package com.icarus.events;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,7 +80,7 @@ public class NotificationItem {
         if (this.message == null || this.message.trim().isEmpty()){
             throw new IllegalArgumentException("Notification message cannot be null or empty");
         }
-        if (recipients.isEmpty()) {
+        if (this.recipients.isEmpty()) {
             throw new IllegalStateException("Notification must have at least one recipient");
         }
 
@@ -91,6 +92,7 @@ public class NotificationItem {
         data.put("recipients", this.recipients);
         data.put("message", this.message);
         data.put("type", this.type);
+        data.put("date", new Date());
         this.db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
                 .add(data)
                 .addOnSuccessListener(docRef -> {})
