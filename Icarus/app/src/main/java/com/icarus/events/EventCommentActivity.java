@@ -1,142 +1,94 @@
 package com.icarus.events;
 
 import android.os.Bundle;
-import android.view.View;
+import android.text.TextUtils;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-/**
- * Activity that displays and manages comments for a single Event.
- *
- * Listens to the event's "comments" subcollection in real-time,
- * renders them in a RecyclerView, and allows users to post new comments.
- *
- * Comments are stored at: events/{eventId}/comments/{commentId}
- * Each comment document has: { text, authorId, authorName, timestamp }
- *
- * @author [Your Name]
- */
-public class EventCommentActivity extends NavigationBarActivity {
+public class EventCommentActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private EditText commentInput;
-    private ImageButton sendBtn;
-
     private EventCommentAdapter adapter;
-    private final List<Comment> commentList = new ArrayList<>();
+    private List<Comment> commentList;
 
-    private ListenerRegistration commentListener;
+    private EditText commentInput;
+    private MaterialButton sendCommentButton;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_event_comment);
-        setupNavBar();
+        setContentView(R.layout.activity_event_comment); // <-- your XML file
 
-        String eventId = getIntent().getStringExtra("eventId");
-        if (eventId == null) eventId = "hL8pW5lK9gDloqcWlmqx"; // For testing
-        String finalEventId = eventId;
-
-        User user = UserSession.getInstance().getCurrentUser();
-        String userId = user.getId();
-        String userName = user.getName(); // adjust to match your User getter
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        //---------------------------
-        // BIND VIEWS
-        //---------------------------
-
-        recyclerView = findViewById(R.id.comments_recycler_view);
+        recyclerView = findViewById(R.id.event_comments_list);
         commentInput = findViewById(R.id.comment_input);
-        sendBtn = findViewById(R.id.send_comment_button);
+        sendCommentButton = findViewById(R.id.send_comment_button);
 
-        //---------------------------
-        // SET UP RECYCLER VIEW
-        //---------------------------
+        commentList = new ArrayList<>();
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setStackFromEnd(true); // newest comments scroll to bottom
-        recyclerView.setLayoutManager(layoutManager);
+        // TODO: Fill out the list from Firebase
 
-        adapter = new EventCommentAdapter(this, commentList);
+        // 3. Add dummy comments (for testing UI)
+        commentList.add(new Comment(
+                "user1",
+                "Alex Alves",
+                "This event was crazy good.",
+                new Date(),
+                false
+        ));
+
+        commentList.add(new Comment(
+                "user2",
+                "Bradley",
+                "Looking forward to the next one.",
+                new Date(),
+                false
+        ));
+
+        commentList.add(new Comment(
+                "user3",
+                "Sam",
+                "I couldn’t make it 😢",
+                new Date(),
+                false
+        ));
+
+        // Set up adapter and layout manager
+        adapter = new EventCommentAdapter(commentList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        //---------------------------
-        // SEND BUTTON
-        //---------------------------
-
-        sendBtn.setOnClickListener(v -> {
+        sendCommentButton.setOnClickListener(v -> {
             String text = commentInput.getText().toString().trim();
-            if (text.isEmpty()) {
-                Toast.makeText(this, "Comment cannot be empty", Toast.LENGTH_SHORT).show();
+
+            if (TextUtils.isEmpty(text)) {
+                commentInput.setError("Enter a comment");
                 return;
             }
 
-            Map<String, Object> comment = new HashMap<>();
-            comment.put("text", text);
-            comment.put("authorId", userId);
-            comment.put("authorName", userName);
-            comment.put("timestamp", new Date());
+            // TODO: Get real user ID and name
+            Comment newComment = new Comment(
+                    "currentUserId",
+                    "Bradley",
+                    text,
+                    new Date(),
+                    false
+            );
 
-            db.collection(FirestoreCollections.EVENTS_COLLECTION)
-                    .document(finalEventId)
-                    .collection("comments")
-                    .add(comment)
-                    .addOnSuccessListener(ref -> commentInput.setText(""))
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "Failed to post comment", Toast.LENGTH_SHORT).show());
+            // New comments get shown first
+            commentList.add(0, newComment);
+            adapter.notifyItemInserted(0);
+            recyclerView.scrollToPosition(0);
+            commentInput.setText("");
         });
-
-        //---------------------------
-        // LISTEN FOR COMMENTS
-        //---------------------------
-
-        commentListener = db.collection(FirestoreCollections.EVENTS_COLLECTION)
-                .document(finalEventId)
-                .collection("comments")
-                .orderBy("timestamp", Query.Direction.ASCENDING)
-                .addSnapshotListener((query, e) -> {
-                    if (e != null || query == null) return;
-
-                    commentList.clear();
-                    for (var doc : query.getDocuments()) {
-                        Comment comment = new Comment(
-                                doc.getId(),
-                                doc.getString("text"),
-                                doc.getString("authorId"),
-                                doc.getString("authorName"),
-                                doc.getDate("timestamp")
-                        );
-                        commentList.add(comment);
-                    }
-
-                    adapter.notifyDataSetChanged();
-
-                    // Auto-scroll to the newest comment
-                    if (!commentList.isEmpty()) {
-                        recyclerView.scrollToPosition(commentList.size() - 1);
-                    }
-                });
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (commentListener != null) commentListener.remove();
     }
 }

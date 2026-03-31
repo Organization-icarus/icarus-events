@@ -7,25 +7,31 @@
     android:background="@color/primary">
 
     <!-- USER COMMENTS -->
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/event_comments_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"/>
 
-        <LinearLayout
-            style="@style/LinearLayoutForNavBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+<!--    <androidx.core.widget.NestedScrollView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="1">-->
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/event_comments_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"/>
+<!--        <LinearLayout-->
+<!--            style="@style/LinearLayoutForNavBar"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content">-->
 
-        </LinearLayout>
+<!--            <androidx.recyclerview.widget.RecyclerView-->
+<!--                android:id="@+id/event_comments_list"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:nestedScrollingEnabled="false"/>-->
 
-    </androidx.core.widget.NestedScrollView>
+<!--        </LinearLayout>-->
+
+<!--    </androidx.core.widget.NestedScrollView>-->
 
     <!-- COMMENT INPUT -->
     <LinearLayout
