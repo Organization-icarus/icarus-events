@@ -10,11 +10,12 @@ The prompt was, "Based on EventDetails.java, I need to create a comment class." 
  * Author: Bradley Bravender
  */
 public class Comment {
+    private String documentId;
     private String authorId;
     private String authorName;
     private String text;
     private Date createdAt;
-    private boolean isDeleted;
+    private boolean deleted;
 
     // Required by Firestore
     public Comment() {}
@@ -30,15 +31,17 @@ public class Comment {
         this.authorId = authorId;
         this.authorName = authorName;
         this.createdAt = createdAt;
-        this.isDeleted = isDeleted;
+        this.deleted = deleted;
     }
 
+    public String getDocumentId() { return documentId; }
+    public void setDocumentId(String documentId) { this.documentId = documentId; }
     public String getText()       { return text; }
     public String getAuthorId()   { return authorId; }
     public String getAuthorName() { return authorName; }
     public Date getCreatedAt()    { return createdAt; }
-    public boolean isDeleted() { return isDeleted; }
-    public void setDeleted(boolean deleted) { isDeleted = deleted; }
+    public boolean isDeleted() { return deleted; }
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
 }
 
 // Each Event document will store a comments subcollection, which holds comment documents.
