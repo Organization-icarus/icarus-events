@@ -327,14 +327,13 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         // TODO: adjust intent destination
         notificationBtn.setOnClickListener(v -> {
-            /* notification logic */
-            // Navigates to the events notification page
             Intent intent = new Intent(
                     EventDetailsActivity.this,
-                    EntrantEventListActivity.class);
+                    EventNotificationsActivity.class
+            );
+            intent.putExtra("eventId", finalEventId);
             startActivity(intent);
         });
-
 
         // TODO: adjust intent destination
         deleteBtn.setOnClickListener(v -> {
