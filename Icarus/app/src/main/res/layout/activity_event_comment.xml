@@ -13,26 +13,6 @@
         android:layout_height="0dp"
         android:layout_weight="1"/>
 
-<!--    <androidx.core.widget.NestedScrollView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:layout_weight="1">-->
-
-<!--        <LinearLayout-->
-<!--            style="@style/LinearLayoutForNavBar"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content">-->
-
-<!--            <androidx.recyclerview.widget.RecyclerView-->
-<!--                android:id="@+id/event_comments_list"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:nestedScrollingEnabled="false"/>-->
-
-<!--        </LinearLayout>-->
-
-<!--    </androidx.core.widget.NestedScrollView>-->
-
     <!-- COMMENT INPUT -->
     <View
         android:layout_width="match_parent"
@@ -41,10 +21,12 @@
         android:alpha="0.3"/>
 
     <LinearLayout
+        android:id="@+id/comment_input_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="12dp"
+        android:paddingBottom="20dp"
         android:gravity="center_vertical"
         android:background="@color/primary">
 
