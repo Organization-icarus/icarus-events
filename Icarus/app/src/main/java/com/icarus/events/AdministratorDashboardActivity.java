@@ -35,8 +35,8 @@ import java.util.Map;
  *
  * @author Benjamin Hall
  */
-public class AdministratorDashboardActivity extends NavigationBarActivity {
-    private RecyclerView eventListView;
+public class AdministratorDashboardActivity extends HeaderNavBarActivity {
+    private ListView eventListView;
     private ListView userListView;
     private ListView imageListView;
     private Button showEventListButton;

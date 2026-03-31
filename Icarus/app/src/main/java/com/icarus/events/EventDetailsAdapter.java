@@ -48,13 +48,17 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
         String regOpen = regOpenDate != null ? sdf.format(regOpenDate) : "TBD";
         String regClose = regCloseDate != null ? sdf.format(regCloseDate) : "TBD";
         String date = eventDate != null ? sdf.format(eventDate) : "TBD";
-        String capacity = event.getCapacity() == null || event.getCapacity() < 1
-                ? "Unlimited"
-                : String.valueOf(event.getCapacity().intValue());
+
+        String waitingListDisplay;
+        if (event.getCapacity() == null || event.getCapacity() < 1) {
+            waitingListDisplay = event.getWaiting_list_size() + " (no limit)";
+        } else {
+            waitingListDisplay = event.getWaiting_list_size() + "/" + event.getCapacity().intValue();
+        }
 
         // Convert Event fields into EventField list
         fields.add(new EventField("Category", event.getCategory()));
-        fields.add(new EventField("Waiting List", String.valueOf(event.getWaiting_list_size()) + "/" + capacity));
+        fields.add(new EventField("Waiting List", waitingListDisplay));
         fields.add(new EventField("Registration Opens", regOpen));
         fields.add(new EventField("Registration Closes", regClose));
         fields.add(new EventField("Event Date", date));

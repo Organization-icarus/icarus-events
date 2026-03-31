@@ -3,4 +3,10 @@
     <dimen name="nav_bar_height">70dp</dimen>
     <dimen name="nav_bar_height_plus_padding">86dp</dimen>
 
+    // The size of icon buttons
+    <dimen name="image_button_size">40dp</dimen>
+
+    // The padding between each side and the content
+    <dimen name="side_padding">24dp</dimen>
+
 </resources>

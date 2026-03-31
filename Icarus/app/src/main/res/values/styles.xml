@@ -12,7 +12,7 @@
         <item name="android:textColor">@color/darkText</item>
         <item name="backgroundTint">@color/accent_first</item>
         <item name="cornerRadius">0dp</item>
-        <item name="iconTint">@color/primary_container_highlighted</item>
+        <item name="iconTint">@color/black</item>
         <item name="iconPadding">8dp</item>
         <item name="android:padding">0dp</item>
         <item name="android:paddingStart">16dp</item>
@@ -60,8 +60,8 @@
         <!-- Orientation -->
         <item name="android:orientation">vertical</item>
         <!-- Padding -->
-        <item name="android:paddingStart">24dp</item>
-        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingStart">@dimen/side_padding</item>
+        <item name="android:paddingEnd">@dimen/side_padding</item>
         <item name="android:paddingTop">16dp</item>
         <item name="android:paddingBottom">@dimen/nav_bar_height_plus_padding</item>
         <!-- Behavior -->
@@ -75,6 +75,32 @@
     <style name="ShapeAppearanceOverlay.App.CircleImageView" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- -->
+    <!-- For Alert dialogs-->
+    <!-- -->
+    <style name="CustomAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:background">@color/secondary</item>
+        <item name="android:textColor">@color/lightText</item>
+        <item name="android:textColorHint">#80FFFFFF</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/CustomAlertDialogTitle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/CustomAlertDialogPositiveButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/CustomAlertDialogNegativeButton</item>
+    </style>
+
+    <style name="CustomAlertDialogTitle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textColor">@color/lightText</item>
+        <item name="android:textSize">@dimen/font_subheading_size</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CustomAlertDialogPositiveButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/accent_first</item>
+    </style>
+
+    <style name="CustomAlertDialogNegativeButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/accent_first</item>
     </style>
 
 </resources>

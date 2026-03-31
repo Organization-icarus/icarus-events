@@ -6,8 +6,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
@@ -19,13 +17,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class EventCommentActivity extends NavigationBarActivity {
+public class EventCommentActivity extends HeaderNavBarActivity {
 
     private static final String TAG = "EventCommentActivity";
 
@@ -39,10 +38,22 @@ public class EventCommentActivity extends NavigationBarActivity {
 
     private EditText commentInput;
     private MaterialButton sendCommentButton;
+    private MaterialButton manageButton;
+
+    private ListenerRegistration commentsListener;
+    private ListenerRegistration eventListener;
+    private ListenerRegistration userListener;
+
+    private boolean isOrganizer = false;
+    private boolean isAdmin = false;
+    private boolean canDelete;
 
     private FirebaseFirestore db;
 
 
+    /* This code was created with the help of ChatGPT on March 31. The prompt
+    was, "How do I delete comments based on if the user organized the event,
+    or if they're an admin?". */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,8 +76,9 @@ public class EventCommentActivity extends NavigationBarActivity {
         recyclerView = findViewById(R.id.event_comments_list);
         commentInput = findViewById(R.id.comment_input);
         sendCommentButton = findViewById(R.id.send_comment_button);
+        manageButton = findViewById(R.id.manage_button);
+        manageButton.setVisibility(View.GONE);
 
-        // So the pop-up keyboard doesn't block the text input
         setupImeInsets();
 
         User user = UserSession.getInstance().getCurrentUser();
@@ -74,13 +86,120 @@ public class EventCommentActivity extends NavigationBarActivity {
         userId = user.getId();
 
         commentList = new ArrayList<>();
-        adapter = new EventCommentAdapter(commentList);
+        canDelete = false;
+
+        adapter = new EventCommentAdapter(commentList, canDelete, selectedCount -> {
+            if (selectedCount > 0 && canDelete) {
+                manageButton.setVisibility(View.VISIBLE);
+                manageButton.setText("Delete (" + selectedCount + ")");
+            } else {
+                manageButton.setVisibility(View.GONE);
+            }
+        });
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        loadComments();
-
         sendCommentButton.setOnClickListener(v -> postComment());
+        manageButton.setOnClickListener(v -> deleteComment());
+
+        listenToPermissions();
+        loadComments();
+    }
+
+
+    private void listenToPermissions() {
+        eventListener = db.collection("events")
+                .document(eventId)
+                .addSnapshotListener((documentSnapshot, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error listening to event document", error);
+                        return;
+                    }
+
+                    boolean newIsOrganizer = false;
+
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        List<?> organizers = (List<?>) documentSnapshot.get("organizers");
+                        newIsOrganizer = organizers != null && organizers.contains(userId);
+                    }
+
+                    isOrganizer = newIsOrganizer;
+                    updateDeletePermission();
+                });
+
+        userListener = db.collection("users")
+                .document(userId)
+                .addSnapshotListener((documentSnapshot, error) -> {
+                    if (error != null) {
+                        Log.e(TAG, "Error listening to user document", error);
+                        return;
+                    }
+
+                    boolean newIsAdmin = false;
+
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        Boolean adminValue = documentSnapshot.getBoolean("isAdmin");
+                        newIsAdmin = adminValue != null && adminValue;
+                    }
+
+                    isAdmin = newIsAdmin;
+                    updateDeletePermission();
+                });
+    }
+
+
+    /* This code was created with the help of ChatGPT on March 31. The prompt
+    was, "How do I delete comments in Firebase using the 'isDeleted' field?". */
+    private void deleteComment() {
+        List<Comment> selectedComments = adapter.getSelectedComments();
+
+        if (selectedComments.isEmpty()) {
+            manageButton.setVisibility(View.GONE);
+            return;
+        }
+
+        for (Comment comment: selectedComments) {
+            if (comment.getDocumentId() != null) {
+                db.collection("events")
+                        .document(eventId)
+                        .collection("comments")
+                        .document(comment.getDocumentId())
+                        .update("deleted", true);
+            }
+        }
+        adapter.clearSelection();
+    }
+
+
+    private void updateDeletePermission() {
+        boolean newCanDelete = isOrganizer || isAdmin;
+
+        if (canDelete == newCanDelete) {
+            return;
+        }
+
+        canDelete = newCanDelete;
+
+        adapter = new EventCommentAdapter(commentList, canDelete, selectedCount -> {
+            if (selectedCount > 0 && canDelete) {
+                manageButton.setVisibility(View.VISIBLE);
+                manageButton.setText("Delete (" + selectedCount + ")");
+            } else {
+                manageButton.setVisibility(View.GONE);
+            }
+        });
+
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        if (!canDelete) {
+            manageButton.setVisibility(View.GONE);
+        }
+
+        Log.d(TAG, "Permissions updated. isOrganizer=" + isOrganizer
+                + ", isAdmin=" + isAdmin
+                + ", canDelete=" + canDelete);
     }
 
 
@@ -119,7 +238,7 @@ public class EventCommentActivity extends NavigationBarActivity {
 
 
     private void loadComments() {
-        db.collection("events")
+        commentsListener = db.collection("events")
                 .document(eventId)
                 .collection("comments")
                 .orderBy("createdAt", Query.Direction.DESCENDING)
@@ -135,6 +254,7 @@ public class EventCommentActivity extends NavigationBarActivity {
                         for (DocumentSnapshot doc : value.getDocuments()) {
                             Comment comment = doc.toObject(Comment.class);
                             if (comment != null && !comment.isDeleted()) {
+                                comment.setDocumentId(doc.getId());
                                 commentList.add(comment);
                             }
                         }
@@ -197,5 +317,21 @@ public class EventCommentActivity extends NavigationBarActivity {
                 dp,
                 getResources().getDisplayMetrics()
         );
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (commentsListener != null) {
+            commentsListener.remove();
+        }
+        if (eventListener != null) {
+            eventListener.remove();
+        }
+        if (userListener != null) {
+            userListener.remove();
+        }
     }
 }

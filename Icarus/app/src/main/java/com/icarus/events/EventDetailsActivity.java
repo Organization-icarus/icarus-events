@@ -6,7 +6,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -37,7 +36,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 
 /**
@@ -49,7 +47,7 @@ import java.util.Set;
  *
  * @author Bradley Bravender
  */
-public class EventDetailsActivity extends NavigationBarActivity {
+public class EventDetailsActivity extends HeaderNavBarActivity {
 
     //---------------------------
     // BUTTONS
@@ -103,7 +101,9 @@ public class EventDetailsActivity extends NavigationBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
+        setupHeaderBar("Details");
         setupNavBar();
+
         eventOrganizers = new ArrayList<String>();
         // Retrieve data passed to the intent
         String eventId = getIntent().getStringExtra("eventId");
@@ -409,22 +409,19 @@ public class EventDetailsActivity extends NavigationBarActivity {
         //---------------------------
         // LOTTERY GUIDELINES DIALOG
         //---------------------------
-        // Set width to 300dp
-        // TODO: Adjust coloring, formatting
-        int widthPx = (int) (300 * getResources().getDisplayMetrics().density);
-
         ImageButton guidelinesButton = findViewById(R.id.lottery_guidelines);
+
         guidelinesButton.setOnClickListener(v -> {
+            View dialogView = getLayoutInflater().inflate(R.layout.lottery_guidelines_dialog, null);
+
             androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(EventDetailsActivity.this)
-                    .setTitle("Lottery Guidelines")
-                    .setMessage(getString(R.string.lottery_guidelines_message))
-                    .setPositiveButton("OK", (d, which) -> d.dismiss())
-                    .setCancelable(true)
+                    .setView(dialogView)
                     .create();
 
             dialog.show();
-            dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background);
-            dialog.getWindow().setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            Button okButton = dialogView.findViewById(R.id.dialog_ok_button);
+            okButton.setOnClickListener(btn -> dialog.dismiss());
         });
 
 

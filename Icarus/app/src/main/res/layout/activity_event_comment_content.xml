@@ -5,6 +5,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:padding="12dp"
+    android:paddingStart="@dimen/side_padding"
+    android:paddingEnd="@dimen/side_padding"
     android:background="@color/primary">
 
     <!-- Profile Picture (top left) -->
@@ -68,8 +70,15 @@
             android:layout_height="wrap_content"
             android:textColor="@color/lightText"
             android:textSize="@dimen/font_text_size"
-            android:text="MY NAME IS ALEX. THIS EVENT WAS CRAAAaaaaAAAZYYYYYYY. Need to do it again one day." />
+            android:text="Example comment about this event." />
 
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/comment_select_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_circle"
+        app:tint="@color/lightTextSemi"
+        android:visibility="gone"/>
 </LinearLayout>

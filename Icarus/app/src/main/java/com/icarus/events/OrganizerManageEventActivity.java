@@ -28,7 +28,6 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,13 +40,13 @@ import java.util.Map;
  * The poster can be updated: chosen images upload to Cloudinary and update Firestore.
  * Old images are deleted, and the UI refreshes to show the new poster.
  * <p>
- * This activity extends {@link NavigationBarActivity} to include
+ * This activity extends {@link HeaderNavBarActivity} to include
  * the application's reusable navigation bar.
  *
  * @author Ben Salmon
  */
 
-public class OrganizerManageEventActivity extends NavigationBarActivity{
+public class OrganizerManageEventActivity extends HeaderNavBarActivity {
 
     private ImageView eventPoster;
     private Button UpdatePoster;

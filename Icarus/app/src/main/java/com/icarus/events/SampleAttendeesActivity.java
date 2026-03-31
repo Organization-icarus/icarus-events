@@ -1,6 +1,5 @@
 package com.icarus.events;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -47,7 +46,7 @@ import java.util.Collections;
  *
  * @author Yifan Jiao
  */
-public class SampleAttendeesActivity extends NavigationBarActivity {
+public class SampleAttendeesActivity extends HeaderNavBarActivity {
 
     private static final String TAG = "SampleAttendeesActivity";
     private String eventId;

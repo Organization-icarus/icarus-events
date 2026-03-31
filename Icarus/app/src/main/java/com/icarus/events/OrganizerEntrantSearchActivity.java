@@ -10,14 +10,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.util.CollectionUtils;
-import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,13 +28,13 @@ import java.util.Set;
  * Activity that allows organizers to view the entrants they can invite to
  * a private event or to add as a Co-Organizer.
  * <p>
- * This activity extends {@link NavigationBarActivity} to include
+ * This activity extends {@link HeaderNavBarActivity} to include
  * the application's reusable navigation bar.
  *
  * @author Ben Salmon
  */
 
-public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
+public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
     private FirebaseFirestore db;
     private TextView eventName;
     private TextView activityName;
