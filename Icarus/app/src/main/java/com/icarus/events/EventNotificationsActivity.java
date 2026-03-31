@@ -12,7 +12,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventNotificationsActivity extends NavigationBarActivity {
+public class EventNotificationsActivity extends HeaderNavBarActivity {
 
     private FirebaseFirestore db;
     private String eventId;

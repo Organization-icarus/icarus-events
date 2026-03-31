@@ -23,7 +23,7 @@ import org.osmdroid.views.overlay.Polygon;
  *
  * @author Benjamin Hall
  */
-public class EntrantMapActivity extends NavigationBarActivity {
+public class EntrantMapActivity extends HeaderNavBarActivity {
     private MapView entrantMap;
     private com.google.firebase.firestore.GeoPoint eventLocation;
     private FirebaseFirestore db;

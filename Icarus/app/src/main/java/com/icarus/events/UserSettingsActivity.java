@@ -10,7 +10,6 @@ import android.widget.Toast;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,7 +21,7 @@ import java.util.Map;
  *
  * @author Alex Alves
  */
-public class UserSettingsActivity extends NavigationBarActivity{
+public class UserSettingsActivity extends HeaderNavBarActivity {
     private Button deleteProfileButton;
     private Switch adminNotificationsSwitch;
     private Switch organizerNotificationsSwitch;

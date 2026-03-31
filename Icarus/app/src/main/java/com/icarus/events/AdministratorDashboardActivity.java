@@ -9,10 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -28,7 +25,7 @@ import java.util.Date;
  *
  * @author Benjamin Hall
  */
-public class AdministratorDashboardActivity extends NavigationBarActivity {
+public class AdministratorDashboardActivity extends HeaderNavBarActivity {
     private ListView eventListView;
     private ListView userListView;
     private ListView imageListView;

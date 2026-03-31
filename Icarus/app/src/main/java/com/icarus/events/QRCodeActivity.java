@@ -34,7 +34,7 @@ import java.util.Collections;
  *
  * Portions of this implementation were developed with assistance from ChatGPT (March 29, 2026).
  */
-public class QRCodeActivity extends NavigationBarActivity {
+public class QRCodeActivity extends HeaderNavBarActivity {
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
     private BarcodeView barcodeScanner;

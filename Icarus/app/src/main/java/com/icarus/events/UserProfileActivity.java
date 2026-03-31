@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author Alex Alves
  */
-public class UserProfileActivity extends NavigationBarActivity {
+public class UserProfileActivity extends HeaderNavBarActivity {
 
     private EditText nameEditText;
     private EditText phoneEditText;

@@ -52,7 +52,7 @@ import java.util.Map;
  *
  * @author Alex Alves
  */
-public class EntrantEventListActivity extends NavigationBarActivity {
+public class EntrantEventListActivity extends HeaderNavBarActivity {
     //Define attributes
     private RecyclerView eventListView;
     private EditText searchTextFilter;
