@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
@@ -35,6 +37,11 @@ public class EventCommentActivity extends NavigationBarActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_comment);
+
+        //--------------------------------
+        // SET UP HEADER AND NAV BAR
+        //--------------------------------
+        setupHeaderBar("Comments");
         setupNavBar();
 
         String eventId = getIntent().getStringExtra("EVENT_ID");
@@ -43,6 +50,7 @@ public class EventCommentActivity extends NavigationBarActivity {
         commentInput = findViewById(R.id.comment_input);
         sendCommentButton = findViewById(R.id.send_comment_button);
 
+        // So the pop-up keyboard doesn't block the text input
         setupImeInsets();
 
         User user = UserSession.getInstance().getCurrentUser();

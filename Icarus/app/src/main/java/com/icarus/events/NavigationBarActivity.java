@@ -3,6 +3,8 @@ package com.icarus.events;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,7 +30,7 @@ public class NavigationBarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
     }
 
-    // TODO: adjust where the profile and registered event click listeners point
+
     /**
      * Initializes the navigation bar and assigns click listeners to its buttons.
      * <p>
@@ -46,6 +48,15 @@ public class NavigationBarActivity extends AppCompatActivity {
                 .setOnClickListener((v -> openActivity(EntrantEventListActivity.class)));
         navBar.findViewById(R.id.registered_events)
                 .setOnClickListener((v -> openActivity(EventHistoryActivity.class)));
+    }
+
+
+    protected void setupHeaderBar(String activityTitle) {
+        View headerBar = findViewById(R.id.header_bar);
+
+        headerBar.findViewById(R.id.back_button)
+                .setOnClickListener(v -> finish());
+        ((TextView) headerBar.findViewById(R.id.header_title)).setText(activityTitle);
     }
 
     /**
@@ -68,6 +79,8 @@ public class NavigationBarActivity extends AppCompatActivity {
 
 
 /*
+USAGE EXAMPLE:
+
 public class HomeActivity extends NavigationBarActivity {
 
     @Override
@@ -78,4 +91,4 @@ public class HomeActivity extends NavigationBarActivity {
         setupNavBar();
     }
 }
- */
+*/
