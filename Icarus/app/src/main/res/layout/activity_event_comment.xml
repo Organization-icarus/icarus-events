@@ -20,6 +20,18 @@
         android:layout_height="0dp"
         android:layout_weight="1"/>
 
+    <!-- DELETE COMMENTS -->
+    <!-- TODO: this button UI is ugly -->
+    <com.google.android.material.button.MaterialButton
+        style="@style/AppButton"
+        android:id="@+id/manage_button"
+        android:text="Delete"
+        android:textColor="@color/lightText"
+        android:backgroundTint="@color/attention"
+        app:icon="@drawable/delete"
+        app:iconTint="@color/lightText"
+        android:visibility="gone"/>
+
     <!-- COMMENT INPUT -->
     <View
         android:layout_width="match_parent"
