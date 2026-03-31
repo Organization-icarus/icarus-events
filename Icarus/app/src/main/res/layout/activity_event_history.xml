@@ -1,74 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:background="@color/primary">
 
-    <!-- Title for event history page-->
-    <TextView
-        android:id="@+id/event_history_title"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="16dp"
-        android:text="Registered Events"
-        android:textSize="@dimen/font_super_heading_size"
-        android:textStyle="bold" />
+        android:background="@color/primary"
+        app:elevation="0dp">
 
-    <!-- Search Filter -->
-    <EditText
-        android:id="@+id/event_history_search_filter"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint="Search events..."
-        android:inputType="text"
-        android:maxLines="1"
-        android:textSize="@dimen/font_subheading_size" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary"
+            android:elevation="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="16dp"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
 
-    <!-- Filter buttons -->
-    <Button
-        android:id="@+id/event_history_filter_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/primary_container_highlighted"
-        android:text="Filter Events"
-        android:textColor="@color/primary_container"
-        android:textSize="@dimen/font_text_size" />
+            <!-- Search Filter -->
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/primary"
+                android:elevation="2dp"
+                android:hint="Search events..."
+                android:outlineAmbientShadowColor="@color/lightText"
+                android:textColorHint="@color/lightText"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="@color/search_box_stroke"
+                app:hintTextColor="@color/accent_first"
+                app:startIconDrawable="@android:drawable/ic_menu_search">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/event_history_list_search_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center_vertical"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:outlineSpotShadowColor="@color/lightText"
+                    android:textColor="@color/lightText"
+                    android:textColorHighlight="@color/lightText"
+                    android:textColorHint="@color/lightTextSemi"
+                    android:textCursorDrawable="@color/accent_first"
+                    android:textSize="@dimen/font_subheading_size" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Filter buttons -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/event_history_list_filter_button"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="12dp"
+                android:contentDescription="Filter events"
+                android:elevation="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:backgroundTint="@color/filter_button_tint"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/ic_filter"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="@color/primary" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/event_history_list_qr_button"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="12dp"
+                android:contentDescription="QR button"
+                android:elevation="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                app:backgroundTint="@color/filter_button_tint"
+                app:cornerRadius="12dp"
+                app:icon="@drawable/twotone_all_out_24"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="@color/primary" />
+
+        </LinearLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <!-- Message for empty list -->
     <TextView
         android:id="@+id/event_history_list_empty_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:gravity="center"
         android:padding="24dp"
         android:text="@string/entrants_event_list_empty_events"
         android:textSize="@dimen/font_subheading_size"
         android:visibility="gone"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         />
 
-    <FrameLayout
+    <!-- Event list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/event_history_list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:paddingBottom="64dp"
+        android:clipToPadding="false"
+        android:background="@color/primary"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <!-- Event History list -->
-        <ListView
-            android:id="@+id/event_history_list_view"
-            android:layout_width="300dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_gravity="top|center"/>
+    <!-- Add Event button-->
 
-        <include
-            android:id="@+id/nav_bar"
-            layout="@layout/nav_bar"
-            android:layout_width="match_parent"
-            android:layout_gravity="bottom|center"
-            android:layout_height="60dp"/>
-    </FrameLayout>
+    <include
+        android:id="@+id/nav_bar"
+        layout="@layout/nav_bar"
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:layout_height="60dp"/>
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
