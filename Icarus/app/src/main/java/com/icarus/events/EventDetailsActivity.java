@@ -103,7 +103,9 @@ public class EventDetailsActivity extends NavigationBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
+        setupHeaderBar("Details");
         setupNavBar();
+
         eventOrganizers = new ArrayList<String>();
         // Retrieve data passed to the intent
         String eventId = getIntent().getStringExtra("eventId");
@@ -397,24 +399,6 @@ public class EventDetailsActivity extends NavigationBarActivity {
         //---------------------------
         // LOTTERY GUIDELINES DIALOG
         //---------------------------
-        // Set width to 300dp
-        // TODO: Adjust coloring, formatting
-//        int widthPx = (int) (300 * getResources().getDisplayMetrics().density);
-
-//        ImageButton guidelinesButton = findViewById(R.id.lottery_guidelines);
-//        guidelinesButton.setOnClickListener(v -> {
-//            androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(EventDetailsActivity.this)
-//                    .setTitle("Lottery Guidelines")
-//                    .setMessage(getString(R.string.lottery_guidelines_message))
-//                    .setPositiveButton("OK", (d, which) -> d.dismiss())
-//                    .setCancelable(true)
-//                    .create();
-//
-//            dialog.show();
-//            dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background);
-//            dialog.getWindow().setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT);
-//        });
-
         ImageButton guidelinesButton = findViewById(R.id.lottery_guidelines);
 
         guidelinesButton.setOnClickListener(v -> {
