@@ -8,4 +8,6 @@
     <dimen name="font_subheading_size">18sp</dimen>
     <!-- Body text size -->
     <dimen name="font_text_size">14sp</dimen>
+    <!-- Mini font sie -->
+    <dimen name="font_mini_text_size">12sp</dimen>
 </resources>
