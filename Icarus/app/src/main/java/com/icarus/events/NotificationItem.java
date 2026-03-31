@@ -26,6 +26,16 @@ public class NotificationItem {
         this.db = FirebaseFirestore.getInstance();
     }
 
+    public NotificationItem(String eventId, String sender, Boolean isEvent, ArrayList<String> recipients, String message) {
+        this.eventId = eventId;
+        this.sender = sender;
+        this.isEvent = isEvent;
+        this.isSystem = !isEvent;
+        this.recipients = recipients;
+        this.message = message;
+        this.db = FirebaseFirestore.getInstance();
+    }
+
     public String getEventId() { return this.eventId; }
 
     public String getSender() { return this.sender; }
