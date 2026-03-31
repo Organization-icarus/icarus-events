@@ -399,20 +399,35 @@ public class EventDetailsActivity extends NavigationBarActivity {
         //---------------------------
         // Set width to 300dp
         // TODO: Adjust coloring, formatting
-        int widthPx = (int) (300 * getResources().getDisplayMetrics().density);
+//        int widthPx = (int) (300 * getResources().getDisplayMetrics().density);
+
+//        ImageButton guidelinesButton = findViewById(R.id.lottery_guidelines);
+//        guidelinesButton.setOnClickListener(v -> {
+//            androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(EventDetailsActivity.this)
+//                    .setTitle("Lottery Guidelines")
+//                    .setMessage(getString(R.string.lottery_guidelines_message))
+//                    .setPositiveButton("OK", (d, which) -> d.dismiss())
+//                    .setCancelable(true)
+//                    .create();
+//
+//            dialog.show();
+//            dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background);
+//            dialog.getWindow().setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT);
+//        });
 
         ImageButton guidelinesButton = findViewById(R.id.lottery_guidelines);
+
         guidelinesButton.setOnClickListener(v -> {
+            View dialogView = getLayoutInflater().inflate(R.layout.lottery_guidelines_dialog, null);
+
             androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(EventDetailsActivity.this)
-                    .setTitle("Lottery Guidelines")
-                    .setMessage(getString(R.string.lottery_guidelines_message))
-                    .setPositiveButton("OK", (d, which) -> d.dismiss())
-                    .setCancelable(true)
+                    .setView(dialogView)
                     .create();
 
             dialog.show();
-            dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background);
-            dialog.getWindow().setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            Button okButton = dialogView.findViewById(R.id.dialog_ok_button);
+            okButton.setOnClickListener(btn -> dialog.dismiss());
         });
 
 
