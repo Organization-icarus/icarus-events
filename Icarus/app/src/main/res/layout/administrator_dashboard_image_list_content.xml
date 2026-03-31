@@ -1,35 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="500dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="16dp">
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/admin_dashboard_image_list_image"
         android:layout_width="0dp"
+        android:layout_height="450dp"
+        android:layout_weight="1"
+        android:scaleType="centerCrop" />
+
+    <ImageButton
+        android:id="@+id/admin_dashboard_image_list_remove_image_button"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginStart="16dp"
+        android:backgroundTint="?android:attr/windowBackground"
+        android:contentDescription="remove_image_button"
+        app:srcCompat="@drawable/delete"
+        app:tint="@color/attention" />
 
-        <ImageView
-            android:id="@+id/admin_dashboard_image_list_image"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:gravity="center" />
-
-        <ImageButton
-            android:id="@+id/admin_dashboard_image_list_remove_image_button"
-            android:layout_width="1dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="?android:attr/windowBackground"
-            android:contentDescription="remove_image_button"
-            app:srcCompat="@android:drawable/ic_menu_delete"
-            app:tint="@color/primary_container_highlighted" />
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

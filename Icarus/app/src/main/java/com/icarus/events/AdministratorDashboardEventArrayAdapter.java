@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -204,8 +205,14 @@ public class AdministratorDashboardEventArrayAdapter extends RecyclerView.Adapte
                         batch.delete(db.collection(FirestoreCollections.EVENTS_COLLECTION).document(event.getId()));
 
                         batch.commit()
-                                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Event deleted successfully"))
-                                .addOnFailureListener(e -> Log.e("Firestore", "Error deleting event", e));
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("Firestore", "Event deleted successfully");
+                                    Toast.makeText(context, "Event deleted", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("Firestore", "Error deleting event", e);
+                                    Toast.makeText(context, "Failed to delete event", Toast.LENGTH_SHORT).show();
+                                });
 
                     }).addOnFailureListener(e -> Log.e("Firestore", "Error fetching subcollections", e));
         });

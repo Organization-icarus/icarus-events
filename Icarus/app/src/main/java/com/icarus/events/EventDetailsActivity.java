@@ -690,7 +690,7 @@ public class EventDetailsActivity extends NavigationBarActivity {
                         } else {
                             // OUT OF RANGE
                             Toast.makeText(this,
-                                    "Sorry, you are too far from the event to join." + geopoint.toString(),
+                                    "Sorry, you are too far from the event to join.",
                                     Toast.LENGTH_SHORT).show();
                         }
                     })
