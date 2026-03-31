@@ -1,7 +1,6 @@
 package com.icarus.events;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
@@ -27,10 +25,8 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.icarus.events.FirestoreCollections;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
@@ -43,11 +39,9 @@ import org.osmdroid.views.overlay.Polygon;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -61,12 +55,12 @@ import java.util.function.Consumer;
  * geolocation tracking is enabled. Event information is validated
  * and then stored in the Firestore "events" collection.
  * <p>
- * This activity extends {@link NavigationBarActivity} to include
+ * This activity extends {@link HeaderNavBarActivity} to include
  * the application's reusable navigation bar.
  *
  * @author Ben Salmon
  */
-public class OrganizerCreateEventActivity extends NavigationBarActivity {
+public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
     private  FirebaseFirestore db;
 
     private ImageView eventPoster;

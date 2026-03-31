@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,12 +27,12 @@ import java.util.Set;
  * when the Organizer selects a filter type
  *
  * <p>
- * This activity extends {@link NavigationBarActivity} to include
+ * This activity extends {@link HeaderNavBarActivity} to include
  * the application's reusable navigation bar.
  *
  * @author Ben Salmon
  */
-public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarActivity{
+public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActivity {
     private FirebaseFirestore db;
     private TextView eventName;
     private Button backButton;

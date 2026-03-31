@@ -6,8 +6,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
@@ -25,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class EventCommentActivity extends NavigationBarActivity {
+public class EventCommentActivity extends HeaderNavBarActivity {
 
     private static final String TAG = "EventCommentActivity";
 
