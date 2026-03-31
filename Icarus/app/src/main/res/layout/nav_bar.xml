@@ -6,7 +6,7 @@
     android:layout_height="@dimen/nav_bar_height"
     android:orientation="horizontal"
     android:gravity="center"
-    android:background="@color/primary"
+    android:background="@drawable/nav_bar_style"
     android:elevation="8dp">
 
     <!-- Registered Events -->

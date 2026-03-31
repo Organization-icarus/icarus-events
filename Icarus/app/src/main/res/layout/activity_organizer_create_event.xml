@@ -169,7 +169,7 @@
                         android:id="@+id/OrganizerCreateEventGeolocationSwitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Geolocation"
+                        android:text="Geolocation "
                         android:textColor="@color/lightText"
                         android:textSize="@dimen/font_subheading_size"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -184,7 +184,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/OrganizerCreateEventSettingsCard"
                 style="@style/ViewCard"
-                android:layout_marginTop="16dp" >
+                android:layout_marginTop="16dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -227,6 +227,25 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventLimitWaitingListLimit"/>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/OrganizerCreateEventPrivateSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventCategory"/>
+
+                    <TextView
+                        android:id="@+id/OrganizerCreateEventGeolocationLabel"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="I want this to be a PRIVATE Event"
+                        android:textColor="@color/lightText"
+                        android:textSize="@dimen/font_subheading_size"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/OrganizerCreateEventPrivateSwitch"
+                        app:layout_constraintBaseline_toBaselineOf="@id/OrganizerCreateEventPrivateSwitch"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

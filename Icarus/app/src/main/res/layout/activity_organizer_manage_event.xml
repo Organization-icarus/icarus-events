@@ -5,18 +5,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-
     <!-- EventName -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/OrganizerManageEventTitleCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        style="@style/ViewCard"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="24dp"
         app:cardElevation="0dp"
         app:cardCornerRadius="8dp"
-        app:strokeColor="@color/primary_container"
         app:strokeWidth="2dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="Manage Event"
-                android:textColor="@color/black"
+                android:textColor="@color/lightText"
                 android:textSize="@dimen/font_super_heading_size"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -47,7 +46,7 @@
                 android:layout_marginTop="0dp"
                 android:gravity="center"
                 android:text="Event Title"
-                android:textColor="@color/black"
+                android:textColor="@color/lightText"
                 android:textSize="@dimen/font_heading_size"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -79,12 +78,12 @@
                 android:id="@+id/OrganizerManageEventImageCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                style="@style/ViewCard"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="16dp"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="8dp"
-                app:strokeColor="@color/primary_container"
                 app:strokeWidth="2dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -109,11 +108,10 @@
                         android:id="@+id/OrganizerManageEventUpdatePoster"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
+                        style="@style/AppButton"
                         android:layout_marginTop="12dp"
-                        android:backgroundTint="@color/primary_container"
                         android:text="Update Poster"
                         android:textSize="@dimen/font_text_size"
-                        android:textColor="@color/primary_container_highlighted"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventViewImage"/>
@@ -127,12 +125,12 @@
                 android:id="@+id/OrganizerManageEventButtonCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                style="@style/ViewCard"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="16dp"
                 app:cardElevation="0dp"
                 app:cardCornerRadius="8dp"
-                app:strokeColor="@color/primary_container"
                 app:strokeWidth="2dp"
                 app:layout_constraintTop_toBottomOf="@id/OrganizerManageEventImageCard"
                 app:layout_constraintStart_toStartOf="parent"
@@ -148,7 +146,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="Actions"
-                        android:textColor="@color/black"
+                        android:textColor="@color/lightText"
                         android:textSize="@dimen/font_subheading_size"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -159,62 +157,56 @@
                         android:id="@+id/OrganizerManageEventViewEntrantMap"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
+                        style="@style/AppButton"
                         android:padding="12dp"
-                        android:backgroundTint="@color/primary_container"
                         android:text="View Entrant Map"
                         android:textSize="@dimen/font_text_size"
-                        android:textColor="@color/primary_container_highlighted"
                         app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventActionTitle"/>
 
                     <Button
                         android:id="@+id/OrganizerManageEventViewEntrantList"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:backgroundTint="@color/primary_container"
+                        style="@style/AppButton"
                         android:text="View Entrant List"
                         android:textSize="@dimen/font_text_size"
-                        android:textColor="@color/primary_container_highlighted"
                         app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventViewEntrantMap"/>
 
                     <Button
                         android:id="@+id/OrganizerManageEventInviteEntrant"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:backgroundTint="@color/primary_container"
+                        style="@style/AppButton"
                         android:text="Invite Specific Entrant"
                         android:textSize="@dimen/font_text_size"
-                        android:textColor="@color/primary_container_highlighted"
-                        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventViewEntrantMap"/>
+                        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventViewEntrantList"/>
 
 
                     <Button
                         android:id="@+id/OrganizerManageEventShareQRCode"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:backgroundTint="@color/primary_container"
+                        style="@style/AppButton"
                         android:text="Share QR code"
                         android:textSize="@dimen/font_text_size"
-                        android:textColor="@color/primary_container_highlighted"
                         app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventInviteEntrant"/>
 
                     <Button
                         android:id="@+id/OrganizerManageEventAddOrganizer"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:backgroundTint="@color/primary_container"
+                        style="@style/AppButton"
                         android:text="Add Organizers"
                         android:textSize="@dimen/font_text_size"
-                        android:textColor="@color/primary_container_highlighted"
                         app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventShareQRCode"/>
 
                     <Button
                         android:id="@+id/OrganizerManageEventReplaceDeclined"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:backgroundTint="@color/primary_container"
+                        style="@style/AppButton"
                         android:text="Replace Declined"
                         android:textSize="@dimen/font_text_size"
-                        android:textColor="@color/primary_container_highlighted"
                         app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventAddOrganizer"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

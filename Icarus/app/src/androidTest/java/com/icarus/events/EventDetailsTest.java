@@ -271,7 +271,7 @@ public class EventDetailsTest {
 
         scenario = ActivityScenario.launch(intent);
 
-        onView(withId(R.id.decline_button)).perform(click());
+        onView(withId(R.id.decline_invitation)).perform(click());
 
         CountDownLatch latch = new CountDownLatch(1);
         final String[] status = {""};
