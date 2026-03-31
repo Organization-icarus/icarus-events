@@ -90,9 +90,8 @@ public class NotificationItem {
         data.put("isSystem", this.isSystem);
         data.put("recipients", this.recipients);
         data.put("message", this.message);
-        this.db.collection(FirestoreCollections.EVENTS_COLLECTION)
-                .document(this.eventId)
-                .collection("notifications")
+        data.put("type", this.type);
+        this.db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
                 .add(data)
                 .addOnSuccessListener(docRef -> {})
                 .addOnFailureListener(e -> {

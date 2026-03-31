@@ -46,7 +46,6 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
     private ArrayList<User> entrantList;
     private OraganizerEntrantViewListArrayAdapter eventListArrayAdapter;
     private String eventId;
-    private String message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +67,6 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
         entrantList = new ArrayList<>();
         eventListArrayAdapter = new OraganizerEntrantViewListArrayAdapter(this, entrantList);
         entrantsOnWaitingList.setAdapter(eventListArrayAdapter);
-        Set<String> selectedIds = eventListArrayAdapter.getSelectedIds();
 
         //get eventId
         eventId = getIntent().getStringExtra("eventId");
@@ -91,6 +89,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
 
         filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) ->{
             if (!isChecked) return; // ← ignore uncheck events entirely
+            Set<String> selectedIds = eventListArrayAdapter.getSelectedIds();
             backButton.setText("Go Back");
             eventListArrayAdapter.clearSelections();
             selectAllButton.setText("Select All");
@@ -105,30 +104,40 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
                 status = "registered";
                 backButton.setText("Export CSV");
             }
-            messageButton.setText("Message all " + status);
+            messageButton.setText(selectedIds.isEmpty() ? "Message All" : "Message Selected");
             loadList(status);
         });
 
         backButton.setOnClickListener(v -> {
-            if(backButton.getText().toString().equals("Export CSV")){
-                createCSV();
-            }
-            else{
-                finish();
-            }
-
+            if (backButton.getText().toString().equals("Export CSV")) createCSV();
+            else finish();
         });
+
         messageButton.setOnClickListener(v -> {
+            Set<String> selectedIds = eventListArrayAdapter.getSelectedIds();
             if (selectedIds.isEmpty() && entrantList.isEmpty()) {
                 Toast.makeText(this, "No users to notify", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            if (UserSession.getInstance().getCurrentUser() == null) {
+                Toast.makeText(this, "No user logged in", Toast.LENGTH_SHORT).show();
+                return;
+            }
             String organizerId = UserSession.getInstance().getCurrentUser().getId();
 
             NotificationItem notification = new NotificationItem(eventId, organizerId, "notification");
             notification.setEvent();
-            notification.setRecipients(new ArrayList<>(selectedIds));
+
+            if (!selectedIds.isEmpty()) {
+                notification.setRecipients(new ArrayList<>(selectedIds));
+            } else {
+                ArrayList<String> allUsers = new ArrayList<>();
+                for (User user : entrantList) {
+                    allUsers.add(user.getId());
+                }
+                notification.setRecipients(allUsers);
+            }
 
             // popup to get the message
             EditText input = new EditText(this);
@@ -150,16 +159,11 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
                     })
                     .setNegativeButton("Cancel", null)
                     .show();
-
-            try {
-                notification.sendNotification();
-                Toast.makeText(this, "Notification sent", Toast.LENGTH_SHORT).show();
-            } catch (IllegalArgumentException e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
         });
+
         selectAllButton.setOnClickListener(v -> {
         //Select all users from the list
+            Set<String> selectedIds = eventListArrayAdapter.getSelectedIds();
             if (selectedIds.size() == entrantList.size() && !entrantList.isEmpty()) {
                 eventListArrayAdapter.clearSelections();
                 selectAllButton.setText("Select All");
