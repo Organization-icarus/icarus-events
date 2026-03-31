@@ -45,7 +45,7 @@ public class EventNotificationsActivity extends NavigationBarActivity {
         String currentUserId = UserSession.getInstance().getCurrentUser().getId();
         notifications.clear();
 
-        db.collection("notifications")
+        db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
                 .whereEqualTo("eventId", eventId)
                 .whereArrayContains("recipients", currentUserId)
                 .get()
@@ -56,7 +56,8 @@ public class EventNotificationsActivity extends NavigationBarActivity {
                                 doc.getString("sender"),
                                 doc.getBoolean("isEvent"),
                                 (ArrayList<String>) doc.get("recipients"),
-                                doc.getString("message")
+                                doc.getString("message"),
+                                doc.getString("type")
                         );
                         notifications.add(notification);
                     }

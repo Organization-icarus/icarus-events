@@ -45,8 +45,6 @@ public class NotificationListAdapter extends ArrayAdapter<NotificationItem> {
                 typeLabel = "Co-organizer Invite";
                 break;
             case "not_selected":
-                typeLabel = "Lottery Result";
-                break;
             case "selected":
                 typeLabel = "Lottery Result";
                 break;

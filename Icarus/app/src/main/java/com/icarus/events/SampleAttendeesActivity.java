@@ -13,12 +13,15 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Activity that allows an organizer to randomly sample attendees
@@ -36,7 +39,7 @@ import java.util.Collections;
  * Note: The event ID is currently hardcoded for testing purposes
  * and should be replaced with a dynamic value when integrated with
  * the full event management flow.
- *
+ * <p>
  * Outstanding issues:
  * - Event ID is currently hardcoded for testing.
  * - Entrants are sampled by device ID from the entrants' subcollection.
@@ -137,32 +140,67 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     ArrayList<QueryDocumentSnapshot> waitingEntrants = new ArrayList<>();
+                    Set<String> sampledEntrants = new HashSet<>();
+                    ArrayList<String> rejectedEntrants = new ArrayList<>();
 
                     for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
                         waitingEntrants.add(snapshot);
                     }
-
                     if (waitingEntrants.isEmpty()) {
                         Toast.makeText(this, "No waiting entrants to sample.", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     int numberToMove = Math.min(attendeeCount, waitingEntrants.size());
-
                     Collections.shuffle(waitingEntrants);
-
                     WriteBatch batch = db.batch();
 
                     for (int i = 0; i < numberToMove; i++) {
-                        batch.update(waitingEntrants.get(i).getReference(), "status", "selected");
+                        QueryDocumentSnapshot entrant = waitingEntrants.get(i);
+                        batch.update(entrant.getReference(), "status", "selected");
+                        sampledEntrants.add(entrant.getId());
+                    }
+
+                    for (QueryDocumentSnapshot entrant : waitingEntrants) {
+                        String userId = entrant.getId();
+                        if (!sampledEntrants.contains(userId)) rejectedEntrants.add(userId);
                     }
 
                     batch.commit()
-                            .addOnSuccessListener(unused -> Toast.makeText(
+                            .addOnSuccessListener(unused -> {
+                                Toast.makeText(
                                     this,
                                     "Sampled " + numberToMove + " entrants.",
                                     Toast.LENGTH_SHORT
-                            ).show())
+                                ).show();
+
+                                db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).get()
+                                        .addOnSuccessListener(event -> {
+                                            NotificationItem notification = new NotificationItem(
+                                                    eventId,
+                                                    UserSession.getInstance().getCurrentUser().getId(),
+                                                    true,
+                                                    new ArrayList<>(sampledEntrants),
+                                                    "Congratulations! You have been selected to attend " +
+                                                            event.getString("name") + " on " + event.getDate("date"),
+                                                    "selected"
+                                            );
+                                            notification.sendNotification();
+
+                                            if (!rejectedEntrants.isEmpty()) {
+                                                NotificationItem rejectedNotification = new NotificationItem(
+                                                        eventId,
+                                                        UserSession.getInstance().getCurrentUser().getId(),
+                                                        true,
+                                                        rejectedEntrants,
+                                                        "Unfortunately, you were not selected for " + event.getString("name")
+                                                                + ". There may still be more samples in the future. Thank you for your interest.",
+                                                        "not_selected"
+                                                );
+                                                rejectedNotification.sendNotification();
+                                            }
+                                        });
+                            })
                             .addOnFailureListener(e -> {
                                 Log.e(TAG, "Failed to update entrant statuses", e);
                                 Toast.makeText(this, "Failed to update entrants.", Toast.LENGTH_SHORT).show();

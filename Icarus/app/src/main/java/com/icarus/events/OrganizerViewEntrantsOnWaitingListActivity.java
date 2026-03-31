@@ -46,6 +46,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
     private ArrayList<User> entrantList;
     private OraganizerEntrantViewListArrayAdapter eventListArrayAdapter;
     private String eventId;
+    private String message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,16 +95,17 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
             eventListArrayAdapter.clearSelections();
             selectAllButton.setText("Select All");
             String status = null;
-            if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_waiting)){
+            if (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_waiting){
                 status = "waiting";
-            }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_chosen)){
+            } else if (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_chosen){
                 status = "selected";
-            }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_cancelled)){
+            } else if (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_cancelled){
                 status = "rejected";
-            }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_final)){
+            } else if (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_final){
                 status = "registered";
                 backButton.setText("Export CSV");
             }
+            messageButton.setText("Message all " + status);
             loadList(status);
         });
 
@@ -124,7 +126,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends NavigationBarAct
 
             String organizerId = UserSession.getInstance().getCurrentUser().getId();
 
-            NotificationItem notification = new NotificationItem(eventId, organizerId);
+            NotificationItem notification = new NotificationItem(eventId, organizerId, "notification");
             notification.setEvent();
             notification.setRecipients(new ArrayList<>(selectedIds));
 

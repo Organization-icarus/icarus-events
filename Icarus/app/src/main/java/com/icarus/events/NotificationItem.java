@@ -14,25 +14,29 @@ public class NotificationItem {
     private boolean isSystem;
     private ArrayList<String> recipients;
     private String message;
+    private String type;
     private final FirebaseFirestore db;
 
-    public NotificationItem(String eventId, String sender) {
+//    TO DO: add type can only be certain values
+    public NotificationItem(String eventId, String sender, String type) {
         this.eventId = eventId;
         this.sender = sender;
         this.isEvent = true;
         this.isSystem = false;
         this.recipients = new ArrayList<>();
         this.message = "";
+        this.type = type;
         this.db = FirebaseFirestore.getInstance();
     }
 
-    public NotificationItem(String eventId, String sender, Boolean isEvent, ArrayList<String> recipients, String message) {
+    public NotificationItem(String eventId, String sender, Boolean isEvent, ArrayList<String> recipients, String message, String type) {
         this.eventId = eventId;
         this.sender = sender;
         this.isEvent = isEvent;
         this.isSystem = !isEvent;
         this.recipients = recipients;
         this.message = message;
+        this.type = type;
         this.db = FirebaseFirestore.getInstance();
     }
 
@@ -44,6 +48,10 @@ public class NotificationItem {
 
     public boolean isEventNotification() { return this.isEvent; }
     public boolean isSystemNotification() { return this.isSystem; }
+
+    public String getType() { return type; }
+
+    public void setType(String type) { this.type = type; }
 
     public void setEvent() {
         this.isEvent = true;
@@ -82,8 +90,7 @@ public class NotificationItem {
         data.put("isSystem", this.isSystem);
         data.put("recipients", this.recipients);
         data.put("message", this.message);
-
-        this.db.collection("events")
+        this.db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(this.eventId)
                 .collection("notifications")
                 .add(data)
