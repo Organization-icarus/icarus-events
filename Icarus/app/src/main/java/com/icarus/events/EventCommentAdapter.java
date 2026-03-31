@@ -18,47 +18,52 @@ import java.util.Locale;
  */
 public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapter.CommentViewHolder> {
 
-    private final Context context;
     private final List<Comment> comments;
     private final SimpleDateFormat dateFormat =
             new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
 
-    public EventCommentAdapter(Context context, List<Comment> comments) {
-        this.context = context;
+    public EventCommentAdapter(List<Comment> comments) {
         this.comments = comments;
     }
 
     @NonNull
     @Override
     public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context)
-                .inflate(R.layout.item_comment, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.activity_event_comment_content, parent, false);
         return new CommentViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = comments.get(position);
+
         holder.authorName.setText(comment.getAuthorName());
-        holder.commentText.setText(comment.getText());
-        holder.timestamp.setText(
-                comment.getTimestamp() != null
-                        ? dateFormat.format(comment.getTimestamp())
-                        : ""
-        );
+
+        if (comment.isDeleted()) {
+            holder.commentTextView.setText("[deleted]");
+        } else{
+            holder.commentTextView.setText(comment.getText());
+        }
+
+        if (comment.getCreatedAt() != null) {
+            holder.createdAtTextView.setText(dateFormat.format(comment.getCreatedAt()));
+        } else {
+            holder.createdAtTextView.setText("");
+        }
     }
 
     @Override
     public int getItemCount() { return comments.size(); }
 
     static class CommentViewHolder extends RecyclerView.ViewHolder {
-        TextView authorName, commentText, timestamp;
+        TextView authorName, commentTextView, createdAtTextView;
 
         CommentViewHolder(@NonNull View itemView) {
             super(itemView);
-            authorName   = itemView.findViewById(R.id.comment_author_name);
-            commentText  = itemView.findViewById(R.id.comment_text);
-            timestamp    = itemView.findViewById(R.id.comment_timestamp);
+            authorName          = itemView.findViewById(R.id.comment_author_name);
+            commentTextView     = itemView.findViewById(R.id.commentTextView);
+            createdAtTextView   = itemView.findViewById(R.id.createdAtTextView);
         }
     }
 }
