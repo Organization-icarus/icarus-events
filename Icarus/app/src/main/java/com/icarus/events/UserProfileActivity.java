@@ -99,7 +99,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
             phoneEditText.setHint("Not provided");
 
             // Bring context user information into the menu
-            db.collection("users").document(deviceId).get()
+            db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
                     .addOnSuccessListener(snapshot -> {
                         if (snapshot.exists()) {
                             if (snapshot.getString("name") != null) nameEditText.setText(snapshot.getString("name"));
@@ -162,7 +162,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
 
         adminDeleteButton.setOnClickListener(v -> {
             // First remove user from all event entrant subcollections
-            db.collection("events").get()
+            db.collection(FirestoreCollections.USERS_COLLECTION).get()
                     .addOnSuccessListener(eventSnapshots -> {
                         for (QueryDocumentSnapshot eventSnapshot : eventSnapshots) {
                             eventSnapshot.getReference()
@@ -178,7 +178,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                                     deleteOldProfileImage(imageURL);
 
                                     // Then delete the user document itself
-                                    db.collection("users").document(deviceId).delete()
+                                    db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).delete()
                                             .addOnSuccessListener(unused -> {
                                                 Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
                                                 finish();

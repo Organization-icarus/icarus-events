@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.squareup.picasso.Picasso;
 
 import java.util.Map;
 
@@ -24,6 +26,7 @@ import java.util.Map;
  */
 public class UserSettingsActivity extends HeaderNavBarActivity {
     private Button deleteProfileButton;
+    private ImageView profileImage;
     private Switch adminNotificationsSwitch;
     private Switch organizerNotificationsSwitch;
     private User user;
@@ -44,6 +47,14 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
+
+        // Initialize user profile image
+        profileImage = findViewById(R.id.user_settings_profile_image);
+        Picasso.get()
+                .load(user.getImage())
+                .placeholder(R.drawable.poster)
+                .error(R.drawable.poster)           // Optional: shows if link fails
+                .into(profileImage);
 
         // Initialize buttons
         deleteProfileButton = findViewById(R.id.user_profile_delete_button);

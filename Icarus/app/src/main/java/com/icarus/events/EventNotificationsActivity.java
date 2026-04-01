@@ -41,7 +41,7 @@ public class EventNotificationsActivity extends HeaderNavBarActivity {
     }
 
     private void loadNotifications() {
-        db.collection("events")
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(eventId)
                 .collection("notifications")
                 .get()

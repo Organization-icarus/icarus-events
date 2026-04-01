@@ -17,11 +17,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -73,13 +75,24 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
         }
 
         User user = users.get(position);
+        ShapeableImageView profileImage = view
+                .findViewById(R.id.admin_dashboard_user_list_image);
         TextView userName = view
                 .findViewById(R.id.admin_dashboard_user_list_user_name);
         ImageButton removeUserButton = view
                 .findViewById(R.id.admin_dashboard_user_list_remove_user_button);
 
+        // Set profile image
+        Picasso.get()
+                .load(user.getImage())
+                .placeholder(R.drawable.poster)
+                .error(R.drawable.poster)           // Optional: shows if link fails
+                .into(profileImage);
+
+        // Set username
         userName.setText(user.getName());
 
+        // Click username to go to profile
         userName.setOnClickListener(v -> {
             if (user.getId().equals(UserSession.getInstance().getCurrentUser().getId())) {
                 Toast.makeText(context, "You cannot access your own account from this menu", Toast.LENGTH_SHORT).show();
@@ -90,8 +103,9 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
             context.startActivity(intent);
         });
 
+        // Remove user from database
         removeUserButton.setOnClickListener(v -> {
-            // Prevent admin from deleting his own profile from here
+            // Prevent admin from deleting their own profile from here
             if (user.getId().equals(UserSession.getInstance().getCurrentUser().getId())) {
                 Toast.makeText(context, "You cannot delete your own account", Toast.LENGTH_SHORT).show();
                 return;

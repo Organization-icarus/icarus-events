@@ -68,7 +68,7 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
 
         // To get the organizer's name from their ID
         FirebaseFirestore.getInstance()
-                .collection("users")
+                .collection(FirestoreCollections.USERS_COLLECTION)
                 .document(event.getOrganizers().get(0))
                 .get()
                 .addOnSuccessListener(doc -> {

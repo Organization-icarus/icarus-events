@@ -12,6 +12,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.datepicker.OnSelectionChangedListener;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -59,6 +61,12 @@ public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapte
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = comments.get(position);
+
+        Picasso.get()
+                .load(comment.getAuthorImage())
+                .placeholder(R.drawable.poster)
+                .error(R.drawable.poster)           // Optional: shows if link fails
+                .into(holder.profileImage);
 
         holder.authorName.setText(comment.getAuthorName());
 
@@ -154,6 +162,7 @@ public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapte
     static class CommentViewHolder extends RecyclerView.ViewHolder {
         TextView authorName, commentTextView, createdAtTextView;
         ImageView selectIcon;
+        ShapeableImageView profileImage;
 
         CommentViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -161,6 +170,7 @@ public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapte
             commentTextView     = itemView.findViewById(R.id.commentTextView);
             createdAtTextView   = itemView.findViewById(R.id.createdAtTextView);
             selectIcon          = itemView.findViewById(R.id.comment_select_icon);
+            profileImage        = itemView.findViewById(R.id.comment_profile_picture);
         }
     }
 }
