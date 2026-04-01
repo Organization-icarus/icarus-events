@@ -30,6 +30,32 @@
         android:textColor="@color/lightText"
         android:textColorHint="@color/lightTextSemi" />
 
+    <!-- Email field -->
+    <EditText
+        android:id="@+id/user_register_email_field"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="@color/accent_first"
+        android:gravity="center"
+        android:hint="Enter your email"
+        android:inputType="textEmailAddress"
+        android:textColor="@color/lightText"
+        android:textColorHint="@color/lightTextSemi" />
+
+    <!-- Phone field -->
+    <EditText
+        android:id="@+id/user_register_phone_field"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="@color/accent_first"
+        android:gravity="center"
+        android:hint="Enter your phone"
+        android:inputType="phone"
+        android:textColor="@color/lightText"
+        android:textColorHint="@color/lightTextSemi" />
+
     <Button
         android:id="@+id/user_register_button"
         android:layout_width="wrap_content"

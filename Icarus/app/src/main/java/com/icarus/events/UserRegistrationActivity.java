@@ -33,6 +33,8 @@ import java.util.Map;
  */
 public class UserRegistrationActivity extends AppCompatActivity {
     private EditText nameEditText;
+    private EditText emailEditText;
+    private EditText phoneEditText;
     private Button registerButton;
     private FirebaseFirestore db;
     private String deviceId;
@@ -60,6 +62,9 @@ public class UserRegistrationActivity extends AppCompatActivity {
 
         // Initialize text field
         nameEditText = findViewById(R.id.user_register_name_field);
+        emailEditText = findViewById(R.id.user_register_email_field);
+        phoneEditText = findViewById(R.id.user_register_phone_field);
+
 
         // Retrieve device Id
         deviceId = getIntent().getStringExtra("deviceId");
@@ -67,12 +72,21 @@ public class UserRegistrationActivity extends AppCompatActivity {
         // Set buttons on click listeners
         registerButton.setOnClickListener(v -> {
             String name = nameEditText.getText().toString().trim();
+            String email = emailEditText.getText().toString().trim();
+            String phone = phoneEditText.getText().toString().trim();
 
             // Check if user entered name in text field
             if (name.isEmpty()) {
                 Toast.makeText(this, "Please enter your name", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            // Check if user entered email in text field
+            if (email.isEmpty()) {
+                Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String userPhone = phone.isEmpty() ? null : phone;
 
             Boolean isAdmin = false;
 
@@ -84,14 +98,17 @@ public class UserRegistrationActivity extends AppCompatActivity {
             // Send user data to database
             Map<String, Object> userData = new HashMap<>();
             userData.put("name", name);
+            userData.put("email", email);
+            if (userPhone != null) userData.put("phone", phone);
             userData.put("isAdmin", isAdmin);
             userData.put("settings", settings);
             userData.put("image", "");
 
             db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).set(userData)
                     .addOnSuccessListener(unused -> {
+
                         // Add information into global session and return user to event list
-                        User user = new User(deviceId, name, null, null, "", isAdmin, null, null, null);
+                        User user = new User(deviceId, name, email, userPhone, "", isAdmin, null, null, null);
                         UserSession.getInstance().setCurrentUser(user);
                         startActivity(new Intent(this, EntrantEventListActivity.class));
                         finish();
