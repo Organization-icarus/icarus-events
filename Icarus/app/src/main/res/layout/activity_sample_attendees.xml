@@ -1,163 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/primary"
-    android:padding="16dp">
+    android:background="@color/primary">
 
-    <!-- Top bar -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="36dp"
-        android:background="@color/primary_container"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
-
-        <TextView
-            android:id="@+id/backButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="‹"
-            android:textColor="@color/black"
-            android:textSize="@dimen/font_heading_size"
-            android:textStyle="normal" />
-
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Sample Attendees"
-            android:textColor="@color/black"
-            android:textSize="@dimen/font_heading_size"
-            android:textStyle="normal" />
-
-        <TextView
-            android:id="@+id/topRightIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="◉"
-            android:textColor="@color/black"
-            android:textSize="@dimen/font_text_size"
-            android:textStyle="normal" />
-    </LinearLayout>
-
-    <!-- Subtitle -->
-    <TextView
-        android:id="@+id/subtitleText"
-        android:layout_width="wrap_content"
+    <!-- Title card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/OrganizerSampleAttendeesTitleCard"
+        style="@style/ViewCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="18dp"
-        android:paddingStart="14dp"
-        android:paddingTop="6dp"
-        android:paddingEnd="14dp"
-        android:paddingBottom="6dp"
-        android:text="Number to Invite"
-        android:textColor="@color/black"
-        android:textSize="@dimen/font_text_size"
-        android:textStyle="normal" />
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="2dp">
 
-    <!-- Number selector -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="44dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="28dp"
-        android:background="@drawable/rounded_selector_box"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp">
-
-        <TextView
-            android:id="@+id/attendeeCountText"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="10"
-            android:textColor="@color/black"
-            android:textSize="@dimen/font_text_size"
-            android:textStyle="normal" />
+            android:padding="12dp">
 
-        <Button
-            android:id="@+id/plusButton"
-            android:layout_width="40dp"
-            android:layout_height="32dp"
-            android:backgroundTint="@color/primary_container"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:padding="0dp"
-            android:text="+"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:textSize="@dimen/font_text_size"
-            android:textStyle="normal" />
+            <TextView
+                android:id="@+id/OrganizerSampleAttendeesScreenTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Sample Attendees"
+                android:textColor="@color/lightText"
+                android:textSize="@dimen/font_super_heading_size"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
-            android:id="@+id/minusButton"
-            android:layout_width="40dp"
-            android:layout_height="32dp"
-            android:backgroundTint="@color/primary_container"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:padding="0dp"
-            android:text="-"
-            android:textAllCaps="false"
-            android:textColor="@color/black"
-            android:textSize="@dimen/font_text_size"
-            android:textStyle="normal" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/OrganizerSampleAttendeesEventTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="Event Title"
+                android:textColor="@color/lightText"
+                android:textSize="@dimen/font_heading_size"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/OrganizerSampleAttendeesScreenTitle"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- Action buttons -->
-    <LinearLayout
-        android:layout_width="wrap_content"
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Stepper card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/OrganizerSampleAttendeesWidget"
+        style="@style/ViewCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/OrganizerSampleAttendeesTitleCard"
+        app:strokeWidth="2dp">
 
-        <Button
-            android:id="@+id/cancelButton"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="20dp"
-            android:backgroundTint="@color/attention"
-            android:text="← Cancel"
-            android:textAllCaps="false"
-            android:textColor="@color/primary"
-            android:textSize="@dimen/font_text_size"
-            android:textStyle="normal" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
 
-        <Button
-            android:id="@+id/sampleButton"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
-            android:backgroundTint="@color/primary_container_highlighted"
-            android:text="✓ Sample"
-            android:textAllCaps="false"
-            android:textColor="@color/primary"
-            android:textSize="@dimen/font_text_size"
-            android:textStyle="normal" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/OrganizerSampleAttendeesInviteText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Number to Invite to Event"
+                android:textColor="@color/lightText"
+                android:textSize="@dimen/font_subheading_size"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Spacer -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+            <Button
+                android:id="@+id/OrganizerSampleAttendeesMinusButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:backgroundTint="@color/accent_first"
+                android:text="−"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:padding="0dp"
+                android:textAllCaps="false"
+                android:textColor="@color/darkText"
+                android:textSize="@dimen/font_heading_size"
+                app:cornerRadius="8dp"
+                app:layout_constraintBottom_toBottomOf="@id/OrganizerSampleAttendeesCountText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/OrganizerSampleAttendeesCountText" />
+
+            <EditText
+                android:id="@+id/OrganizerSampleAttendeesCountText"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="@color/lightText"
+                android:textSize="@dimen/font_heading_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/OrganizerSampleAttendeesPlusButton"
+                app:layout_constraintStart_toEndOf="@id/OrganizerSampleAttendeesMinusButton"
+                app:layout_constraintTop_toBottomOf="@id/OrganizerSampleAttendeesInviteText" />
+
+            <Button
+                android:id="@+id/OrganizerSampleAttendeesPlusButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:backgroundTint="@color/accent_first"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                android:text="+"
+                android:textAllCaps="false"
+                android:textColor="@color/darkText"
+                android:textSize="@dimen/font_heading_size"
+                app:cornerRadius="8dp"
+                app:layout_constraintBottom_toBottomOf="@id/OrganizerSampleAttendeesCountText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/OrganizerSampleAttendeesCountText" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Action buttons card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/OrganizerSampleAttendeesButtons"
+        style="@style/ViewCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/OrganizerSampleAttendeesWidget"
+        app:strokeWidth="2dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp">
+
+            <Button
+                android:id="@+id/OrganizerSampleAttendeesCancelButton"
+                android:layout_width="130dp"
+                android:layout_height="44dp"
+                android:backgroundTint="@color/attention"
+                android:text="Cancel"
+                android:textStyle="bold"
+                android:textColor="@color/darkText"
+                android:textSize="@dimen/font_text_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/OrganizerSampleAttendeesSampleButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/OrganizerSampleAttendeesSampleButton"
+                android:layout_width="130dp"
+                android:layout_height="44dp"
+                android:layout_marginStart="16dp"
+                android:backgroundTint="@color/accent_first"
+                android:text="Sample"
+                android:textStyle="bold"
+                android:textColor="@color/darkText"
+                android:textSize="@dimen/font_text_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/OrganizerSampleAttendeesCancelButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
     <include
         android:id="@+id/nav_bar"
         layout="@layout/nav_bar"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_gravity="bottom"/>
-</LinearLayout>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
