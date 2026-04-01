@@ -60,6 +60,7 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
     private String eventId;
     private String eventName;
     private String posterURL;
+    private Boolean locationEnabled;
     private Boolean isPrivate;
 
     private FirebaseFirestore db;
@@ -94,7 +95,9 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
                     eventName = document.getString("name");
                     eventTitle.setText(eventName);
                     isPrivate = document.getBoolean("isPrivate");
+                    locationEnabled = document.getBoolean("geolocation");
                     if(isPrivate == null){isPrivate = false;}
+                    if(locationEnabled == null){locationEnabled = false;}
                     if(isPrivate){
                         inviteEntrant.setText("Invite Specific Entrant");
                     } else {
@@ -136,10 +139,14 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
             imagePickerLauncher.launch("image/*");
         });
         ViewEntrantMap.setOnClickListener(v -> {
-            // View Entrant Map
-            Intent intent = new Intent(this, EntrantMapActivity.class);
-            intent.putExtra("eventId", eventId);
-            startActivity(intent);
+            if (locationEnabled) {
+                // View Entrant Map
+                Intent intent = new Intent(this, EntrantMapActivity.class);
+                intent.putExtra("eventId", eventId);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Geolocation is not enabled for this event.", Toast.LENGTH_SHORT).show();
+            }
         });
         ViewEntrantList.setOnClickListener(v -> {
             // View Entrant List

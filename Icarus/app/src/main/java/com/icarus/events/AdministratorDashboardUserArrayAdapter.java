@@ -83,11 +83,16 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
                 .findViewById(R.id.admin_dashboard_user_list_remove_user_button);
 
         // Set profile image
-        Picasso.get()
-                .load(user.getImage())
-                .placeholder(R.drawable.poster)
-                .error(R.drawable.poster)           // Optional: shows if link fails
-                .into(profileImage);
+        String imageUrl = user.getImage();
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            Picasso.get()
+                    .load(imageUrl)
+                    .placeholder(R.drawable.poster)
+                    .error(R.drawable.poster)
+                    .into(profileImage);
+        } else {
+            profileImage.setImageResource(R.drawable.poster);
+        }
 
         // Set username
         userName.setText(user.getName());
