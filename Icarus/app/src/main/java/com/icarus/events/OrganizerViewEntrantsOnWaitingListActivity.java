@@ -4,12 +4,14 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -78,7 +80,11 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
 
         //Set default as waiting
         filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
-        loadList("waiting");
+
+        MaterialButton defaultButton = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
+        defaultButton.setTextColor(getColor(R.color.darkText));
+        status.set("waiting");
+        loadList(status.get());
 
         //Set event Title
         db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId)
@@ -94,10 +100,21 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
 
         filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) ->{
             if (!isChecked) return; // ← ignore uncheck events entirely
+
+            for (int i = 0; i < group.getChildCount(); i++) {
+                View view = group.getChildAt(i);
+                if (view instanceof MaterialButton) {
+                    ((MaterialButton) view).setTextColor(getColor(R.color.lightText));
+                }
+            }
+            MaterialButton selectedButton = findViewById(checkedId);
+            selectedButton.setTextColor(getColor(R.color.darkText));
+
             backButton.setText("Go Back");
             eventListArrayAdapter.clearSelections();
             selectAllButton.setText("Select All");
             status.set(null);
+
             if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_waiting)){
                 status.set("waiting");
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_chosen)){
@@ -133,7 +150,9 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
             EditText input = new EditText(this);
             input.setHint("The Message you wish to send");
             input.setPadding(48, 24, 48, 24);
-            input.setHintTextColor(0x80FFFFFF);
+            input.setHintTextColor(getColor(R.color.lightTextSemi));
+            input.setTextColor(getColor(R.color.lightText));
+
             new MaterialAlertDialogBuilder(this, R.style.CustomAlertDialog)
                     .setTitle("Send Message to Entrants")
                     .setView(input)
@@ -143,7 +162,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                             Toast.makeText(this, "Message cannot be empty", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        sendMessage(message, String.valueOf(status), new ArrayList<>(selectedIds));
+                        sendMessage(message, status.get(), new ArrayList<>(selectedIds));
 
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
