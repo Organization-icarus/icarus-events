@@ -102,19 +102,19 @@
                         android:src="@drawable/poster"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <Button
                         android:id="@+id/OrganizerManageEventUpdatePoster"
+                        style="@style/AppButton"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        style="@style/AppButton"
                         android:layout_marginTop="12dp"
                         android:text="Update Poster"
                         android:textSize="@dimen/font_text_size"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventViewImage"/>
+                        app:layout_constraintTop_toBottomOf="@+id/OrganizerManageEventViewImage" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -212,7 +212,6 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </com.google.android.material.card.MaterialCardView>
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
