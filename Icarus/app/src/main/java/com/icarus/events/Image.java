@@ -76,8 +76,16 @@ public class Image {
                                 .document(this.publicId)
                                 .delete()
                                 .addOnSuccessListener(unused -> {
-                                    // Remove image URl from all events that use it
+                                    // Remove image URl from all events and users that use it
                                     db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                                            .whereEqualTo("image", this.URL)
+                                            .get()
+                                            .addOnSuccessListener(querySnapshot -> {
+                                                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                                    doc.getReference().update("image", "No Image");
+                                                }
+                                            });
+                                    db.collection(FirestoreCollections.USERS_COLLECTION)
                                             .whereEqualTo("image", this.URL)
                                             .get()
                                             .addOnSuccessListener(querySnapshot -> {

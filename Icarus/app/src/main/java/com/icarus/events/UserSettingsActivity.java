@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -59,7 +60,6 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
         // Taken from Claude March 11th 2026,
         // "I need to modify my query to also delete the user from the event collection entrant subcollection"
         deleteProfileButton.setOnClickListener(v -> {
-            // First remove user from all event entrant subcollections
             db.collection(FirestoreCollections.EVENTS_COLLECTION).get()
                     .addOnSuccessListener(eventSnapshots -> {
                         for (QueryDocumentSnapshot eventSnapshot : eventSnapshots) {
@@ -68,21 +68,28 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
                                     .document(deviceId)
                                     .delete();
                         }
-                        // Then delete the user document itself
-                        db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).delete()
-                                .addOnSuccessListener(unused -> {
-                                    Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
-                                    UserSession.getInstance().clear();
-                                    startActivity(new Intent(this, MainActivity.class));
-                                    finish();
-                                })
-                                .addOnFailureListener(e ->
-                                        Toast.makeText(this, "Failed to delete profile", Toast.LENGTH_SHORT).show());
+
+                        // Delete profile image
+                        db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
+                                .addOnSuccessListener(userSnapshot -> {
+                                    String imageURL = userSnapshot.getString("image");
+                                    deleteOldProfileImage(imageURL);
+
+                                    // Delete the user document after
+                                    db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).delete()
+                                            .addOnSuccessListener(unused -> {
+                                                Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
+                                                UserSession.getInstance().clear();
+                                                startActivity(new Intent(this, MainActivity.class));
+                                                finish();
+                                            })
+                                            .addOnFailureListener(e ->
+                                                    Toast.makeText(this, "Failed to delete profile", Toast.LENGTH_SHORT).show());
+                                });
                     })
                     .addOnFailureListener(e ->
                             Toast.makeText(this, "Failed to delete profile", Toast.LENGTH_SHORT).show());
         });
-
 
         // Taken from Claude March 11th 2026, "What query can I use to load in current settings"
         db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
@@ -114,5 +121,22 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
                 .addOnFailureListener(e ->
                         Log.e("UserSettings", "Failed to load settings: " + e.getMessage()));
 
+    }
+
+    /**
+     * Delete image from firestore database
+     *
+     * @param URL   URL of image to delete
+     */
+    private void deleteOldProfileImage(String URL) {
+        db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                .whereEqualTo("URL", URL)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        Image oldImage = new Image(URL, doc.getId());
+                        oldImage.delete(this, db);
+                    }
+                });
     }
 }

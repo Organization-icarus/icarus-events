@@ -75,6 +75,7 @@ public class OrganizerCreateEventTest {
                 "Test Organizer",
                 "organizer@example.com",
                 "1234567890",
+                "",
                 false,
                 new ArrayList<>(),
                 new ArrayList<>(),

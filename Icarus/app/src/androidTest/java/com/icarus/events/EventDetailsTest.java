@@ -102,6 +102,7 @@ public class EventDetailsTest {
                             "Test Entrant",
                             "test@email.com",
                             "1234567890",
+                            "",
                             false,
                             new java.util.ArrayList<>(),
                             new java.util.ArrayList<>(),
