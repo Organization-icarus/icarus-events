@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Adapter for displaying notification items.
@@ -29,7 +28,10 @@ public class NotificationListAdapter extends ArrayAdapter<NotificationItem> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        View view = context.getLayoutInflater().inflate(R.layout.notification_list_item, parent, false);
+        View view = convertView;
+        if (view == null) {
+            view = context.getLayoutInflater().inflate(R.layout.notification_list_item, parent, false);
+        }
 
         TextView typeText = view.findViewById(R.id.notification_type_text);
         TextView messageText = view.findViewById(R.id.notification_message_text);
@@ -45,8 +47,10 @@ public class NotificationListAdapter extends ArrayAdapter<NotificationItem> {
                 typeLabel = "Co-organizer Invite";
                 break;
             case "not_selected":
+                typeLabel = "Not Selected";
+                break;
             case "selected":
-                typeLabel = "Lottery Result";
+                typeLabel = "Selected";
                 break;
             default:
                 typeLabel = "Notification";

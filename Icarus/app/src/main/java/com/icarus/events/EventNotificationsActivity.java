@@ -11,8 +11,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * Activity for viewing all notifications sent for a specific event.
+ * <p>
+ * Organizers and admins can use this page to review notification history
+ * related to an event.
+ *
+ * @author Ben Salmon
+ */
 public class EventNotificationsActivity extends NavigationBarActivity {
 
     private FirebaseFirestore db;
@@ -21,49 +28,71 @@ public class EventNotificationsActivity extends NavigationBarActivity {
     private ListView notificationsList;
 
     private final ArrayList<NotificationItem> notifications = new ArrayList<>();
+    private NotificationListAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_notifications);
+        setupNavBar();
 
         db = FirebaseFirestore.getInstance();
 
         titleText = findViewById(R.id.notifications_page_title);
         notificationsList = findViewById(R.id.notifications_list_view);
 
+        adapter = new NotificationListAdapter(this, notifications);
+        notificationsList.setAdapter(adapter);
+
         eventId = getIntent().getStringExtra("eventId");
 
-        titleText.setText("Notifications");
+        titleText.setText("Event Notifications");
 
         if (eventId != null && !eventId.isEmpty()) {
             loadNotifications();
+        } else {
+            Toast.makeText(this, "Event ID missing", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
+    /**
+     * Loads all notifications sent for this event.
+     */
     private void loadNotifications() {
-        String currentUserId = UserSession.getInstance().getCurrentUser().getId();
         notifications.clear();
 
         db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
                 .whereEqualTo("eventId", eventId)
-                .whereArrayContains("recipients", currentUserId)
+                .orderBy("date", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        ArrayList<String> recipients =
+                                (ArrayList<String>) doc.get("recipients");
+
+                        Boolean isEvent = doc.getBoolean("isEvent");
+                        if (isEvent == null) {
+                            isEvent = true;
+                        }
+
                         NotificationItem notification = new NotificationItem(
-                                eventId,
+                                doc.getString("eventId"),
                                 doc.getString("sender"),
-                                doc.getBoolean("isEvent"),
-                                (ArrayList<String>) doc.get("recipients"),
-                                doc.getString("message"),
-                                doc.getString("type")
+                                isEvent,
+                                recipients != null ? recipients : new ArrayList<>(),
+                                doc.getString("message") != null ? doc.getString("message") : "",
+                                doc.getString("type") != null ? doc.getString("type") : "general"
                         );
+
                         notifications.add(notification);
                     }
 
-                    NotificationListAdapter adapter = new NotificationListAdapter(this, notifications);
-                    notificationsList.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+
+                    if (notifications.isEmpty()) {
+                        Toast.makeText(this, "No notifications found for this event", Toast.LENGTH_SHORT).show();
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load notifications", Toast.LENGTH_SHORT).show();

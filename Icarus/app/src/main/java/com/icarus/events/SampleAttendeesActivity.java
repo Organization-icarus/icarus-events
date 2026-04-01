@@ -169,9 +169,9 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
                     batch.commit()
                             .addOnSuccessListener(unused -> {
                                 Toast.makeText(
-                                    this,
-                                    "Sampled " + numberToMove + " entrants.",
-                                    Toast.LENGTH_SHORT
+                                        this,
+                                        "Sampled " + numberToMove + " entrants.",
+                                        Toast.LENGTH_SHORT
                                 ).show();
 
                                 db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).get()
@@ -186,29 +186,14 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
                                                     "selected"
                                             );
                                             notification.sendNotification();
-
-                                            if (!rejectedEntrants.isEmpty()) {
-                                                NotificationItem rejectedNotification = new NotificationItem(
-                                                        eventId,
-                                                        UserSession.getInstance().getCurrentUser().getId(),
-                                                        true,
-                                                        rejectedEntrants,
-                                                        "Unfortunately, you were not selected for " + event.getString("name")
-                                                                + ". There may still be more samples in the future. Thank you for your interest.",
-                                                        "not_selected"
-                                                );
-                                                rejectedNotification.sendNotification();
-                                            }
                                         });
                             })
                             .addOnFailureListener(e -> {
                                 Log.e(TAG, "Failed to update entrant statuses", e);
                                 Toast.makeText(this, "Failed to update entrants.", Toast.LENGTH_SHORT).show();
                             });
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to load waiting entrants", e);
-                    Toast.makeText(this, "Failed to load waiting entrants.", Toast.LENGTH_SHORT).show();
                 });
     }
 }
+
+

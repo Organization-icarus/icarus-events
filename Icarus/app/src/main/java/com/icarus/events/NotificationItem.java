@@ -18,7 +18,7 @@ public class NotificationItem {
     private String type;
     private final FirebaseFirestore db;
 
-//    TO DO: add type can only be certain values
+    //    TO DO: add type can only be certain values
     public NotificationItem(String eventId, String sender, String type) {
         this.eventId = eventId;
         this.sender = sender;
@@ -41,18 +41,37 @@ public class NotificationItem {
         this.db = FirebaseFirestore.getInstance();
     }
 
-    public String getEventId() { return this.eventId; }
+    public String getEventId() {
+        return this.eventId;
+    }
 
-    public String getSender() { return this.sender; }
-    public ArrayList<String> getRecipients() { return this.recipients; }
-    public String getMessage() { return this.message; }
+    public String getSender() {
+        return this.sender;
+    }
 
-    public boolean isEventNotification() { return this.isEvent; }
-    public boolean isSystemNotification() { return this.isSystem; }
+    public ArrayList<String> getRecipients() {
+        return this.recipients;
+    }
 
-    public String getType() { return type; }
+    public String getMessage() {
+        return this.message;
+    }
 
-    public void setType(String type) { this.type = type; }
+    public boolean isEventNotification() {
+        return this.isEvent;
+    }
+
+    public boolean isSystemNotification() {
+        return this.isSystem;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public void setEvent() {
         this.isEvent = true;
@@ -64,9 +83,13 @@ public class NotificationItem {
         this.isEvent = false;
     }
 
-    public void setRecipients(ArrayList<String> users) { this.recipients = new ArrayList<String>(users); }
+    public void setRecipients(ArrayList<String> users) {
+        this.recipients = new ArrayList<String>(users);
+    }
 
-    public void setMessage(String message) { this.message = message; }
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     public void addRecipient(String userId) {
         if (!this.recipients.contains(userId)) {
@@ -74,10 +97,12 @@ public class NotificationItem {
         }
     }
 
-    public void removeRecipient(String userId) { this.recipients.remove(userId); }
+    public void removeRecipient(String userId) {
+        this.recipients.remove(userId);
+    }
 
     public void sendNotification() {
-        if (this.message == null || this.message.trim().isEmpty()){
+        if (this.message == null || this.message.trim().isEmpty()) {
             throw new IllegalArgumentException("Notification message cannot be null or empty");
         }
         if (this.recipients.isEmpty()) {
@@ -93,11 +118,11 @@ public class NotificationItem {
         data.put("message", this.message);
         data.put("type", this.type);
         data.put("date", new Date());
+
         this.db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
                 .add(data)
-                .addOnSuccessListener(docRef -> {})
-                .addOnFailureListener(e -> {
-                    throw new RuntimeException("Failed to send notification", e);
-                });
+                .addOnSuccessListener(docRef -> {
+                })
+                .addOnFailureListener(Throwable::printStackTrace);
     }
 }

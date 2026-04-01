@@ -55,8 +55,8 @@ import java.util.Map;
 public class EntrantEventListActivity extends NavigationBarActivity {
     //Define attributes
     private RecyclerView eventListView;
-    private EditText searchTextFilter;
     private String currentSearch = "";
+    private EditText searchTextFilter;
     private MaterialButton filterCategoryButton;
     private MaterialButton qrButton;
     private FloatingActionButton addEvent;
@@ -196,6 +196,10 @@ public class EntrantEventListActivity extends NavigationBarActivity {
                 ArrayList<String> activeEventIds = new ArrayList<>();
 
                 for (QueryDocumentSnapshot snapshot : value) {
+                    Boolean isPrivate = snapshot.getBoolean("isPrivate");
+                    if (Boolean.TRUE.equals(isPrivate)) {
+                        continue;
+                    }
                     String id = snapshot.getId();
                     String name = snapshot.getString("name");
                     String category  = snapshot.getString("category");

@@ -328,11 +328,15 @@ public class EventDetailsActivity extends NavigationBarActivity {
 
         // TODO: adjust intent destination
         notificationBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(
-                    EventDetailsActivity.this,
-                    EventNotificationsActivity.class
-            );
-            intent.putExtra("eventId", finalEventId);
+            Intent intent;
+
+            if (Boolean.TRUE.equals(isAdmin) || Boolean.TRUE.equals(isOrganizer)) {
+                intent = new Intent(EventDetailsActivity.this, EventNotificationsActivity.class);
+                intent.putExtra("eventId", finalEventId);
+            } else {
+                intent = new Intent(EventDetailsActivity.this, UserNotificationsActivity.class);
+            }
+
             startActivity(intent);
         });
 
@@ -520,8 +524,10 @@ public class EventDetailsActivity extends NavigationBarActivity {
         organizers. */
 
         // Shared: admin + organizer
+
+        notificationBtn.setVisibility(View.VISIBLE);
+
         if (isAdmin || isOrganizer) {
-            notificationBtn.setVisibility(View.VISIBLE);
             deleteBtn.setVisibility(View.VISIBLE);
         }
 
