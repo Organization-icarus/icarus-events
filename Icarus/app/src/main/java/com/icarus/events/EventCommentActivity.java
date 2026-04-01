@@ -15,10 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,9 +36,11 @@ public class EventCommentActivity extends HeaderNavBarActivity {
 
     private String username;
     private String userId;
+    private String userImage;
     private String eventId;
 
     private EditText commentInput;
+    private ShapeableImageView commentProfileImage;
     private MaterialButton sendCommentButton;
     private MaterialButton manageButton;
 
@@ -75,6 +79,7 @@ public class EventCommentActivity extends HeaderNavBarActivity {
 
         recyclerView = findViewById(R.id.event_comments_list);
         commentInput = findViewById(R.id.comment_input);
+        commentProfileImage = findViewById(R.id.new_comment_profile_picture);
         sendCommentButton = findViewById(R.id.send_comment_button);
         manageButton = findViewById(R.id.manage_button);
         manageButton.setVisibility(View.GONE);
@@ -84,6 +89,14 @@ public class EventCommentActivity extends HeaderNavBarActivity {
         User user = UserSession.getInstance().getCurrentUser();
         username = user.getName();
         userId = user.getId();
+        userImage = user.getImage();
+
+        // Set current users profile image in the comment footer
+        Picasso.get()
+                .load(userImage)
+                .placeholder(R.drawable.poster)
+                .error(R.drawable.poster)           // Optional: shows if link fails
+                .into(commentProfileImage);
 
         commentList = new ArrayList<>();
         canDelete = false;
@@ -109,7 +122,7 @@ public class EventCommentActivity extends HeaderNavBarActivity {
 
 
     private void listenToPermissions() {
-        eventListener = db.collection("events")
+        eventListener = db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(eventId)
                 .addSnapshotListener((documentSnapshot, error) -> {
                     if (error != null) {
@@ -128,7 +141,7 @@ public class EventCommentActivity extends HeaderNavBarActivity {
                     updateDeletePermission();
                 });
 
-        userListener = db.collection("users")
+        userListener = db.collection(FirestoreCollections.USERS_COLLECTION)
                 .document(userId)
                 .addSnapshotListener((documentSnapshot, error) -> {
                     if (error != null) {
@@ -161,7 +174,7 @@ public class EventCommentActivity extends HeaderNavBarActivity {
 
         for (Comment comment: selectedComments) {
             if (comment.getDocumentId() != null) {
-                db.collection("events")
+                db.collection(FirestoreCollections.EVENTS_COLLECTION)
                         .document(eventId)
                         .collection("comments")
                         .document(comment.getDocumentId())
@@ -214,6 +227,7 @@ public class EventCommentActivity extends HeaderNavBarActivity {
         Comment newComment = new Comment(
                 userId,
                 username,
+                userImage,
                 text,
                 new Date(),
                 false
@@ -221,7 +235,7 @@ public class EventCommentActivity extends HeaderNavBarActivity {
 
         sendCommentButton.setEnabled(false);
 
-        db.collection("events")
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(eventId)
                 .collection("comments")
                 .add(newComment)
@@ -238,7 +252,7 @@ public class EventCommentActivity extends HeaderNavBarActivity {
 
 
     private void loadComments() {
-        commentsListener = db.collection("events")
+        commentsListener = db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(eventId)
                 .collection("comments")
                 .orderBy("createdAt", Query.Direction.DESCENDING)
