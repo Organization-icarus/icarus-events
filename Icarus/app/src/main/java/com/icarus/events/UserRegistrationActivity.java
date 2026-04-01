@@ -113,7 +113,7 @@ public class UserRegistrationActivity extends AppCompatActivity {
                     .addOnSuccessListener(unused -> {
 
                         // Add information into global session and return user to event list
-                        User user = new User(deviceId, name, email, userPhone, "", isAdmin, null, null, null);
+                        User user = new User(deviceId, name, email, userPhone, "No Image", isAdmin, null, null, null);
                         UserSession.getInstance().setCurrentUser(user);
                         startActivity(new Intent(this, EntrantEventListActivity.class));
                         finish();

@@ -56,11 +56,16 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
         profileImage = findViewById(R.id.user_settings_profile_image);
         db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
                 .addOnSuccessListener(snapshot -> {
-                    Picasso.get()
-                            .load(snapshot.getString("image"))
-                            .placeholder(R.drawable.poster)
-                            .error(R.drawable.poster)           // Optional: shows if link fails
-                            .into(profileImage);
+                    String imageURL = snapshot.getString("image");
+                    if (imageURL != null && !imageURL.isEmpty()) {
+                        Picasso.get()
+                                .load(imageURL)
+                                .placeholder(R.drawable.poster)
+                                .error(R.drawable.poster)           // Optional: shows if link fails
+                                .into(profileImage);
+                    } else {
+                        profileImage.setImageResource(R.drawable.poster);
+                    }
                 });
 
         // Initialize buttons

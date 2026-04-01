@@ -105,7 +105,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                             if (snapshot.getString("name") != null) nameEditText.setText(snapshot.getString("name"));
                             if (snapshot.getString("email") != null) emailEditText.setText(snapshot.getString("email"));
                             if (snapshot.getString("phone") != null) phoneEditText.setText(snapshot.getString("phone"));
-                            if (snapshot.getString("image") != null) {
+                            if (snapshot.getString("image") != null && !snapshot.getString("image").isEmpty()) {
                                 profileImageURL = snapshot.getString("image");
                                 Picasso.get()
                                         .load(profileImageURL)
@@ -343,17 +343,19 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                                                             .update("image", newProfileImageURL);
                                                     profileImageURL = newProfileImageURL;
                                                     profileImage.setImageURI(uri);
+                                                    Toast.makeText(UserProfileActivity.this,
+                                                            "Image uploaded", Toast.LENGTH_SHORT).show();
                                                 })
                                                 .addOnFailureListener(e -> {
                                                     Toast.makeText(UserProfileActivity.this,
-                                                            "Failed to add image to firestore", Toast.LENGTH_SHORT).show();
+                                                            "Image upload failed", Toast.LENGTH_SHORT).show();
                                                 });
                                     }
 
                                     @Override
                                     public void onError(String requestId, ErrorInfo error) {
                                         Toast.makeText(UserProfileActivity.this,
-                                                "Failed to Upload Image.", Toast.LENGTH_SHORT).show();
+                                                "Image upload failed", Toast.LENGTH_SHORT).show();
                                         Log.e("UPLOAD_ERROR", error.getDescription());
                                     }
 

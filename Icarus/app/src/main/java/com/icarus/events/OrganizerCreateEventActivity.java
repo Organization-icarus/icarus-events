@@ -317,10 +317,12 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
                                         .document(publicId)
                                         .set(imageData)
                                         .addOnSuccessListener(unused -> {
+                                            Toast.makeText(OrganizerCreateEventActivity.this,
+                                                    "Image uploaded", Toast.LENGTH_SHORT).show();
                                         })
                                         .addOnFailureListener(e -> {
                                             Toast.makeText(OrganizerCreateEventActivity.this,
-                                                    "Failed to add image to firestore", Toast.LENGTH_SHORT).show();
+                                                    "Image upload failed", Toast.LENGTH_SHORT).show();
                                         });
                                 // Save event to firestore
                                 saveEvent(finalName, finalDescription, finalCategory, finalCapacity, posterURL, finalLocation, finalOrganizerIds);
@@ -330,7 +332,7 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
                             public void onError(String requestId, ErrorInfo error) {
                                 posterURL = "";
                                 Toast.makeText(OrganizerCreateEventActivity.this,
-                                        "Failed to Upload Image.", Toast.LENGTH_SHORT).show();
+                                        "Image upload failed", Toast.LENGTH_SHORT).show();
                                 Log.e("UPLOAD_ERROR", error.getDescription());
                                 // Save event to firestore with empty poster
                                 saveEvent(finalName, finalDescription,finalCategory, finalCapacity, posterURL, finalLocation, finalOrganizerIds);

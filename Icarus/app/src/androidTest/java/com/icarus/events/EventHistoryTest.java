@@ -109,7 +109,7 @@ public class EventHistoryTest {
                             .addOnSuccessListener(unused -> {
                                 testUser = new User(entrantId, "Test Entrant",
                                         "testentrant@email.com",
-                                        "1234567890", "", false,
+                                        "1234567890", "No Image", false,
                                         new ArrayList<>(List.of(eventId)),
                                         new ArrayList<>(),
                                         new HashMap<>());

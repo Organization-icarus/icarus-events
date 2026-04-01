@@ -3,6 +3,7 @@ package com.icarus.events;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.cloudinary.android.MediaManager;
@@ -93,21 +94,16 @@ public class Image {
                                                     doc.getReference().update("image", "No Image");
                                                 }
                                             });
-                                    Toast.makeText(context, "Image deleted", Toast.LENGTH_SHORT).show();
                                 })
                                 .addOnFailureListener(e ->
-                                        Toast.makeText(context, "Failed to delete from database", Toast.LENGTH_SHORT).show()
+                                        Log.e("IMAGE_DELETE_ERROR", e.getMessage())
                                 );
                     });
                 } else {
-                    new Handler(Looper.getMainLooper()).post(() ->
-                            Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
-                    );
+                    Log.e("IMAGE_DELETE_ERROR", "Cloudinary delete failed for publicId: " + this.publicId);
                 }
             } catch (IOException e) {
-                new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
-                );
+                Log.e("IMAGE_DELETE_ERROR", e.getMessage());
             }
         }).start();
     }
