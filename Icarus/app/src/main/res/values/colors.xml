@@ -17,7 +17,7 @@
     <!-- A darker background color to indicate selection -->
     <color name="primary_container_highlighted">#FF6750A4</color>
     <!-- For buttons that require sensitive action (delete, remove, etc)  -->
-    <color name="attention">#FFB00020</color>
+    <color name="attention">#D32F2F</color>
     <!-- Rotating accent colors for lists -->
     <color name="accent_first">#FFFFBD61</color>
     <color name="accent_second">#FF77FFF2</color>

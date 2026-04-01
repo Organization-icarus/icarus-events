@@ -164,6 +164,7 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
             }else{
                 Intent intent = new Intent(this, SampleAttendeesActivity.class);
                 intent.putExtra("eventId", eventId);
+                intent.putExtra("ActivityName", eventName);
                 startActivity(intent);
             }
 
