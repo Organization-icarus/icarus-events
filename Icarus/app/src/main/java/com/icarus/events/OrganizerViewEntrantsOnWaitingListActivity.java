@@ -4,14 +4,14 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.app.AlertDialog;
-import android.widget.EditText;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -19,8 +19,12 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Activity that allows organizers to view the entrants on the waiting,
@@ -69,13 +73,18 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
         eventListArrayAdapter = new OraganizerEntrantViewListArrayAdapter(this, entrantList);
         entrantsOnWaitingList.setAdapter(eventListArrayAdapter);
         Set<String> selectedIds = eventListArrayAdapter.getSelectedIds();
+        AtomicReference<String> status = new AtomicReference<>();
 
         //get eventId
         eventId = getIntent().getStringExtra("eventId");
 
         //Set default as waiting
         filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
-        loadList("waiting");
+
+        MaterialButton defaultButton = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
+        defaultButton.setTextColor(getColor(R.color.darkText));
+        status.set("waiting");
+        loadList(status.get());
 
         //Set event Title
         db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId)
@@ -91,21 +100,32 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
 
         filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) ->{
             if (!isChecked) return; // ← ignore uncheck events entirely
+
+            for (int i = 0; i < group.getChildCount(); i++) {
+                View view = group.getChildAt(i);
+                if (view instanceof MaterialButton) {
+                    ((MaterialButton) view).setTextColor(getColor(R.color.lightText));
+                }
+            }
+            MaterialButton selectedButton = findViewById(checkedId);
+            selectedButton.setTextColor(getColor(R.color.darkText));
+
             backButton.setText("Go Back");
             eventListArrayAdapter.clearSelections();
             selectAllButton.setText("Select All");
-            String status = null;
+            status.set(null);
+
             if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_waiting)){
-                status = "waiting";
+                status.set("waiting");
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_chosen)){
-                status = "selected";
+                status.set("selected");
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_cancelled)){
-                status = "rejected";
+                status.set("rejected");
             }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_final)){
-                status = "registered";
+                status.set("registered");
                 backButton.setText("Export CSV");
             }
-            loadList(status);
+            loadList(status.get());
         });
 
         backButton.setOnClickListener(v -> {
@@ -130,7 +150,9 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
             EditText input = new EditText(this);
             input.setHint("The Message you wish to send");
             input.setPadding(48, 24, 48, 24);
-            input.setHintTextColor(0x80FFFFFF);
+            input.setHintTextColor(getColor(R.color.lightTextSemi));
+            input.setTextColor(getColor(R.color.lightText));
+
             new MaterialAlertDialogBuilder(this, R.style.CustomAlertDialog)
                     .setTitle("Send Message to Entrants")
                     .setView(input)
@@ -140,7 +162,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                             Toast.makeText(this, "Message cannot be empty", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        // TODO: send message to selectedIds
+                        sendMessage(message, status.get(), new ArrayList<>(selectedIds));
 
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
@@ -215,5 +237,30 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
         } catch (Exception e) {
             Toast.makeText(this, "Export failed", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void sendMessage(String message, String type, ArrayList<String> recipients) {
+        User user = UserSession.getInstance().getCurrentUser();
+        String userId = user.getId();
+        Date now = new Date();
+
+        Map<String, Object> notification = new HashMap<>();
+        notification.put("date", now);
+        notification.put("eventID", eventId);
+        notification.put("isEvent", true);
+        notification.put("isSystem", false);
+        notification.put("message", message);
+        notification.put("recipients", recipients);
+        notification.put("sender", userId);
+        notification.put("type", type);
+
+        db.collection("notifications")
+                .add(notification)
+                .addOnSuccessListener(dummy -> {
+                    Toast.makeText(this, "Message sent", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to send message", Toast.LENGTH_SHORT).show();
+                });
     }
 }
