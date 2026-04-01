@@ -175,7 +175,6 @@
         android:layout_width="105dp"
         android:layout_height="88dp"
         android:backgroundTint="@color/lightText"
-        android:tint="@color/accent_first"
         app:layout_constraintBottom_toTopOf="@+id/user_profile_name_edit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"

@@ -115,7 +115,7 @@ public class EntrantWaitlistTest {
                 .addOnSuccessListener(doc -> {
                     // Create User object for session
                     testUser = new User(doc.getId(), "Test Entrant",
-                            "entrant@email.com", "123012312",
+                            "entrant@email.com", "123012312", "",
                             false, new ArrayList<String>(),
                             new ArrayList<String>(), new HashMap<String, Object>());
                     UserSession.getInstance().setCurrentUser(testUser);

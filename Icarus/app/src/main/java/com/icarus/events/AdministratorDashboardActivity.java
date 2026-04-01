@@ -36,7 +36,7 @@ import java.util.Map;
  * @author Benjamin Hall
  */
 public class AdministratorDashboardActivity extends HeaderNavBarActivity {
-    private ListView eventListView;
+    private RecyclerView eventListView;
     private ListView userListView;
     private ListView imageListView;
     private Button showEventListButton;
@@ -149,9 +149,10 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
                 for (QueryDocumentSnapshot snapshot : value) {
                     String id = snapshot.getId();
                     String name = snapshot.getString("name");
+                    String image = snapshot.getString("image");
 
                     userArrayList.add(new User(id, name, null, null,
-                            null, null, null, null));
+                            image, null, null, null, null));
                 }
                 userArrayAdapter.notifyDataSetChanged();
             }

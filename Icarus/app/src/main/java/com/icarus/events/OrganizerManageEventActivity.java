@@ -246,6 +246,11 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
         startActivity(Intent.createChooser(shareIntent, "Share Event QR Code"));
     }
 
+    /**
+     * Removes image from firestore database
+     *
+     * @param URL   URL of image to delete
+     */
     private void deleteOldPoster(String URL) {
         db.collection(FirestoreCollections.IMAGES_COLLECTION)
                 .whereEqualTo("URL", URL)
@@ -257,6 +262,12 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
                     }
                 });
     }
+
+    /**
+     * Image picker activity for updating the event poster
+     *
+     * @return  result of activity
+     */
     private ActivityResultLauncher<String> createImagePicker() {
         return registerForActivityResult(
                 new ActivityResultContracts.GetContent(), uri -> {
