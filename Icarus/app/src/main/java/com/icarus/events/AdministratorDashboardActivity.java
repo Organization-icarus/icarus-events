@@ -81,6 +81,15 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
         userListView = findViewById(R.id.admin_dashboard_user_list);
         imageListView = findViewById(R.id.admin_dashboard_image_list);
 
+        // create event, user, and image array
+        eventArrayList = new ArrayList<>();
+        eventArrayAdapter = new AdministratorDashboardEventArrayAdapter(this,
+                eventArrayList, categoryColors);
+        userArrayList = new ArrayList<>();
+        userArrayAdapter = new AdministratorDashboardUserArrayAdapter(this, userArrayList);
+        imageArrayList = new ArrayList<>();
+        imageArrayAdapter = new AdministratorDashboardImageArrayAdapter(this, imageArrayList);
+
         // Initialize current colors
         categoryColors = new HashMap<>();
         db.collection("event-categories")
@@ -110,15 +119,6 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
         eventListView.setVisibility(VISIBLE);
         userListView.setVisibility(GONE);
         imageListView.setVisibility(GONE);
-
-        // create event, user, and image array
-        eventArrayList = new ArrayList<>();
-        eventArrayAdapter = new AdministratorDashboardEventArrayAdapter(this,
-                eventArrayList, categoryColors);
-        userArrayList = new ArrayList<>();
-        userArrayAdapter = new AdministratorDashboardUserArrayAdapter(this, userArrayList);
-        imageArrayList = new ArrayList<>();
-        imageArrayAdapter = new AdministratorDashboardImageArrayAdapter(this, imageArrayList);
 
         // Get all items in the collection
         eventsRef.addSnapshotListener((value,error) -> {

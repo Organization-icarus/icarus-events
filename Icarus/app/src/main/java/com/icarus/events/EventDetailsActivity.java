@@ -389,7 +389,10 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
                         batch.delete(db.collection(FirestoreCollections.EVENTS_COLLECTION).document(finalEventId));
 
                         batch.commit()
-                                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Event deleted successfully"))
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("Firestore", "Event deleted successfully");
+                                    finish();
+                                })
                                 .addOnFailureListener(e -> Log.e("Firestore", "Error deleting event", e));
 
                     }).addOnFailureListener(e -> Log.e("Firestore", "Error fetching subcollections", e));
