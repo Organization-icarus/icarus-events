@@ -48,13 +48,20 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
 
+        // Retrieve device Id/User object
+        user = UserSession.getInstance().getCurrentUser();
+        String deviceId = user.getId();
+
         // Initialize user profile image
         profileImage = findViewById(R.id.user_settings_profile_image);
-        Picasso.get()
-                .load(user.getImage())
-                .placeholder(R.drawable.poster)
-                .error(R.drawable.poster)           // Optional: shows if link fails
-                .into(profileImage);
+        db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
+                .addOnSuccessListener(snapshot -> {
+                    Picasso.get()
+                            .load(snapshot.getString("image"))
+                            .placeholder(R.drawable.poster)
+                            .error(R.drawable.poster)           // Optional: shows if link fails
+                            .into(profileImage);
+                });
 
         // Initialize buttons
         deleteProfileButton = findViewById(R.id.user_profile_delete_button);
@@ -63,13 +70,10 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
         adminNotificationsSwitch = findViewById(R.id.user_settings_admin_notifications_switch);
         organizerNotificationsSwitch = findViewById(R.id.user_settings_org_notifications_switch);
 
-        // Retrieve device Id/User object
-        user = UserSession.getInstance().getCurrentUser();
-        String deviceId = user.getId();
-
         // Set buttons on click listeners
         // Taken from Claude March 11th 2026,
         // "I need to modify my query to also delete the user from the event collection entrant subcollection"
+        android.content.Context appContext = getApplicationContext();
         deleteProfileButton.setOnClickListener(v -> {
             db.collection(FirestoreCollections.EVENTS_COLLECTION).get()
                     .addOnSuccessListener(eventSnapshots -> {
@@ -89,17 +93,19 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
                                     // Delete the user document after
                                     db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).delete()
                                             .addOnSuccessListener(unused -> {
-                                                Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
-                                                UserSession.getInstance().clear();
-                                                startActivity(new Intent(this, MainActivity.class));
+                                                Toast.makeText(appContext, "Profile deleted", Toast.LENGTH_SHORT).show();
+                                                Intent intent = new Intent(UserSettingsActivity.this, MainActivity.class);
+                                                intent.putExtra("clearSession", true);
+                                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                startActivity(intent);
                                                 finish();
                                             })
                                             .addOnFailureListener(e ->
-                                                    Toast.makeText(this, "Failed to delete profile", Toast.LENGTH_SHORT).show());
+                                                    Toast.makeText(appContext, "Failed to delete profile", Toast.LENGTH_SHORT).show());
                                 });
                     })
                     .addOnFailureListener(e ->
-                            Toast.makeText(this, "Failed to delete profile", Toast.LENGTH_SHORT).show());
+                            Toast.makeText(appContext, "Failed to delete profile", Toast.LENGTH_SHORT).show());
         });
 
         // Taken from Claude March 11th 2026, "What query can I use to load in current settings"
