@@ -202,9 +202,11 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                     Toast.makeText(this, "Please enter your name", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                /**@ TODO
-                 * Check if user entered email in text field IF THAT IS A REQUIREMENT
-                 */
+                // Check if user entered email in text fields
+                if (email.isEmpty()) {
+                    Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 // Send user data to database
                 Map<String, Object> userData = new HashMap<>();
                 userData.put("name", name);
