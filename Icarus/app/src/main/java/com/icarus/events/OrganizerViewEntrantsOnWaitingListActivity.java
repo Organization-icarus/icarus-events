@@ -177,7 +177,8 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                                         String name = userSnapshot.getString("name");
                                         String email = userSnapshot.getString("email");
                                         String phone = userSnapshot.getString("phone");
-                                        entrantList.add(new User(deviceId, name, email, phone,
+                                        String image = userSnapshot.getString("image");
+                                        entrantList.add(new User(deviceId, name, email, phone, image,
                                                 null, null, null, null));
                                         eventListArrayAdapter.notifyDataSetChanged();
                                     });

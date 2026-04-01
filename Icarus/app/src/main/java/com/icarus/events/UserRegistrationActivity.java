@@ -86,11 +86,12 @@ public class UserRegistrationActivity extends AppCompatActivity {
             userData.put("name", name);
             userData.put("isAdmin", isAdmin);
             userData.put("settings", settings);
+            userData.put("image", "");
 
             db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).set(userData)
                     .addOnSuccessListener(unused -> {
                         // Add information into global session and return user to event list
-                        User user = new User(deviceId, name, null, null, isAdmin, null, null, null);
+                        User user = new User(deviceId, name, null, null, "", isAdmin, null, null, null);
                         UserSession.getInstance().setCurrentUser(user);
                         startActivity(new Intent(this, EntrantEventListActivity.class));
                         finish();

@@ -191,6 +191,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                                 String name = userSnapshot.getString("name");
                                                 String email = userSnapshot.getString("email");
                                                 String phone = userSnapshot.getString("phone");
+                                                String image = userSnapshot.getString("image");
                                                 Boolean isAdmin = userSnapshot.getBoolean("isAdmin");
 
                                                 boolean userIsAdmin = isAdmin != null && isAdmin;
@@ -199,7 +200,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                                 boolean isOrganizer = organizerSet.contains(deviceId); // ← new
 
                                                 if (notInEntrants && !userIsAdmin && !isCurrentUser && !isOrganizer) {
-                                                    entrantUserList.add(new User(deviceId, name, email, phone,
+                                                    entrantUserList.add(new User(deviceId, name, email, phone, image,
                                                             null, null, null, null));
                                                 }
                                             }
@@ -297,7 +298,8 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                         String name = userSnapshot.getString("name");
                                         String email = userSnapshot.getString("email");
                                         String phone = userSnapshot.getString("phone");
-                                        entrantUserList.add(new User(deviceId, name, email, phone,
+                                        String image = userSnapshot.getString("image");
+                                        entrantUserList.add(new User(deviceId, name, email, phone, image,
                                                 null, null, null, null));
                                         eventListArrayAdapter.notifyDataSetChanged();
                                     });

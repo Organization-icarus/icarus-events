@@ -16,6 +16,7 @@ public class User {
     private String name;
     private String email;
     private String phone;
+    private String image;
     private Boolean isAdmin;
     private ArrayList<String> events;
     private ArrayList<String> organizedEvents;
@@ -32,13 +33,14 @@ public class User {
      * @param events list of event IDs associated with the user
      * @param settings map of user-specific configuration settings
      */
-    public User(String id, String name, String email, String phone, Boolean isAdmin,
+    public User(String id, String name, String email, String phone, String image, Boolean isAdmin,
                 ArrayList<String> events, ArrayList<String> organizedEvents,
                 Map<String, Object> settings) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.phone = phone;
+        this.image = image;
         this.isAdmin = isAdmin;
         this.events = events;
         this.organizedEvents = organizedEvents;
@@ -178,5 +180,13 @@ public class User {
      */
     public void setSettings(Map<String, Object> settings) {
         this.settings = settings;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

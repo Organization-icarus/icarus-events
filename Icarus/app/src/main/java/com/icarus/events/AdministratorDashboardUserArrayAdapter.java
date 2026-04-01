@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
@@ -104,13 +105,23 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
                                     .document(user.getId())
                                     .delete();
                         }
-                        // Then delete the user document itself
-                        db.collection(FirestoreCollections.USERS_COLLECTION).document(user.getId()).delete()
-                                .addOnSuccessListener(unused -> {
-                                    Toast.makeText(context, "Profile deleted", Toast.LENGTH_SHORT).show();
-                                })
-                                .addOnFailureListener(e ->
-                                        Toast.makeText(context, "Failed to delete profile", Toast.LENGTH_SHORT).show());
+
+                        // Remove the users poster from the database
+                        db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                                .whereEqualTo("URL", user.getImage())
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                        new Image(user.getImage(), doc.getId()).delete(context, db);
+                                    }
+                                    // Then delete the user document itself
+                                    db.collection(FirestoreCollections.USERS_COLLECTION).document(user.getId()).delete()
+                                            .addOnSuccessListener(unused -> {
+                                                Toast.makeText(context, "Profile deleted", Toast.LENGTH_SHORT).show();
+                                            })
+                                            .addOnFailureListener(e ->
+                                                    Toast.makeText(context, "Failed to delete profile", Toast.LENGTH_SHORT).show());
+                                });
                     })
                     .addOnFailureListener(e ->
                             Toast.makeText(context, "Failed to delete profile", Toast.LENGTH_SHORT).show());

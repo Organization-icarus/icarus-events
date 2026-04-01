@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
                                 snapshot.getString("name"),
                                 snapshot.getString("email"),
                                 snapshot.getString("phone"),
+                                snapshot.getString("image"),
                                 isAdmin != null ? isAdmin : false,
                                 (ArrayList<String>) snapshot.get("events"),
                                 (ArrayList<String>) snapshot.get("organizedEvents"),
