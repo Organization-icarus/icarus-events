@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -46,6 +47,7 @@ public class UserRegistrationActivity extends AppCompatActivity {
     private Button registerButton;
     private FirebaseFirestore db;
     private String deviceId;
+    private View profileImageContainer;
     private ImageView profileImage;
     private String profileImageURL = "";
     private ActivityResultLauncher<String> imagePickerLauncher;
@@ -77,17 +79,19 @@ public class UserRegistrationActivity extends AppCompatActivity {
         phoneEditText = findViewById(R.id.user_register_phone_field);
 
         // Initialize profile icon
+        profileImageContainer = findViewById(R.id.user_register_profile_container);
         profileImage = findViewById(R.id.user_register_profile_image);
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(), uri -> {
                     if (uri != null) {
                         profileImage.setImageURI(uri);
+                        profileImage.setVisibility(View.VISIBLE);
                         uploadProfileImage(uri);
                     }
                 }
         );
 
-        profileImage.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
+        profileImageContainer.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
 
 
 
