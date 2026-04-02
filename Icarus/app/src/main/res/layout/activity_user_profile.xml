@@ -172,8 +172,8 @@
     <!-- Profile icon -->
     <ImageView
         android:id="@+id/user_profile_image"
-        android:layout_width="105dp"
-        android:layout_height="88dp"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
         android:backgroundTint="@color/lightText"
         app:layout_constraintBottom_toTopOf="@+id/user_profile_name_edit"
         app:layout_constraintEnd_toEndOf="parent"
