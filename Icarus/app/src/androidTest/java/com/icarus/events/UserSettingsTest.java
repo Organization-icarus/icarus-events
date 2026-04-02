@@ -65,7 +65,7 @@ public class UserSettingsTest {
                 .add(userMap)
                 .addOnSuccessListener(doc -> {
                     testUser = new User(doc.getId(), "Test Entrant",
-                            "testentrant@email.com", "1234567890", "",
+                            "testentrant@email.com", "1234567890", "No Image",
                             false, new ArrayList<>(), new ArrayList<>(),
                             Map.of("adminNotifications", true, "organizerNotifications", true));
                     UserSession.getInstance().setCurrentUser(testUser);

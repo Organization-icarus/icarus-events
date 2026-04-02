@@ -62,11 +62,16 @@ public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapte
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = comments.get(position);
 
-        Picasso.get()
-                .load(comment.getAuthorImage())
-                .placeholder(R.drawable.poster)
-                .error(R.drawable.poster)           // Optional: shows if link fails
-                .into(holder.profileImage);
+        String authorImageURL = comment.getAuthorImage();
+        if (authorImageURL != null && !authorImageURL.isEmpty()) {
+            Picasso.get()
+                    .load(authorImageURL)
+                    .placeholder(R.drawable.poster)
+                    .error(R.drawable.poster)           // Optional: shows if link fails
+                    .into(holder.profileImage);
+        } else {
+            holder.profileImage.setImageResource(R.drawable.poster);
+        }
 
         holder.authorName.setText(comment.getAuthorName());
 

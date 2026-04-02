@@ -301,17 +301,19 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
                                                             .update("image", newPosterURL);
                                                     posterURL = newPosterURL;
                                                     eventPoster.setImageURI(uri);
+                                                    Toast.makeText(OrganizerManageEventActivity.this,
+                                                            "Image uploaded", Toast.LENGTH_SHORT).show();
                                                 })
                                                 .addOnFailureListener(e -> {
                                                     Toast.makeText(OrganizerManageEventActivity.this,
-                                                            "Failed to add image to firestore", Toast.LENGTH_SHORT).show();
+                                                            "Image upload failed", Toast.LENGTH_SHORT).show();
                                                 });
                                     }
 
                                     @Override
                                     public void onError(String requestId, ErrorInfo error) {
                                         Toast.makeText(OrganizerManageEventActivity.this,
-                                                "Failed to Upload Image.", Toast.LENGTH_SHORT).show();
+                                                "Image upload failed.", Toast.LENGTH_SHORT).show();
                                         Log.e("UPLOAD_ERROR", error.getDescription());
                                     }
 

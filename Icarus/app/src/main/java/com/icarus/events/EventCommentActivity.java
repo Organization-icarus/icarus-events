@@ -92,11 +92,15 @@ public class EventCommentActivity extends HeaderNavBarActivity {
         userImage = user.getImage();
 
         // Set current users profile image in the comment footer
-        Picasso.get()
-                .load(userImage)
-                .placeholder(R.drawable.poster)
-                .error(R.drawable.poster)           // Optional: shows if link fails
-                .into(commentProfileImage);
+        if (userImage != null && !userImage.isEmpty()) {
+            Picasso.get()
+                    .load(userImage)
+                    .placeholder(R.drawable.poster)
+                    .error(R.drawable.poster)           // Optional: shows if link fails
+                    .into(commentProfileImage);
+        } else {
+            commentProfileImage.setImageResource(R.drawable.poster);
+        }
 
         commentList = new ArrayList<>();
         canDelete = false;

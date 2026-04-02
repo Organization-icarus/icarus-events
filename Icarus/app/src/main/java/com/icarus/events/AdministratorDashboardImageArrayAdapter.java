@@ -83,7 +83,8 @@ public class AdministratorDashboardImageArrayAdapter extends ArrayAdapter<Image>
                 .document(image.getPublicId()).get()
                 .addOnSuccessListener(snapshot -> {
                     if (snapshot.exists()) {
-                        if (snapshot.getString("URL") != null) {
+                        String imageURL = snapshot.getString("URL");
+                        if (imageURL != null && !imageURL.isEmpty()) {
                             Picasso.get()
                                     .load(snapshot.getString("URL"))
                                     .error(R.drawable.poster)           // Optional: shows if link fails
@@ -98,6 +99,7 @@ public class AdministratorDashboardImageArrayAdapter extends ArrayAdapter<Image>
         // remove image
         removeImageButton.setOnClickListener(v -> {
             image.delete(context, db);
+            Toast.makeText(context, "Image deleted", Toast.LENGTH_SHORT).show();
         });
 
         return view;
