@@ -21,6 +21,21 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.309" />
 
+    <!-- Profile icon -->
+    <ImageView
+        android:id="@+id/user_profile_image"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:backgroundTint="@color/lightText"
+        android:layout_marginBottom="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/user_profile_name_edit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/user_profile_title"
+        app:layout_constraintVertical_bias="0.2"
+        app:srcCompat="@drawable/profile" />
+
     <!-- User text editable sections: name, email, phone -->
     <EditText
         android:id="@+id/user_profile_email_edit"
@@ -126,7 +141,7 @@
         android:layout_height="48dp"
         android:layout_margin="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:tint="@color/accent_first"
+        app:tint="@color/accent_first"
         android:contentDescription="Settings"
         android:padding="8dp"
         android:scaleType="fitCenter"
@@ -169,20 +184,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.877" />
-
-    <!-- Profile icon -->
-    <ImageView
-        android:id="@+id/user_profile_image"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
-        android:backgroundTint="@color/lightText"
-        app:layout_constraintBottom_toTopOf="@+id/user_profile_name_edit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_profile_title"
-        app:layout_constraintVertical_bias="0.2"
-        app:srcCompat="@drawable/profile" />
 
     <!-- Included nav bar -->
     <include
