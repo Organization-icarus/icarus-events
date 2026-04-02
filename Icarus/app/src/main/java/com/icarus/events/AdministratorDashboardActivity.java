@@ -131,10 +131,10 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
                     String id = snapshot.getId();
                     String name = snapshot.getString("name");
                     String category = snapshot.getString("category");
-                    Date date = snapshot.getDate("date");
+                    Date date = snapshot.getDate("startDate");
                     String posterURL = snapshot.getString("image");
 
-                    eventArrayList.add(new Event(id, name, category, null, null, null, date, null, posterURL, null));
+                    eventArrayList.add(new Event(id, name, category, null, null, null, date,null, null, posterURL, null));
                 }
                 eventArrayAdapter.notifyDataSetChanged();
             }

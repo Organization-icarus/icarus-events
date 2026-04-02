@@ -117,9 +117,9 @@ public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEv
         }
 
         // Reformatting date to be more readable and convert to string
-        if (event.getDate() != null) {
+        if (event.getStartDate() != null) {
             SimpleDateFormat formatter = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
-            String dateString = formatter.format(event.getDate());
+            String dateString = formatter.format(event.getStartDate());
             holder.eventDate.setText(dateString);
         } else {
             holder.eventDate.setText(R.string.entrant_event_list_missing_date);

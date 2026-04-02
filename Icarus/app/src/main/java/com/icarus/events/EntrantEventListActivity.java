@@ -238,7 +238,8 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
                     Double capacity = snapshot.getDouble("capacity");
                     Date regOpen = snapshot.getDate("open");
                     Date regClose = snapshot.getDate("close");
-                    Date date = snapshot.getDate("date");
+                    Date startDate = snapshot.getDate("startDate");
+                    Date endDate = snapshot.getDate("endDate");
                     String location = snapshot.getString("location");
                     String image = snapshot.getString("image");
                     ArrayList<String> organizers = (ArrayList<String>) snapshot.get("organizers");
@@ -254,7 +255,8 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
                                     capacity,
                                     regOpen,
                                     regClose,
-                                    date,
+                                    startDate,
+                                    endDate,
                                     location,
                                     image,
                                     organizers));
@@ -323,11 +325,11 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
             boolean matchesCapacity = maxCapacityFilter == null
                     || (event.getCapacity() != null && event.getCapacity() <= maxCapacityFilter);
 
-            Date eventDate = event.getDate();
+            Date eventStartDate = event.getStartDate();
             boolean matchesStartDate = startDateFilter == null
-                    || (eventDate != null && !eventDate.before(startDateFilter));
+                    || (eventStartDate != null && !eventStartDate.before(startDateFilter));
             boolean matchesEndDate = endDateFilter == null
-                    || (eventDate != null && !eventDate.after(endDateFilter));
+                    || (eventStartDate != null && !eventStartDate.after(endDateFilter));
 
             Long waitingCount = eventWaitingCounts.get(event.getId());
             boolean isFull = waitingCount != null
@@ -354,8 +356,8 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
                         : name2.compareTo(name1);
             }
 
-            Date date1 = event1.getDate();
-            Date date2 = event2.getDate();
+            Date date1 = event1.getStartDate();
+            Date date2 = event2.getStartDate();
 
             if (date1 == null && date2 == null) {
                 return 0;

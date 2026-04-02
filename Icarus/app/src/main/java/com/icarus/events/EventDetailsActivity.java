@@ -76,7 +76,7 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
     private int currentWaitingCount;
     private ArrayList<String> eventOrganizers;
     private double eventCapacity;
-    private Date eventRegOpen, eventRegClose, eventDate;
+    private Date eventRegOpen, eventRegClose, eventStartDate, eventEndDate;
     private String
             eventName,
             eventCategory,
@@ -448,7 +448,8 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
                         eventCapacity = capacityValue != null ? capacityValue : -1;
                         eventRegOpen = doc.getDate("open");
                         eventRegClose = doc.getDate("close");
-                        eventDate = doc.getDate("date");
+                        eventStartDate = doc.getDate("startDate");
+                        eventEndDate = doc.getDate("endDate");
                         locationEnabled = doc.getBoolean("geolocation");
                         eventLocation = doc.getString("location");
                         eventImage = doc.getString("image");
@@ -581,7 +582,7 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
 
         Event event = new Event(
                 finalEventId, eventName, eventCategory, eventCapacity,
-                eventRegOpen, eventRegClose, eventDate, eventLocation,
+                eventRegOpen, eventRegClose, eventStartDate, eventEndDate, eventLocation,
                 eventImage, eventOrganizers, currentStatus, currentWaitingCount
         ); // unchanged
 

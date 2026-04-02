@@ -1,14 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!--
-    activity_organizer_create_event.xml
-    Author: Ben Salmon
-
-    AI was used the creation of the cards. Not in the buttons, editTexts, imageViews, or spinners.
-    Claude AI, March 22,2026 "How can I separate a XML file into separate cards that
-    will make the screen more visually pleasing for users. What is the layout for cards and how
-    they used?"
--->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -60,10 +50,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:backgroundTint="@color/primary_container"
+                        android:backgroundTint="@color/accent_first"
                         android:text="Upload Event Image"
                         android:textSize="@dimen/font_text_size"
-                        android:textColor="@color/primary_container_highlighted"
+                        android:textColor="@color/darkText"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventImage"/>
@@ -172,6 +162,8 @@
                         android:text="Geolocation "
                         android:textColor="@color/lightText"
                         android:textSize="@dimen/font_subheading_size"
+                        app:trackTint="@color/primary"
+                        app:thumbTint="@color/switch_thumb_selector"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@id/OrganizerCreateEventEventLocation"
                         app:layout_constraintBottom_toBottomOf="@id/OrganizerCreateEventEventLocation"/>
@@ -223,7 +215,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:padding="12dp"
-                        android:backgroundTint="@color/primary_container"
+                        android:backgroundTint="@color/accent_first"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventLimitWaitingListLimit"/>
@@ -233,6 +225,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
+                        app:trackTint="@color/primary"
+                        app:thumbTint="@color/switch_thumb_selector"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventCategory"/>
 
@@ -287,8 +281,8 @@
                             android:layout_marginEnd="4dp"
                             android:text="Set Date"
                             android:textSize="@dimen/font_text_size"
-                            android:backgroundTint="@color/primary_container"
-                            android:textColor="@color/primary_container_highlighted"/>
+                            android:backgroundTint="@color/accent_first"
+                            android:textColor="@color/darkText"/>
 
                         <Button
                             android:id="@+id/OrganizerCreateEventRegistrationPeriodStartTime"
@@ -298,8 +292,8 @@
                             android:layout_marginStart="4dp"
                             android:text="Set Time"
                             android:textSize="@dimen/font_text_size"
-                            android:backgroundTint="@color/primary_container"
-                            android:textColor="@color/primary_container_highlighted"/>
+                            android:backgroundTint="@color/accent_first"
+                            android:textColor="@color/darkText"/>
 
                     </LinearLayout>
 
@@ -308,7 +302,7 @@
                         android:layout_height="1dp"
                         android:layout_marginTop="12dp"
                         android:layout_marginBottom="12dp"
-                        android:background="@color/primary_container"/>
+                        android:background="@color/accent_first"/>
 
                     <!-- Registration End -->
                     <TextView
@@ -334,8 +328,8 @@
                             android:layout_marginEnd="4dp"
                             android:text="Set Date"
                             android:textSize="@dimen/font_text_size"
-                            android:backgroundTint="@color/primary_container"
-                            android:textColor="@color/primary_container_highlighted"/>
+                            android:backgroundTint="@color/accent_first"
+                            android:textColor="@color/darkText"/>
 
                         <Button
                             android:id="@+id/OrganizerCreateEventRegistrationPeriodEndTime"
@@ -345,8 +339,8 @@
                             android:layout_marginStart="4dp"
                             android:text="Set Time"
                             android:textSize="@dimen/font_text_size"
-                            android:backgroundTint="@color/primary_container"
-                            android:textColor="@color/primary_container_highlighted"/>
+                            android:backgroundTint="@color/accent_first"
+                            android:textColor="@color/darkText"/>
 
                     </LinearLayout>
 
@@ -355,14 +349,14 @@
                         android:layout_height="1dp"
                         android:layout_marginTop="12dp"
                         android:layout_marginBottom="12dp"
-                        android:background="@color/primary_container"/>
+                        android:background="@color/accent_first"/>
 
                     <!-- Event Date -->
                     <TextView
-                        android:id="@+id/OrganizerCreateEventShowEventDateTitle"
+                        android:id="@+id/OrganizerCreateEventShowEventStartDateTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Event Date and Time"
+                        android:text="Event Start Date and Time"
                         android:textSize="@dimen/font_subheading_size"
                         android:textStyle="bold"
                         android:textColor="@color/lightText"/>
@@ -374,26 +368,70 @@
                         android:layout_marginTop="8dp">
 
                         <Button
-                            android:id="@+id/OrganizerCreateEventDate"
+                            android:id="@+id/OrganizerCreateEventStartDate"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
                             android:text="Set Date"
                             android:textSize="@dimen/font_text_size"
-                            android:backgroundTint="@color/primary_container"
-                            android:textColor="@color/primary_container_highlighted"/>
+                            android:backgroundTint="@color/accent_first"
+                            android:textColor="@color/darkText"/>
 
                         <Button
-                            android:id="@+id/OrganizerCreateEventTime"
+                            android:id="@+id/OrganizerCreateEventStartTime"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="4dp"
                             android:text="Set Time"
                             android:textSize="@dimen/font_text_size"
-                            android:backgroundTint="@color/primary_container"
-                            android:textColor="@color/primary_container_highlighted"/>
+                            android:backgroundTint="@color/accent_first"
+                            android:textColor="@color/darkText"/>
+
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="12dp"
+                        android:background="@color/accent_first"/>
+                    <!-- Event Date -->
+                    <TextView
+                        android:id="@+id/OrganizerCreateEventShowEventEndDateTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Event End Date and Time"
+                        android:textSize="@dimen/font_subheading_size"
+                        android:textStyle="bold"
+                        android:textColor="@color/lightText"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
+
+                        <Button
+                            android:id="@+id/OrganizerCreateEventEndDate"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:text="Set Date"
+                            android:textSize="@dimen/font_text_size"
+                            android:backgroundTint="@color/accent_first"
+                            android:textColor="@color/darkText"/>
+
+                        <Button
+                            android:id="@+id/OrganizerCreateEventEndTime"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="4dp"
+                            android:text="Set Time"
+                            android:textSize="@dimen/font_text_size"
+                            android:backgroundTint="@color/accent_first"
+                            android:textColor="@color/darkText"/>
 
                     </LinearLayout>
 
@@ -409,8 +447,8 @@
                 android:layout_marginTop="24dp"
                 android:text="Create Event"
                 android:textSize="@dimen/font_text_size"
-                android:backgroundTint="@color/primary_container"
-                android:textColor="@color/primary_container_highlighted"/>
+                android:backgroundTint="@color/accent_first"
+                android:textColor="@color/darkText"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
