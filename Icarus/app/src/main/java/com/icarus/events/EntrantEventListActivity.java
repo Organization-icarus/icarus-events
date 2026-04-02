@@ -197,6 +197,12 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
 
                 for (QueryDocumentSnapshot snapshot : value) {
                     String id = snapshot.getId();
+                    Boolean isPrivate = snapshot.getBoolean("isPrivate");
+                    // Hide private events
+                    if (Boolean.TRUE.equals(isPrivate)) {
+                        continue;
+                    }
+
                     String name = snapshot.getString("name");
                     String category  = snapshot.getString("category");
                     Double capacity = snapshot.getDouble("capacity");
@@ -264,47 +270,6 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
         });
 
         filterCategoryButton.setOnClickListener(v -> showFilterDialog());
-    }
-
-    /**
-     * Handles a category filter button click by toggling its visual state
-     * and applying the updated filters to the event list. (Currently not in use)
-     *
-     * @param filterName the category associated with the button
-     * @param button the button that was clicked
-     */
-    private void handleButtonClick(String filterName, Button button) {
-        //Check if already true in filter list
-        boolean selected = Boolean.TRUE.equals(currentFilters.get(filterName));
-        if (selected) {
-            //Set button to be normal colour
-            button.setBackgroundColor(
-                    androidx.core.content.ContextCompat.getColor(
-                            this,
-                            R.color.primary_container
-                    )
-            );
-            button.setTextColor(
-                    androidx.core.content.ContextCompat.getColor(
-                            this,
-                            R.color.primary_container_highlighted
-                    )
-            );
-        } else {
-            //Set button to be selected colour
-            button.setBackgroundColor(
-                    androidx.core.content.ContextCompat.getColor(
-                            this,
-                            R.color.primary_container_highlighted
-                    )
-            );
-            button.setTextColor(androidx.core.content.ContextCompat.getColor(
-                            this,
-                            R.color.primary_container
-                    )
-            );
-        }
-        applyFilters();
     }
 
     /**
