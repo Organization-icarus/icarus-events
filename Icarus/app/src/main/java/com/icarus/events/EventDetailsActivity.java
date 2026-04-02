@@ -1,9 +1,12 @@
 package com.icarus.events;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,6 +34,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.WriteBatch;
 import com.squareup.picasso.Picasso;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,6 +65,7 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
             leaveWaitingBtn,
             declineInviteBtn,
             registerBtn,
+            printTicketBtn,
             cancelRegistrationBtn;
 
     //---------------------------
@@ -131,6 +136,7 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
         leaveWaitingBtn = findViewById(R.id.leave_waiting_list_button);
         declineInviteBtn = findViewById(R.id.decline_invitation);
         registerBtn = findViewById(R.id.register_button);
+        printTicketBtn = findViewById(R.id.print_ticket_button);
         cancelRegistrationBtn = findViewById(R.id.cancel_registration);
 
         //---------------------------
@@ -286,6 +292,10 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
                     .set(entrant);
         });
 
+        //Give user a ticket for the event
+        printTicketBtn.setOnClickListener(v->{
+            printTicket();
+        });
 
         // Lets users cancel their registration
         cancelRegistrationBtn.setOnClickListener(v-> {
@@ -535,6 +545,7 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
         leaveWaitingBtn.setVisibility(View.GONE);
         declineInviteBtn.setVisibility(View.GONE);
         registerBtn.setVisibility(View.GONE);
+        printTicketBtn.setVisibility(View.GONE);
         cancelRegistrationBtn.setVisibility(View.GONE);
 
         // Don't proceed until everything is ready
@@ -571,7 +582,9 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
             }
 
             else if (status.equals("registered")) {
+                printTicketBtn.setVisibility(View.VISIBLE);
                 cancelRegistrationBtn.setVisibility(View.VISIBLE);
+
             }
         }
     }
@@ -714,6 +727,30 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
             // Add event to user's own event collection
             db.collection(FirestoreCollections.USERS_COLLECTION).document(userId)
                     .update("events", com.google.firebase.firestore.FieldValue.arrayUnion(eventId));
+        }
+    }
+    private void printTicket(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Event Name: " + eventName + "\n");
+        sb.append("Category: "+ eventCategory + "\n");
+        sb.append("Location: " + eventLocation + "\n");
+        sb.append("Event Start: "+ (eventStartDate != null ? eventStartDate.toString() : "N/A") + "\n");
+        sb.append("Event End: "+ (eventEndDate != null ? eventEndDate.toString() : "N/A") + "\n");
+        String filename = eventName + ".txt";
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Downloads.DISPLAY_NAME, filename);
+        values.put(MediaStore.Downloads.MIME_TYPE, "text/plain");
+        Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+        if (uri == null) {
+            Toast.makeText(this, "Failed to create file", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try (OutputStream outputStream = getContentResolver().openOutputStream(uri)) {
+            outputStream.write(sb.toString().getBytes());
+            Toast.makeText(this, "Ticket exported to Downloads/" + filename, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "Export failed", Toast.LENGTH_SHORT).show();
         }
     }
 }
