@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
@@ -390,6 +391,7 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
         //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
         db.collection(FirestoreCollections.EVENTS_COLLECTION).add(eventData)
                 .addOnSuccessListener(unused -> {
+                    Toast.makeText(this, "Event created", Toast.LENGTH_SHORT).show();
                     finish();
                 })
                 .addOnFailureListener(e -> {
@@ -533,7 +535,8 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
                 // Place new marker
                 Marker marker = new Marker(dialogMap);
                 marker.setPosition(p);
-                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                marker.setIcon(ResourcesCompat.getDrawable(getResources(), android.R.drawable.btn_star_big_on, getTheme()));
                 dialogMap.getOverlays().add(marker);
                 dialogMap.invalidate();
                 selectedMarker[0] = marker;
@@ -584,13 +587,19 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                selectedEntrantRange = seekBar.getProgress();
+                if (seekBar.getProgress() > 0) {
+                    selectedEntrantRange = seekBar.getProgress();
+                }
             }
         });
 
         confirmButton.setOnClickListener(v -> {
             if (selectedMarker[0] == null) {
                 Toast.makeText(this, "Please tap a location on the map", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (selectedEntrantRange == null) {
+                Toast.makeText(this, "Please select an entrant range", Toast.LENGTH_SHORT).show();
                 return;
             }
             selectedEventLocation = selectedMarker[0].getPosition();

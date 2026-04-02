@@ -1,7 +1,10 @@
 package com.icarus.events;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -57,7 +60,7 @@ public class EntrantMapActivity extends HeaderNavBarActivity {
                     // Centre map on event location and draw a circle to show entrant restriction radius
                     GeoPoint startPoint = new GeoPoint(eventLocation.getLatitude(), eventLocation.getLongitude());
                     drawCircle(eventLocation.getLatitude(), eventLocation.getLongitude(), entrantRange * 1000);
-                    addMarker(eventLocation.getLatitude(), eventLocation.getLongitude());
+                    addMarker(eventLocation.getLatitude(), eventLocation.getLongitude(), true);
                     entrantMap.getController().setZoom(12.0);
                     entrantMap.getController().setCenter(startPoint);
                 })
@@ -79,7 +82,7 @@ public class EntrantMapActivity extends HeaderNavBarActivity {
                        if (location != null) {
                            double lat = location.getLatitude();
                            double lon = location.getLongitude();
-                           addMarker(lat, lon);
+                           addMarker(lat, lon, false);
                        }
                    }
                 })
@@ -95,10 +98,18 @@ public class EntrantMapActivity extends HeaderNavBarActivity {
      * @param lat Latitude of the markers location
      * @param lon Longitude of the markers location
      */
-    private void addMarker(double lat, double lon) {
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private void addMarker(double lat, double lon, Boolean isEvent) {
         Marker marker = new Marker(entrantMap);
         marker.setPosition(new GeoPoint(lat, lon));
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        if (isEvent) {
+            // Unique event location pin
+            marker.setIcon(ResourcesCompat.getDrawable(getResources(), android.R.drawable.btn_star_big_on, getTheme()));
+        } else {
+            // Default osmdroid marker icon for entrants
+            marker.setIcon(ResourcesCompat.getDrawable(getResources(), R.drawable.profile, getTheme()));
+        }
         entrantMap.getOverlays().add(marker);
     }
 

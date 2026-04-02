@@ -22,6 +22,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 import com.squareup.picasso.Picasso;
 
@@ -171,7 +172,9 @@ public class AdministratorDashboardEventArrayAdapter extends RecyclerView.Adapte
                         // Remove event from each user's events array and delete entrant docs
                         for (DocumentSnapshot userDoc : userSnapshots.getDocuments()) {
                             DocumentReference userRef = db.collection(FirestoreCollections.USERS_COLLECTION).document(userDoc.getId());
-                            batch.update(userRef, "events", FieldValue.arrayRemove(event.getId()));
+                            Map<String, Object> updateData = new HashMap<>();
+                            updateData.put("events", FieldValue.arrayRemove(event.getId()));
+                            batch.set(userRef, updateData, SetOptions.merge());
                             batch.delete(userDoc.getReference());
                         }
 
