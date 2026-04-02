@@ -671,7 +671,12 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
             db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).get()
                     .addOnSuccessListener(snapshot -> {
                         GeoPoint eventLocation = snapshot.getGeoPoint("coordinates");
-                        Double radius = snapshot.getDouble("entrantRange") * 1000; // In meters
+                        Double radius = snapshot.getDouble("entrantRange");
+                        if (radius == null) {
+                            radius = 0.0; // Set to 0 if entrant range is null
+                        } else {
+                            radius = radius * 1000; // In meters
+                        }
                         float[] results = new float[1];
                         Location.distanceBetween(geopoint.getLatitude(),
                                 geopoint.getLongitude(),
