@@ -123,8 +123,6 @@ public class QRCodeActivity extends HeaderNavBarActivity {
                     startScanner();
                     return;
                 }
-                //For debug:
-                Toast.makeText(QRCodeActivity.this, "SCANNED: " + scannedEventId, Toast.LENGTH_SHORT).show();
 
                 // Reject malformed QR payloads before querying Firestore.
                 // Firestore document IDs cannot safely be looked up from arbitrary URL-like strings.
