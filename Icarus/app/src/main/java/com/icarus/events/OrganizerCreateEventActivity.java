@@ -309,7 +309,7 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
                 return;
             }
             // Check if user filled all text fields before proceeding
-            if (name.isEmpty() || category.equals("category") || location.isEmpty()) {
+            if (name.isEmpty() || category.equals("Category") || location.isEmpty()) {
                 Toast.makeText(this, "Please fill in name, category, and location fields.", Toast.LENGTH_SHORT).show();
                 return;
             }
