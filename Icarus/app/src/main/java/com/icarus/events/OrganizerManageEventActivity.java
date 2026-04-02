@@ -207,15 +207,25 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
      * @throws Exception if QR generation fails.
      */
     private Bitmap generateQRCodeBitmap(String content) throws Exception {
-        int size = 800;
-        BitMatrix bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, size, size);
+        int qrSize = 800;
+        int padding = 80;
+        BitMatrix bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, qrSize, qrSize);
 
-        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
-        for (int x = 0; x < size; x++) {
-            for (int y = 0; y < size; y++) {
-                bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+        int outputSize = qrSize + (padding * 2);
+        Bitmap bitmap = Bitmap.createBitmap(outputSize, outputSize, Bitmap.Config.RGB_565);
+
+        for (int x = 0; x < outputSize; x++) {
+            for (int y = 0; y < outputSize; y++) {
+                bitmap.setPixel(x, y, Color.WHITE);
             }
         }
+
+        for (int x = 0; x < qrSize; x++) {
+            for (int y = 0; y < qrSize; y++) {
+                bitmap.setPixel(x + padding, y + padding, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+            }
+        }
+
         return bitmap;
     }
 

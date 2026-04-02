@@ -25,6 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Entry activity for the application.
  * <p>
@@ -84,10 +88,8 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        TextView deviceIdText = findViewById(R.id.main_device_id_text);
-
-        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-        deviceIdText.setText("Device ID: " + deviceId);
+        String rawDeviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        String deviceId = hashDeviceId(rawDeviceId);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
@@ -117,5 +119,33 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 });
 
+    }
+    // Taken from ChatGPT March 29th 2026,
+    //"Create a method to hash our device ids"
+    /**
+     * Hashes the provided device ID using SHA-256 so a deterministic but non-raw
+     * identifier can be stored and used by the app.
+     *
+     * @param rawDeviceId the raw Android device ID
+     * @return the SHA-256 hash of the device ID as a lowercase hex string
+     */
+    private String hashDeviceId(String rawDeviceId) {
+        if (rawDeviceId == null) {
+            return "";
+        }
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(rawDeviceId.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+
+            for (byte b : hashBytes) {
+                hexString.append(String.format("%02x", b));
+            }
+
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 not available", e);
+        }
     }
 }

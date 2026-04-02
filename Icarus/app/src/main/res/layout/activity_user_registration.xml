@@ -27,7 +27,9 @@
         android:layout_marginBottom="24dp"
         android:background="@drawable/dashed_upload_box"
         android:clickable="true"
-        android:focusable="true">
+        android:focusable="true"
+        android:outlineProvider="background"
+        android:clipToOutline="true">
 
         <LinearLayout
             android:layout_width="match_parent"

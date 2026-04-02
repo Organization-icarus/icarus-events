@@ -15,8 +15,11 @@ import com.journeyapps.barcodescanner.BarcodeView;
 
 import android.widget.FrameLayout;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.Collections;
+
+import com.google.firebase.firestore.FirebaseFirestore;
 
 // Portions of this code were developed and adapted with assistance from ChatGPT to learn what libraries and
 // functions were needed/helping with debugging on March 29, 2026.
@@ -41,6 +44,7 @@ public class QRCodeActivity extends HeaderNavBarActivity {
     private boolean hasScanned = false;
     private boolean scannerInitialized = false;
     private boolean scannerRunning = false;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     /**
      * Called when the activity is first created.
@@ -112,11 +116,44 @@ public class QRCodeActivity extends HeaderNavBarActivity {
                 hasScanned = true;
                 stopScanner();
 
-                String scannedEventId = result.getText();
-                Intent intent = new Intent(QRCodeActivity.this, EventDetailsActivity.class);
-                intent.putExtra("eventId", scannedEventId);
-                startActivity(intent);
-                finish();
+                String scannedEventId = result.getText() != null ? result.getText().trim() : "";
+
+                if (scannedEventId.isEmpty()) {
+                    hasScanned = false;
+                    startScanner();
+                    return;
+                }
+
+                // Reject malformed QR payloads before querying Firestore.
+                // Firestore document IDs cannot safely be looked up from arbitrary URL-like strings.
+                if (!scannedEventId.matches("^[A-Za-z0-9_-]+$")) {
+                    Toast.makeText(QRCodeActivity.this, "Invalid event QR code", Toast.LENGTH_SHORT).show();
+                    hasScanned = false;
+                    startScanner();
+                    return;
+                }
+
+                // Check scanned ID against Firestore to verify it is a real event before rerouting.
+                db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                        .document(scannedEventId)
+                        .get()
+                        .addOnSuccessListener(snapshot -> {
+                            if (snapshot.exists()) {
+                                Intent intent = new Intent(QRCodeActivity.this, EventDetailsActivity.class);
+                                intent.putExtra("eventId", scannedEventId);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(QRCodeActivity.this, "Invalid event QR code", Toast.LENGTH_SHORT).show();
+                                hasScanned = false;
+                                startScanner();
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(QRCodeActivity.this, "Failed to validate event QR code", Toast.LENGTH_SHORT).show();
+                            hasScanned = false;
+                            startScanner();
+                        });
             }
         });
 

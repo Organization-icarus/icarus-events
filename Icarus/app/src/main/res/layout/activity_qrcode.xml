@@ -30,7 +30,9 @@
                 style="@style/ViewCard"
                 android:layout_marginBottom="12dp"
                 android:layout_gravity="center_horizontal"
-                app:cardCornerRadius="16dp">
+                app:cardCornerRadius="16dp"
+                android:background="@color/accent_first"
+                app:strokeColor="@color/accent_first">
 
                 <FrameLayout
                     android:id="@+id/camera_preview"
