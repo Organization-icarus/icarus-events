@@ -17,6 +17,17 @@
         android:textSize="@dimen/font_super_heading_size"
         android:textStyle="bold" />
 
+    <!-- Profile icon -->
+    <ImageView
+        android:id="@+id/user_register_profile_image"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="@color/accent_first"
+        android:contentDescription="Profile image"
+        android:scaleType="centerCrop"
+        android:src="@drawable/poster" />
+
     <!-- Name field -->
     <EditText
         android:id="@+id/user_register_name_field"
