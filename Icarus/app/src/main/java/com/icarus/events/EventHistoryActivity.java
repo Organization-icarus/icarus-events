@@ -272,14 +272,15 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
                                         Double capacity = snapshot.getDouble("capacity");
                                         Date regOpen = snapshot.getDate("open");
                                         Date regClose = snapshot.getDate("close");
-                                        Date date = snapshot.getDate("date");
+                                        Date startDate = snapshot.getDate("startDate");
+                                        Date endDate = snapshot.getDate("endDate");
                                         String location = snapshot.getString("location");
                                         String image = snapshot.getString("image");
                                         ArrayList<String> organizers =
                                                 (ArrayList<String>) snapshot.get("organizers");
 
                                         allEvents.add(new Event(id, name, category, capacity,
-                                                regOpen, regClose, date, location, image, organizers));
+                                                regOpen, regClose, startDate, endDate, location, image, organizers));
                                     }
 
                                     // Only update the list once ALL chunks have returned
@@ -337,7 +338,7 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
             boolean matchesCapacity = maxCapacityFilter == null
                     || (event.getCapacity() != null && event.getCapacity() <= maxCapacityFilter);
 
-            Date eventDate = event.getDate();
+            Date eventDate = event.getStartDate();
             boolean matchesStartDate = startDateFilter == null
                     || (eventDate != null && !eventDate.before(startDateFilter));
             boolean matchesEndDate = endDateFilter == null
@@ -368,8 +369,8 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
                         : name2.compareTo(name1);
             }
 
-            Date date1 = event1.getDate();
-            Date date2 = event2.getDate();
+            Date date1 = event1.getStartDate();
+            Date date2 = event2.getStartDate();
 
             if (date1 == null && date2 == null) {
                 return 0;
