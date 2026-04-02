@@ -81,17 +81,17 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
     private Button RegistrationEndDateButton;
     private Button RegistrationEndTimeButton;
 
-    private Button EventDate;
-    private Button EventTime;
+    private Button eventStartDate, eventEndDate;
+    private Button eventStartTime, eventEndTime;
     private Button CreateEvent;
 
     private Date startDate;
     private Date endDate;
-    private Date eventDate;
+    private Date eventStartDateDate, eventEndDateDate;
 
     private Date startTime;
     private Date endTime;
-    private Date eventTime;
+    private Date eventStartTimeTime, eventEndTimeTime;
 
     private ActivityResultLauncher<String> imagePickerLauncher;
     private String posterURL;
@@ -179,8 +179,10 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
         RegistrationEndDateButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEndDate);
         RegistrationEndTimeButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEndTime);
 
-        EventDate = findViewById(R.id.OrganizerCreateEventDate);
-        EventTime = findViewById(R.id.OrganizerCreateEventTime);
+        eventStartDate = findViewById(R.id.OrganizerCreateEventStartDate);
+        eventStartTime = findViewById(R.id.OrganizerCreateEventStartTime);
+        eventEndDate = findViewById(R.id.OrganizerCreateEventEndDate);
+        eventEndTime = findViewById(R.id.OrganizerCreateEventEndTime);
 
         CreateEvent = findViewById(R.id.OrganizerCreateEventCreateEvent);
 
@@ -234,20 +236,36 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
             });
         });
 
-        EventDate.setOnClickListener(v -> {
+        eventStartDate.setOnClickListener(v -> {
             // Set event date
             showDatePicker(date -> {
-                this.eventDate = date;
+                this.eventStartDateDate = date;
                 String eventDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
-                EventDate.setText("Event Date:\n"+ eventDate);
+                eventStartDate.setText("Event Date:\n"+ eventDate);
             });
         });
-        EventTime.setOnClickListener(v -> {
+        eventStartTime.setOnClickListener(v -> {
             // Set Registration end Time
             showTimePicker(time->{
-                eventTime = time;
-                String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(eventTime);
-                EventTime.setText("Event Time:\n"+showTime );
+                eventStartTimeTime = time;
+                String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(time);
+                eventStartTime.setText("Event Time:\n"+showTime );
+            });
+        });
+        eventEndDate.setOnClickListener(v -> {
+            // Set event date
+            showDatePicker(date -> {
+                this.eventEndDateDate = date;
+                String eventDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
+                eventEndDate.setText("Event Date:\n"+ eventDate);
+            });
+        });
+        eventEndTime.setOnClickListener(v -> {
+            // Set Registration end Time
+            showTimePicker(time->{
+                eventEndTimeTime = time;
+                String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(time);
+                eventEndTime.setText("Event Time:\n"+showTime );
             });
         });
 
@@ -262,14 +280,17 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
 
 
             // Check if user filled in all dates before proceeding
-            if (startDate == null || startTime == null || endDate == null || endTime == null || eventDate == null || eventTime == null) {
+            if (startDate == null || startTime == null || endDate == null || endTime == null ||
+                    eventStartDateDate == null || eventStartTimeTime == null ||
+                    eventEndDateDate == null || eventEndTimeTime == null) {
                 Toast.makeText(this, "Please select all dates", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             this.startDate = mergeDateAndTime(startDate,startTime);
             this.endDate = mergeDateAndTime(endDate,endTime);
-            this.eventDate = mergeDateAndTime(eventDate,eventTime);
+            this.eventStartDateDate = mergeDateAndTime(eventStartDateDate,eventStartTimeTime);
+            this.eventEndDateDate = mergeDateAndTime(eventEndDateDate,eventEndTimeTime);
 
             if (startDate.before(new Date())) {
                 Toast.makeText(this, "Registration Start Date cannot be in the past.", Toast.LENGTH_SHORT).show();
@@ -279,12 +300,16 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
                 Toast.makeText(this, "Registration Start Date cannot be after Registration End Date.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if(endDate.after(eventDate)){
-                Toast.makeText(this, "Registration End Date cannot be after Event Date.", Toast.LENGTH_SHORT).show();
+            if(endDate.after(eventStartDateDate)){
+                Toast.makeText(this, "Registration End Date cannot be after Event Start Date.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(eventStartDateDate.after(eventEndDateDate)){
+                Toast.makeText(this, "Event Start Date cannot be after Event End Date.", Toast.LENGTH_SHORT).show();
                 return;
             }
             // Check if user filled all text fields before proceeding
-            if (name.isEmpty() || category.isEmpty() || location.isEmpty()) {
+            if (name.isEmpty() || category.equals("category") || location.isEmpty()) {
                 Toast.makeText(this, "Please fill in name, category, and location fields.", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -370,7 +395,8 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
         eventData.put("capacity",capacity);
         eventData.put("open", startDate);
         eventData.put("close", endDate);
-        eventData.put("date", eventDate);
+        eventData.put("startDate", eventStartDateDate);
+        eventData.put("endDate", eventEndDateDate);
         eventData.put("image", posterURL);
         eventData.put("location", location);
         eventData.put("geolocation",geolocationSwitch.isChecked());
