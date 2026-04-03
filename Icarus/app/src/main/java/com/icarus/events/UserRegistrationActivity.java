@@ -5,14 +5,20 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -20,6 +26,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import android.net.Uri;
+import android.widget.ImageView;
 
 /**
  * Activity that allows a new user to register in the application.
@@ -33,9 +42,15 @@ import java.util.Map;
  */
 public class UserRegistrationActivity extends AppCompatActivity {
     private EditText nameEditText;
+    private EditText emailEditText;
+    private EditText phoneEditText;
     private Button registerButton;
     private FirebaseFirestore db;
     private String deviceId;
+    private View profileImageContainer;
+    private ImageView profileImage;
+    private String profileImageURL = "";
+    private ActivityResultLauncher<String> imagePickerLauncher;
 
     /**
      * Initializes the user registration interface.
@@ -60,6 +75,25 @@ public class UserRegistrationActivity extends AppCompatActivity {
 
         // Initialize text field
         nameEditText = findViewById(R.id.user_register_name_field);
+        emailEditText = findViewById(R.id.user_register_email_field);
+        phoneEditText = findViewById(R.id.user_register_phone_field);
+
+        // Initialize profile icon
+        profileImageContainer = findViewById(R.id.user_register_profile_container);
+        profileImage = findViewById(R.id.user_register_profile_image);
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(), uri -> {
+                    if (uri != null) {
+                        profileImage.setImageURI(uri);
+                        profileImage.setVisibility(View.VISIBLE);
+                        uploadProfileImage(uri);
+                    }
+                }
+        );
+
+        profileImageContainer.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
+
+
 
         // Retrieve device Id
         deviceId = getIntent().getStringExtra("deviceId");
@@ -67,12 +101,21 @@ public class UserRegistrationActivity extends AppCompatActivity {
         // Set buttons on click listeners
         registerButton.setOnClickListener(v -> {
             String name = nameEditText.getText().toString().trim();
+            String email = emailEditText.getText().toString().trim();
+            String phone = phoneEditText.getText().toString().trim();
 
             // Check if user entered name in text field
             if (name.isEmpty()) {
                 Toast.makeText(this, "Please enter your name", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            // Check if user entered email in text field
+            if (email.isEmpty()) {
+                Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String userPhone = phone.isEmpty() ? null : phone;
 
             Boolean isAdmin = false;
 
@@ -84,13 +127,27 @@ public class UserRegistrationActivity extends AppCompatActivity {
             // Send user data to database
             Map<String, Object> userData = new HashMap<>();
             userData.put("name", name);
+            userData.put("email", email);
+            if (userPhone != null) userData.put("phone", phone);
             userData.put("isAdmin", isAdmin);
             userData.put("settings", settings);
+            userData.put("image", profileImageURL);
 
             db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).set(userData)
                     .addOnSuccessListener(unused -> {
+
                         // Add information into global session and return user to event list
-                        User user = new User(deviceId, name, null, null, isAdmin, null, null, null);
+                        User user = new User(
+                                deviceId,
+                                name,
+                                email,
+                                userPhone,
+                                profileImageURL,
+                                isAdmin,
+                                null,
+                                null,
+                                null);
+
                         UserSession.getInstance().setCurrentUser(user);
                         startActivity(new Intent(this, EntrantEventListActivity.class));
                         finish();
@@ -99,6 +156,31 @@ public class UserRegistrationActivity extends AppCompatActivity {
                         Toast.makeText(this, "Failed to register", Toast.LENGTH_SHORT).show();
                     });
         });
+    }
 
+    // Taken from ChatGPT March 29th 2026,
+    // "How do I add functionality for uploading profile images through the registration page"
+    private void uploadProfileImage(Uri uri) {
+        MediaManager.get().upload(uri)
+                .option("upload_preset", "ml_default")
+                .callback(new UploadCallback() {
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        profileImageURL = (String) resultData.get("secure_url");
+                        Toast.makeText(UserRegistrationActivity.this,
+                                "Image uploaded", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+                        Toast.makeText(UserRegistrationActivity.this,
+                                "Image upload failed", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override public void onStart(String requestId) {}
+                    @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
+                    @Override public void onReschedule(String requestId, ErrorInfo error) {}
+                })
+                .dispatch();
     }
 }

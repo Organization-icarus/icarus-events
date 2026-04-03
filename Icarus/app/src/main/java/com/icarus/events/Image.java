@@ -3,6 +3,7 @@ package com.icarus.events;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.cloudinary.android.MediaManager;
@@ -76,7 +77,7 @@ public class Image {
                                 .document(this.publicId)
                                 .delete()
                                 .addOnSuccessListener(unused -> {
-                                    // Remove image URl from all events that use it
+                                    // Remove image URl from all events and users that use it
                                     db.collection(FirestoreCollections.EVENTS_COLLECTION)
                                             .whereEqualTo("image", this.URL)
                                             .get()
@@ -85,21 +86,24 @@ public class Image {
                                                     doc.getReference().update("image", "No Image");
                                                 }
                                             });
-                                    Toast.makeText(context, "Image deleted", Toast.LENGTH_SHORT).show();
+                                    db.collection(FirestoreCollections.USERS_COLLECTION)
+                                            .whereEqualTo("image", this.URL)
+                                            .get()
+                                            .addOnSuccessListener(querySnapshot -> {
+                                                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                                    doc.getReference().update("image", "No Image");
+                                                }
+                                            });
                                 })
                                 .addOnFailureListener(e ->
-                                        Toast.makeText(context, "Failed to delete from database", Toast.LENGTH_SHORT).show()
+                                        Log.e("IMAGE_DELETE_ERROR", e.getMessage())
                                 );
                     });
                 } else {
-                    new Handler(Looper.getMainLooper()).post(() ->
-                            Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
-                    );
+                    Log.e("IMAGE_DELETE_ERROR", "Cloudinary delete failed for publicId: " + this.publicId);
                 }
             } catch (IOException e) {
-                new Handler(Looper.getMainLooper()).post(() ->
-                        Toast.makeText(context, "Failed to delete image", Toast.LENGTH_SHORT).show()
-                );
+                Log.e("IMAGE_DELETE_ERROR", e.getMessage());
             }
         }).start();
     }

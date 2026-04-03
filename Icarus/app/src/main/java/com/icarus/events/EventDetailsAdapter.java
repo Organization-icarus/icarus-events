@@ -44,27 +44,34 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd 'at' HH:mm", Locale.getDefault());
         Date regOpenDate = event.getRegOpen();
         Date regCloseDate = event.getRegClose();
-        Date eventDate = event.getDate();
+        Date eventStartDate = event.getStartDate();
+        Date eventEndDate = event.getEndDate();
         String regOpen = regOpenDate != null ? sdf.format(regOpenDate) : "TBD";
         String regClose = regCloseDate != null ? sdf.format(regCloseDate) : "TBD";
-        String date = eventDate != null ? sdf.format(eventDate) : "TBD";
-        String capacity = event.getCapacity() == null || event.getCapacity() < 1
-                ? "Unlimited"
-                : String.valueOf(event.getCapacity().intValue());
+        String startDate = eventStartDate != null ? sdf.format(eventStartDate) : "TBD";
+        String endDate = eventEndDate != null ? sdf.format(eventEndDate) : "TBD";
+
+        String waitingListDisplay;
+        if (event.getCapacity() == null || event.getCapacity() < 1) {
+            waitingListDisplay = event.getWaiting_list_size() + " (no limit)";
+        } else {
+            waitingListDisplay = event.getWaiting_list_size() + "/" + event.getCapacity().intValue();
+        }
 
         // Convert Event fields into EventField list
         fields.add(new EventField("Category", event.getCategory()));
-        fields.add(new EventField("Waiting List", String.valueOf(event.getWaiting_list_size()) + "/" + capacity));
+        fields.add(new EventField("Waiting List", waitingListDisplay));
         fields.add(new EventField("Registration Opens", regOpen));
         fields.add(new EventField("Registration Closes", regClose));
-        fields.add(new EventField("Event Date", date));
+        fields.add(new EventField("Event Start Date", startDate));
+        fields.add(new EventField("Event End Date", endDate));
         fields.add(new EventField("Location", event.getLocation()));
         fields.add(new EventField("Organizer", event.getOrganizers().get(0)));
         fields.add(new EventField("User Status", event.getUser_status()));
 
         // To get the organizer's name from their ID
         FirebaseFirestore.getInstance()
-                .collection("users")
+                .collection(FirestoreCollections.USERS_COLLECTION)
                 .document(event.getOrganizers().get(0))
                 .get()
                 .addOnSuccessListener(doc -> {

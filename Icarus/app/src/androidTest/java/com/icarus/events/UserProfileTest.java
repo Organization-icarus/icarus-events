@@ -73,6 +73,7 @@ public class UserProfileTest {
                             "Test Entrant",
                             "entrant@email.com",
                             "123456789",
+                            "No Image",
                             false,
                             new ArrayList<>(),
                             new ArrayList<>(),

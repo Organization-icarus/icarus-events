@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Taken from ChatGPT March 29th 2026,
+    "How can I add a dashed line box for the image placeholder on registration"-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@android:color/transparent" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/lightTextSemi"
+        android:dashWidth="8dp"
+        android:dashGap="6dp" />
+</shape>

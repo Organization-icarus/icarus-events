@@ -1,7 +1,6 @@
 package com.icarus.events;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,7 +15,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
@@ -27,10 +26,8 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.icarus.events.FirestoreCollections;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
@@ -43,11 +40,9 @@ import org.osmdroid.views.overlay.Polygon;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -61,12 +56,12 @@ import java.util.function.Consumer;
  * geolocation tracking is enabled. Event information is validated
  * and then stored in the Firestore "events" collection.
  * <p>
- * This activity extends {@link NavigationBarActivity} to include
+ * This activity extends {@link HeaderNavBarActivity} to include
  * the application's reusable navigation bar.
  *
  * @author Ben Salmon
  */
-public class OrganizerCreateEventActivity extends NavigationBarActivity {
+public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
     private  FirebaseFirestore db;
 
     private ImageView eventPoster;
@@ -86,17 +81,17 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
     private Button RegistrationEndDateButton;
     private Button RegistrationEndTimeButton;
 
-    private Button EventDate;
-    private Button EventTime;
+    private Button eventStartDate, eventEndDate;
+    private Button eventStartTime, eventEndTime;
     private Button CreateEvent;
 
     private Date startDate;
     private Date endDate;
-    private Date eventDate;
+    private Date eventStartDateDate, eventEndDateDate;
 
     private Date startTime;
     private Date endTime;
-    private Date eventTime;
+    private Date eventStartTimeTime, eventEndTimeTime;
 
     private ActivityResultLauncher<String> imagePickerLauncher;
     private String posterURL;
@@ -184,8 +179,10 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         RegistrationEndDateButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEndDate);
         RegistrationEndTimeButton = findViewById(R.id.OrganizerCreateEventRegistrationPeriodEndTime);
 
-        EventDate = findViewById(R.id.OrganizerCreateEventDate);
-        EventTime = findViewById(R.id.OrganizerCreateEventTime);
+        eventStartDate = findViewById(R.id.OrganizerCreateEventStartDate);
+        eventStartTime = findViewById(R.id.OrganizerCreateEventStartTime);
+        eventEndDate = findViewById(R.id.OrganizerCreateEventEndDate);
+        eventEndTime = findViewById(R.id.OrganizerCreateEventEndTime);
 
         CreateEvent = findViewById(R.id.OrganizerCreateEventCreateEvent);
 
@@ -239,20 +236,36 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
             });
         });
 
-        EventDate.setOnClickListener(v -> {
+        eventStartDate.setOnClickListener(v -> {
             // Set event date
             showDatePicker(date -> {
-                this.eventDate = date;
+                this.eventStartDateDate = date;
                 String eventDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
-                EventDate.setText("Event Date:\n"+ eventDate);
+                eventStartDate.setText("Event Date:\n"+ eventDate);
             });
         });
-        EventTime.setOnClickListener(v -> {
+        eventStartTime.setOnClickListener(v -> {
             // Set Registration end Time
             showTimePicker(time->{
-                eventTime = time;
-                String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(eventTime);
-                EventTime.setText("Event Time:\n"+showTime );
+                eventStartTimeTime = time;
+                String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(time);
+                eventStartTime.setText("Event Time:\n"+showTime );
+            });
+        });
+        eventEndDate.setOnClickListener(v -> {
+            // Set event date
+            showDatePicker(date -> {
+                this.eventEndDateDate = date;
+                String eventDate = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(date);
+                eventEndDate.setText("Event Date:\n"+ eventDate);
+            });
+        });
+        eventEndTime.setOnClickListener(v -> {
+            // Set Registration end Time
+            showTimePicker(time->{
+                eventEndTimeTime = time;
+                String showTime = new SimpleDateFormat("h:mm a", Locale.getDefault()).format(time);
+                eventEndTime.setText("Event Time:\n"+showTime );
             });
         });
 
@@ -267,14 +280,17 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
 
 
             // Check if user filled in all dates before proceeding
-            if (startDate == null || startTime == null || endDate == null || endTime == null || eventDate == null || eventTime == null) {
+            if (startDate == null || startTime == null || endDate == null || endTime == null ||
+                    eventStartDateDate == null || eventStartTimeTime == null ||
+                    eventEndDateDate == null || eventEndTimeTime == null) {
                 Toast.makeText(this, "Please select all dates", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             this.startDate = mergeDateAndTime(startDate,startTime);
             this.endDate = mergeDateAndTime(endDate,endTime);
-            this.eventDate = mergeDateAndTime(eventDate,eventTime);
+            this.eventStartDateDate = mergeDateAndTime(eventStartDateDate,eventStartTimeTime);
+            this.eventEndDateDate = mergeDateAndTime(eventEndDateDate,eventEndTimeTime);
 
             if (startDate.before(new Date())) {
                 Toast.makeText(this, "Registration Start Date cannot be in the past.", Toast.LENGTH_SHORT).show();
@@ -284,12 +300,16 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 Toast.makeText(this, "Registration Start Date cannot be after Registration End Date.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if(endDate.after(eventDate)){
-                Toast.makeText(this, "Registration End Date cannot be after Event Date.", Toast.LENGTH_SHORT).show();
+            if(endDate.after(eventStartDateDate)){
+                Toast.makeText(this, "Registration End Date cannot be after Event Start Date.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if(eventStartDateDate.after(eventEndDateDate)){
+                Toast.makeText(this, "Event Start Date cannot be after Event End Date.", Toast.LENGTH_SHORT).show();
                 return;
             }
             // Check if user filled all text fields before proceeding
-            if (name.isEmpty() || category.isEmpty() || location.isEmpty()) {
+            if (name.isEmpty() || category.equals("Category") || location.isEmpty()) {
                 Toast.makeText(this, "Please fill in name, category, and location fields.", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -323,10 +343,12 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                                         .document(publicId)
                                         .set(imageData)
                                         .addOnSuccessListener(unused -> {
+                                            Toast.makeText(OrganizerCreateEventActivity.this,
+                                                    "Image uploaded", Toast.LENGTH_SHORT).show();
                                         })
                                         .addOnFailureListener(e -> {
                                             Toast.makeText(OrganizerCreateEventActivity.this,
-                                                    "Failed to add image to firestore", Toast.LENGTH_SHORT).show();
+                                                    "Image upload failed", Toast.LENGTH_SHORT).show();
                                         });
                                 // Save event to firestore
                                 saveEvent(finalName, finalDescription, finalCategory, finalCapacity, posterURL, finalLocation, finalOrganizerIds);
@@ -336,7 +358,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                             public void onError(String requestId, ErrorInfo error) {
                                 posterURL = "";
                                 Toast.makeText(OrganizerCreateEventActivity.this,
-                                        "Failed to Upload Image.", Toast.LENGTH_SHORT).show();
+                                        "Image upload failed", Toast.LENGTH_SHORT).show();
                                 Log.e("UPLOAD_ERROR", error.getDescription());
                                 // Save event to firestore with empty poster
                                 saveEvent(finalName, finalDescription,finalCategory, finalCapacity, posterURL, finalLocation, finalOrganizerIds);
@@ -373,7 +395,8 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         eventData.put("capacity",capacity);
         eventData.put("open", startDate);
         eventData.put("close", endDate);
-        eventData.put("date", eventDate);
+        eventData.put("startDate", eventStartDateDate);
+        eventData.put("endDate", eventEndDateDate);
         eventData.put("image", posterURL);
         eventData.put("location", location);
         eventData.put("geolocation",geolocationSwitch.isChecked());
@@ -394,6 +417,7 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
         //Event event = new Event(null,name,category,numberOfPeople, this.startDate,this.endDate,this.eventDate);
         db.collection(FirestoreCollections.EVENTS_COLLECTION).add(eventData)
                 .addOnSuccessListener(unused -> {
+                    Toast.makeText(this, "Event created", Toast.LENGTH_SHORT).show();
                     finish();
                 })
                 .addOnFailureListener(e -> {
@@ -537,7 +561,8 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
                 // Place new marker
                 Marker marker = new Marker(dialogMap);
                 marker.setPosition(p);
-                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+                marker.setIcon(ResourcesCompat.getDrawable(getResources(), android.R.drawable.btn_star_big_on, getTheme()));
                 dialogMap.getOverlays().add(marker);
                 dialogMap.invalidate();
                 selectedMarker[0] = marker;
@@ -588,13 +613,19 @@ public class OrganizerCreateEventActivity extends NavigationBarActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                selectedEntrantRange = seekBar.getProgress();
+                if (seekBar.getProgress() > 0) {
+                    selectedEntrantRange = seekBar.getProgress();
+                }
             }
         });
 
         confirmButton.setOnClickListener(v -> {
             if (selectedMarker[0] == null) {
                 Toast.makeText(this, "Please tap a location on the map", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (selectedEntrantRange == null) {
+                Toast.makeText(this, "Please select an entrant range", Toast.LENGTH_SHORT).show();
                 return;
             }
             selectedEventLocation = selectedMarker[0].getPosition();

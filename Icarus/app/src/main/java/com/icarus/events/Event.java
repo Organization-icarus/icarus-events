@@ -18,7 +18,7 @@ public class Event {
     private Double capacity;
     private Date regOpen;
     private Date regClose;
-    private Date date;
+    private Date startDate, endDate;
     private String location;
     private String image;
     private ArrayList<String> organizers;
@@ -38,20 +38,22 @@ public class Event {
      * @param capacity the maximum number of entrants allowed
      * @param regOpen the date when registration opens
      * @param regClose the date when registration closes
-     * @param date the date the event takes place
+     * @param startDate the date the event takes place
+     * @param endDate the date the event takes place
      * @param location the location where the event is held
      * @param image the image associated with the event
      * @param organizers the identifier of the event organizer
      */
     public Event(String id, String name, String category, Double capacity, Date regOpen,
-                 Date regClose, Date date, String location, String image, ArrayList<String> organizers) {
+                 Date regClose, Date startDate, Date endDate, String location, String image, ArrayList<String> organizers) {
         this.id = id;
         this.name = name;
         this.category = category;
         this.capacity = capacity;
         this.regOpen = regOpen;
         this.regClose = regClose;
-        this.date = date;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.location = location;
         this.image = image;
         this.organizers = organizers;
@@ -59,7 +61,7 @@ public class Event {
 
     // A full constructor
     public Event(String id, String name, String category, Double capacity, Date regOpen,
-                 Date regClose, Date date, String location, String image, ArrayList<String> organizers,
+                 Date regClose, Date startDate, Date endDate, String location, String image, ArrayList<String> organizers,
                  String user_status, int waiting_list_size) {
         this.id = id;
         this.name = name;
@@ -67,7 +69,8 @@ public class Event {
         this.capacity = capacity;
         this.regOpen = regOpen;
         this.regClose = regClose;
-        this.date = date;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.location = location;
         this.image = image;
         this.organizers = organizers;
@@ -175,21 +178,39 @@ public class Event {
     }
 
     /**
-     * Returns the date of the event.
+     * Returns the start date of the event.
      *
      * @return the event date
      */
-    public Date getDate() {
-        return date;
+    public Date getStartDate() {
+        return startDate;
     }
 
     /**
-     * Sets the date of the event.
+     * Sets the start date of the event.
      *
      * @param date the new event date
      */
-    public void setDate(Date date) {
-        this.date = date;
+    public void setStartDate(Date date) {
+        this.startDate = date;
+    }
+
+    /**
+     * Returns the end date of the event.
+     *
+     * @return the event date
+     */
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    /**
+     * Sets the end date of the event.
+     *
+     * @param date the new event date
+     */
+    public void setEndDate(Date date) {
+        this.endDate = date;
     }
 
     public String getUser_status() { return user_status; }

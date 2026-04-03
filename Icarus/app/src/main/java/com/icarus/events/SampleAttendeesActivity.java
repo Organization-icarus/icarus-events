@@ -1,16 +1,16 @@
 package com.icarus.events;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import android.util.Log;
 
 /**
  * Activity that allows an organizer to randomly sample attendees
@@ -30,19 +31,7 @@ import java.util.Set;
  * The organizer specifies how many attendees to select. A random
  * subset of entrants with status {@code waiting} in Firestore
  * is updated to status {@code selected}.
- * from the event waitlist.
  * <p>
- * The organizer specifies how many attendees to select. A random
- * subset of users from the {@code waitlist_entrants} field in Firestore
- * is moved to the {@code selected_entrants} field.
- * <p>
- * Note: The event ID is currently hardcoded for testing purposes
- * and should be replaced with a dynamic value when integrated with
- * the full event management flow.
- * <p>
- * Outstanding issues:
- * - Event ID is currently hardcoded for testing.
- * - Entrants are sampled by device ID from the entrants' subcollection.
  * AI Use Disclosure:
  * AI tools were used to assist with drafting and revising parts of this activity,
  * including logic structure, wording, and code refinement. All final edits,
@@ -50,22 +39,18 @@ import java.util.Set;
  *
  * @author Yifan Jiao
  */
-public class SampleAttendeesActivity extends NavigationBarActivity {
-
-    private static final String TAG = "SampleAttendeesActivity";
+public class SampleAttendeesActivity extends HeaderNavBarActivity {
     private String eventId;
-
-    private int attendeeCount = 10;
+    private Button minusButton, addButton, sampleButton, cancelButton;
+    private TextView eventName;
+    private EditText attendeesNumber;
+    private int waitingListSize, inviteCount;
 
     private FirebaseFirestore db;
     private CollectionReference entrantsRef;
 
     /**
      * Initializes the sampling interface and UI controls.
-     * <p>
-     * This method configures the attendee count selector, navigation
-     * buttons, and sampling functionality. It also initializes the
-     * Firestore reference used to retrieve and update event data.
      *
      * @param savedInstanceState previously saved activity state,
      *                           or null if the activity is newly created
@@ -73,67 +58,81 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_sample_attendees);
         setupNavBar();
 
         eventId = getIntent().getStringExtra("eventId");
-
+        String name = getIntent().getStringExtra("ActivityName");
         db = FirebaseFirestore.getInstance();
+
+        // Assign entrantsRef here so sampleEntrants() can use it without crashing
         entrantsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(eventId)
                 .collection("entrants");
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        entrantsRef.whereEqualTo("status", "waiting")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots ->
+                        waitingListSize = queryDocumentSnapshots.size());
 
-        TextView attendeeCountText = findViewById(R.id.attendeeCountText);
-        TextView backButton = findViewById(R.id.backButton);
-        Button minusButton = findViewById(R.id.minusButton);
-        Button plusButton = findViewById(R.id.plusButton);
-        Button cancelButton = findViewById(R.id.cancelButton);
-        Button sampleButton = findViewById(R.id.sampleButton);
 
-        updateAttendeeCount(attendeeCountText);
+        eventName = findViewById(R.id.OrganizerSampleAttendeesEventTitle);
+        eventName.setText(name);
+        //Create Add, Minus, and EditText
+        attendeesNumber = findViewById(R.id.OrganizerSampleAttendeesCountText);
+        minusButton = findViewById(R.id.OrganizerSampleAttendeesMinusButton);
+        addButton = findViewById(R.id.OrganizerSampleAttendeesPlusButton);
+        //Create Cancel and Sample Buttons
+        cancelButton = findViewById(R.id.OrganizerSampleAttendeesCancelButton);
+        sampleButton = findViewById(R.id.OrganizerSampleAttendeesSampleButton);
 
-        backButton.setOnClickListener(v -> finish());
+        inviteCount = 1;
+        attendeesNumber.setText(String.valueOf(inviteCount));
 
-        plusButton.setOnClickListener(v -> {
-            attendeeCount++;
-            updateAttendeeCount(attendeeCountText);
+        addButton.setOnClickListener(v -> {
+            inviteCount = Integer.parseInt(attendeesNumber.getText().toString());
+            if (inviteCount >= waitingListSize) {
+                inviteCount = waitingListSize;
+                attendeesNumber.setText(String.valueOf(inviteCount));
+            } else if (inviteCount < 1) {
+                inviteCount = 1;
+                attendeesNumber.setText(String.valueOf(inviteCount));
+            } else {
+                inviteCount++;
+                attendeesNumber.setText(String.valueOf(inviteCount));
+            }
         });
 
         minusButton.setOnClickListener(v -> {
-            if (attendeeCount > 1) {
-                attendeeCount--;
-                updateAttendeeCount(attendeeCountText);
+            inviteCount = Integer.parseInt(attendeesNumber.getText().toString());
+            if (inviteCount >= waitingListSize) {
+                inviteCount = waitingListSize;
+                attendeesNumber.setText(String.valueOf(inviteCount));
+            } else if (inviteCount < 1) {
+                inviteCount = 1;
+                attendeesNumber.setText(String.valueOf(inviteCount));
+            } else if (inviteCount > 1) {
+                inviteCount--;
+                attendeesNumber.setText(String.valueOf(inviteCount));
             }
         });
 
         cancelButton.setOnClickListener(v -> finish());
 
-        sampleButton.setOnClickListener(v -> sampleEntrants());
+        sampleButton.setOnClickListener(v -> {
+            inviteCount = Integer.parseInt(attendeesNumber.getText().toString());
+            sampleEntrants();
+            finish();
+        });
+
     }
 
-    /**
-     * Updates the attendee count displayed on screen.
-     *
-     * @param attendeeCountText TextView used to display the current
-     *                          number of attendees to sample
-     */
-    private void updateAttendeeCount(TextView attendeeCountText) {
-        attendeeCountText.setText(String.valueOf(attendeeCount));
-    }
 
     /**
      * Randomly selects entrants with status "waiting" and updates them to "selected".
-     * Randomly selects entrants from the event waitlist and moves them
-     * to the selected entrants list.
+     * <p>
      * AI tools were used to help draft and refine portions of the entrant sampling
-     * and Firestore batch update logic in this method. Final implementation decisions
+     * and Firestore batch update logic in this method.
      */
     private void sampleEntrants() {
         entrantsRef.whereEqualTo("status", "waiting")
@@ -146,13 +145,15 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
                     for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
                         waitingEntrants.add(snapshot);
                     }
+
                     if (waitingEntrants.isEmpty()) {
                         Toast.makeText(this, "No waiting entrants to sample.", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
-                    int numberToMove = Math.min(attendeeCount, waitingEntrants.size());
+                    int numberToMove = Math.min(inviteCount, waitingEntrants.size());
                     Collections.shuffle(waitingEntrants);
+
                     WriteBatch batch = db.batch();
 
                     for (int i = 0; i < numberToMove; i++) {
@@ -163,7 +164,9 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
 
                     for (QueryDocumentSnapshot entrant : waitingEntrants) {
                         String userId = entrant.getId();
-                        if (!sampledEntrants.contains(userId)) rejectedEntrants.add(userId);
+                        if (!sampledEntrants.contains(userId)) {
+                            rejectedEntrants.add(userId);
+                        }
                     }
 
                     batch.commit()
@@ -174,26 +177,30 @@ public class SampleAttendeesActivity extends NavigationBarActivity {
                                         Toast.LENGTH_SHORT
                                 ).show();
 
-                                db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).get()
+                                db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                                        .document(eventId)
+                                        .get()
                                         .addOnSuccessListener(event -> {
                                             NotificationItem notification = new NotificationItem(
                                                     eventId,
                                                     UserSession.getInstance().getCurrentUser().getId(),
                                                     true,
                                                     new ArrayList<>(sampledEntrants),
-                                                    "Congratulations! You have been selected to attend " +
-                                                            event.getString("name") + " on " + event.getDate("date"),
+                                                    "Congratulations! You have been selected to attend "
+                                                            + event.getString("name") + " on " + event.getDate("date"),
                                                     "selected"
                                             );
                                             notification.sendNotification();
                                         });
                             })
                             .addOnFailureListener(e -> {
-                                Log.e(TAG, "Failed to update entrant statuses", e);
+                                Log.e("SampleAttendees", "Failed to update entrant statuses", e);
                                 Toast.makeText(this, "Failed to update entrants.", Toast.LENGTH_SHORT).show();
                             });
-                });
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this,
+                                "Failed to load waiting entrants.",
+                                Toast.LENGTH_SHORT).show());
     }
 }
-
-

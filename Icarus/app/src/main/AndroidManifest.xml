@@ -72,6 +72,8 @@
         <activity android:name=".OrganizerMyEventsActivity" />
 
 
+        <activity android:name=".EventCommentActivity" />
+
     </application>
 
 </manifest>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/primary"
+    android:fitsSystemWindows="true" >
+
+    <!-- The Header -->
+    <include
+        layout="@layout/header_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <!-- USER COMMENTS -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/event_comments_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- DELETE COMMENTS -->
+    <!-- TODO: this button UI is ugly -->
+    <com.google.android.material.button.MaterialButton
+        style="@style/AppButton"
+        android:id="@+id/manage_button"
+        android:text="Delete"
+        android:textColor="@color/lightText"
+        android:backgroundTint="@color/attention"
+        app:icon="@drawable/delete"
+        app:iconTint="@color/lightText"
+        android:visibility="gone"/>
+
+    <!-- COMMENT INPUT -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/lightTextSemi"
+        android:alpha="0.3"/>
+
+    <LinearLayout
+        android:id="@+id/comment_input_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:paddingBottom="20dp"
+        android:gravity="center_vertical"
+        android:background="@color/primary">
+
+        <!-- Profile Picture -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/new_comment_profile_picture"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/poster"
+            app:shapeAppearance="@style/ShapeAppearanceOverlay.App.CircleImageView"/>
+
+        <!-- Text Input (no outline) -->
+        <EditText
+            android:id="@+id/comment_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:hint="Add a comment..."
+            android:textColor="@color/lightText"
+            android:textColorHint="@color/lightTextSemi"
+            android:textSize="@dimen/font_text_size"
+            android:inputType="textMultiLine"
+            android:maxLines="4"
+            android:minLines="1"/>
+
+        <!-- Post Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/send_comment_button"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Post"
+            android:textColor="#0095F6"
+            android:textStyle="bold"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"/>
+
+    </LinearLayout>
+
+    <!-- NAVIGATION BAR -->
+    <include
+        android:id="@+id/nav_bar"
+        layout="@layout/nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/nav_bar_height"/>
+
+</LinearLayout>

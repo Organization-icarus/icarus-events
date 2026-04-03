@@ -1,9 +1,6 @@
 package com.icarus.events;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +12,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.cloudinary.android.MediaManager;
-import com.cloudinary.utils.ObjectUtils;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Adapter used in the administrator dashboard to display images in a ListView.
@@ -83,7 +75,8 @@ public class AdministratorDashboardImageArrayAdapter extends ArrayAdapter<Image>
                 .document(image.getPublicId()).get()
                 .addOnSuccessListener(snapshot -> {
                     if (snapshot.exists()) {
-                        if (snapshot.getString("URL") != null) {
+                        String imageURL = snapshot.getString("URL");
+                        if (imageURL != null && !imageURL.isEmpty()) {
                             Picasso.get()
                                     .load(snapshot.getString("URL"))
                                     .error(R.drawable.poster)           // Optional: shows if link fails
@@ -98,6 +91,7 @@ public class AdministratorDashboardImageArrayAdapter extends ArrayAdapter<Image>
         // remove image
         removeImageButton.setOnClickListener(v -> {
             image.delete(context, db);
+            Toast.makeText(context, "Image deleted", Toast.LENGTH_SHORT).show();
         });
 
         return view;

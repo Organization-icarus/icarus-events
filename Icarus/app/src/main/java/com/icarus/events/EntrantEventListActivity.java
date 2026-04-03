@@ -2,7 +2,8 @@ package com.icarus.events;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-import android.app.DatePickerDialog;
+import androidx.core.util.Pair;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import android.content.Intent;
 import android.view.ContextThemeWrapper;
 import android.content.res.ColorStateList;
@@ -14,7 +15,11 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.view.MotionEvent;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -52,7 +57,7 @@ import java.util.Map;
  *
  * @author Alex Alves
  */
-public class EntrantEventListActivity extends NavigationBarActivity {
+public class EntrantEventListActivity extends HeaderNavBarActivity {
     //Define attributes
     private RecyclerView eventListView;
     private String currentSearch = "";
@@ -139,6 +144,31 @@ public class EntrantEventListActivity extends NavigationBarActivity {
 
         //Initialize text filter
         searchTextFilter = findViewById(R.id.entrant_event_list_search_filter);
+        eventListView.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                searchTextFilter.clearFocus();
+            }
+            return false;
+        });
+        searchTextFilter.setOnEditorActionListener((v, actionId, event) -> {
+            boolean isEnterKey = event != null
+                    && event.getAction() == KeyEvent.ACTION_DOWN
+                    && event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
+
+            boolean isImeAction = actionId == EditorInfo.IME_ACTION_SEARCH
+                    || actionId == EditorInfo.IME_ACTION_DONE
+                    || actionId == EditorInfo.IME_ACTION_GO;
+
+            if (isEnterKey || isImeAction) {
+                searchTextFilter.clearFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(searchTextFilter.getWindowToken(), 0);
+                }
+                return true;
+            }
+            return false;
+        });
         searchTextFilter.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -201,12 +231,19 @@ public class EntrantEventListActivity extends NavigationBarActivity {
                         continue;
                     }
                     String id = snapshot.getId();
+                    Boolean isPrivate = snapshot.getBoolean("isPrivate");
+                    // Hide private events
+                    if (Boolean.TRUE.equals(isPrivate)) {
+                        continue;
+                    }
+
                     String name = snapshot.getString("name");
                     String category  = snapshot.getString("category");
                     Double capacity = snapshot.getDouble("capacity");
                     Date regOpen = snapshot.getDate("open");
                     Date regClose = snapshot.getDate("close");
-                    Date date = snapshot.getDate("date");
+                    Date startDate = snapshot.getDate("startDate");
+                    Date endDate = snapshot.getDate("endDate");
                     String location = snapshot.getString("location");
                     String image = snapshot.getString("image");
                     ArrayList<String> organizers = (ArrayList<String>) snapshot.get("organizers");
@@ -222,7 +259,8 @@ public class EntrantEventListActivity extends NavigationBarActivity {
                                     capacity,
                                     regOpen,
                                     regClose,
-                                    date,
+                                    startDate,
+                                    endDate,
                                     location,
                                     image,
                                     organizers));
@@ -271,47 +309,6 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     }
 
     /**
-     * Handles a category filter button click by toggling its visual state
-     * and applying the updated filters to the event list. (Currently not in use)
-     *
-     * @param filterName the category associated with the button
-     * @param button the button that was clicked
-     */
-    private void handleButtonClick(String filterName, Button button) {
-        //Check if already true in filter list
-        boolean selected = Boolean.TRUE.equals(currentFilters.get(filterName));
-        if (selected) {
-            //Set button to be normal colour
-            button.setBackgroundColor(
-                    androidx.core.content.ContextCompat.getColor(
-                            this,
-                            R.color.primary_container
-                    )
-            );
-            button.setTextColor(
-                    androidx.core.content.ContextCompat.getColor(
-                            this,
-                            R.color.primary_container_highlighted
-                    )
-            );
-        } else {
-            //Set button to be selected colour
-            button.setBackgroundColor(
-                    androidx.core.content.ContextCompat.getColor(
-                            this,
-                            R.color.primary_container_highlighted
-                    )
-            );
-            button.setTextColor(androidx.core.content.ContextCompat.getColor(
-                            this,
-                            R.color.primary_container
-                    )
-            );
-        }
-        applyFilters();
-    }
-
-    /**
      * Applies the current search text and all active filters to the event list.
      * <p>
      * Updates the filtered event list based on the active filters and refreshes
@@ -332,11 +329,11 @@ public class EntrantEventListActivity extends NavigationBarActivity {
             boolean matchesCapacity = maxCapacityFilter == null
                     || (event.getCapacity() != null && event.getCapacity() <= maxCapacityFilter);
 
-            Date eventDate = event.getDate();
+            Date eventStartDate = event.getStartDate();
             boolean matchesStartDate = startDateFilter == null
-                    || (eventDate != null && !eventDate.before(startDateFilter));
+                    || (eventStartDate != null && !eventStartDate.before(startDateFilter));
             boolean matchesEndDate = endDateFilter == null
-                    || (eventDate != null && !eventDate.after(endDateFilter));
+                    || (eventStartDate != null && !eventStartDate.after(endDateFilter));
 
             Long waitingCount = eventWaitingCounts.get(event.getId());
             boolean isFull = waitingCount != null
@@ -363,8 +360,8 @@ public class EntrantEventListActivity extends NavigationBarActivity {
                         : name2.compareTo(name1);
             }
 
-            Date date1 = event1.getDate();
-            Date date2 = event2.getDate();
+            Date date1 = event1.getStartDate();
+            Date date2 = event2.getStartDate();
 
             if (date1 == null && date2 == null) {
                 return 0;
@@ -453,13 +450,10 @@ public class EntrantEventListActivity extends NavigationBarActivity {
         capacityRow.setOnClickListener(v -> showMaxCapacityDialog(capacityRow));
         addFilterRow(container, capacityRow);
 
-        MaterialButton startDateRow = buildDialogRow(getStartDateSummaryText(), startDateFilter != null);
-        startDateRow.setOnClickListener(v -> showDatePicker(true, startDateRow));
-        addFilterRow(container, startDateRow);
-
-        MaterialButton endDateRow = buildDialogRow(getEndDateSummaryText(), endDateFilter != null);
-        endDateRow.setOnClickListener(v -> showDatePicker(false, endDateRow));
-        addFilterRow(container, endDateRow);
+        MaterialButton dateRangeRow = buildDialogRow(getDateRangeSummaryText(),
+                startDateFilter != null || endDateFilter != null);
+        dateRangeRow.setOnClickListener(v -> showDateRangePicker(dateRangeRow));
+        addFilterRow(container, dateRangeRow);
 
         MaterialButton sortRow = buildDialogRow(getSortSummaryText(), sortOptionSelected);
         sortRow.setOnClickListener(v -> showSortDropdown(sortRow));
@@ -805,37 +799,54 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     /**
      * Displays a date picker to choose the start or end date filter.
      *
-     * @param isStartDate true to set the start date, false for the end date
      * @param anchor the row text to refresh after selection
      */
-    private void showDatePicker(boolean isStartDate, MaterialButton anchor) {
-        Calendar calendar = Calendar.getInstance();
-        Date currentDate = isStartDate ? startDateFilter : endDateFilter;
+    private void showDateRangePicker(MaterialButton anchor) {
+        MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker()
+                .setTitleText("Select Event Date Range");
 
-        if (currentDate != null) {
-            calendar.setTime(currentDate);
+        if (startDateFilter != null && endDateFilter != null) {
+            builder.setSelection(new Pair<>(startDateFilter.getTime(), endDateFilter.getTime()));
         }
 
-        new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-            Calendar selectedCalendar = Calendar.getInstance();
-            selectedCalendar.set(year, month, dayOfMonth);
+        MaterialDatePicker<Pair<Long, Long>> picker = builder.build();
 
-            if (isStartDate) {
-                setStartOfDay(selectedCalendar);
-                startDateFilter = selectedCalendar.getTime();
-                anchor.setText(getStartDateSummaryText());
-            } else {
-                setEndOfDay(selectedCalendar);
-                endDateFilter = selectedCalendar.getTime();
-                anchor.setText(getEndDateSummaryText());
+        picker.addOnPositiveButtonClickListener(selection -> {
+            if (selection != null) {
+                Long start = selection.first;
+                Long end = selection.second;
+
+                if (start != null) {
+                    Calendar startCalendar = Calendar.getInstance();
+                    startCalendar.setTimeInMillis(start);
+                    setStartOfDay(startCalendar);
+                    startDateFilter = startCalendar.getTime();
+                } else {
+                    startDateFilter = null;
+                }
+
+                if (end != null) {
+                    Calendar endCalendar = Calendar.getInstance();
+                    endCalendar.setTimeInMillis(end);
+                    setEndOfDay(endCalendar);
+                    endDateFilter = endCalendar.getTime();
+                } else {
+                    endDateFilter = null;
+                }
+
+                anchor.setText(getDateRangeSummaryText());
+                anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
+                boolean hasDateRange = startDateFilter != null || endDateFilter != null;
+                anchor.setBackgroundTintList(ColorStateList.valueOf(
+                        hasDateRange ? getColor(R.color.accent_first) : getColor(R.color.white)
+                ));
+                anchor.setStrokeColor(ColorStateList.valueOf(
+                        hasDateRange ? getColor(R.color.accent_first) : getColor(R.color.white)
+                ));
             }
-            anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
-            anchor.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.accent_first)));
-            anchor.setStrokeColor(ColorStateList.valueOf(getColor(R.color.accent_first)));
-        },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)).show();
+        });
+
+        picker.show(getSupportFragmentManager(), "event_date_range_picker");
     }
 
     // Taken from ChatGPT March 29th 2026,
@@ -936,25 +947,22 @@ public class EntrantEventListActivity extends NavigationBarActivity {
     }
 
     /**
-     * Returns summary text for the start date row.
+     * Returns summary text for the date range row.
      *
-     * @return summary text for start date filter
+     * @return summary text for date range filter
      */
-    private String getStartDateSummaryText() {
-        return startDateFilter == null
-                ? "Start Date: Any"
-                : "Start Date: " + filterDateFormat.format(startDateFilter);
-    }
-
-    /**
-     * Returns summary text for the end date row.
-     *
-     * @return summary text for end date filter
-     */
-    private String getEndDateSummaryText() {
-        return endDateFilter == null
-                ? "End Date: Any"
-                : "End Date: " + filterDateFormat.format(endDateFilter);
+    private String getDateRangeSummaryText() {
+        if (startDateFilter == null && endDateFilter == null) {
+            return "Date Range: Any";
+        }
+        if (startDateFilter != null && endDateFilter != null) {
+            return "Date Range: " + filterDateFormat.format(startDateFilter)
+                    + " - " + filterDateFormat.format(endDateFilter);
+        }
+        if (startDateFilter != null) {
+            return "Date Range: From " + filterDateFormat.format(startDateFilter);
+        }
+        return "Date Range: Until " + filterDateFormat.format(endDateFilter);
     }
 
     @Override

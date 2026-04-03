@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:paddingStart="@dimen/side_padding"
+    android:paddingEnd="@dimen/side_padding"
+    android:background="@color/primary">
+
+    <!-- Profile Picture (top left) -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/comment_profile_picture"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="top"
+        android:scaleType="centerCrop"
+        android:src="@drawable/poster"
+        app:shapeAppearance="@style/ShapeAppearanceOverlay.App.CircleImageView"/>
+
+    <!-- Right side: username + timestamp on one row, comment below -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingStart="10dp">
+
+        <!-- Username + Timestamp on the same row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/comment_author_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textColor="@color/lightTextSemi"
+                android:textSize="@dimen/font_mini_text_size"
+                android:text="Alex Alves" />
+
+            <TextView
+                android:id="@+id/comment_divider"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:textStyle="bold"
+                android:textColor="@color/lightTextSemi"
+                android:textSize="@dimen/font_mini_text_size"
+                android:text="•" />
+
+            <TextView
+                android:id="@+id/createdAtTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:textColor="@color/lightTextSemi"
+                android:textSize="@dimen/font_mini_text_size"
+                android:text="5m" />
+
+        </LinearLayout>
+
+        <!-- Comment below username -->
+        <TextView
+            android:id="@+id/commentTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/lightText"
+            android:textSize="@dimen/font_text_size"
+            android:text="Example comment about this event." />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/comment_select_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_circle"
+        app:tint="@color/lightTextSemi"
+        android:visibility="gone"/>
+</LinearLayout>

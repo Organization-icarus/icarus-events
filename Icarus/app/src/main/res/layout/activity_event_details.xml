@@ -3,18 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary">
+    android:background="@color/primary"
+    android:fitsSystemWindows="true" >
 
     <!-- MAIN CONTENT -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-            <!-- FULL_WIDTH EVENT POSTER -->
+        <!-- FULL_WIDTH EVENT POSTER -->
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
+                <!-- The Header -->
+                <include
+                    layout="@layout/header_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <!-- POSTER: edge-to-edge -->
                 <ImageView
@@ -22,7 +29,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:scaleType="centerCrop"
-                    android:layout_marginTop="32dp"
                     android:src="@drawable/poster" />
 
             <!-- OTHER CONTENT -->
@@ -82,19 +88,39 @@
                             android:nestedScrollingEnabled="false"/>
 
                     <!-- LOTTERY GUIDELINES -->
-                    <TextView
-                        android:id="@+id/lottery_guidelines"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="Lottery Guidelines"
-                        android:textColor="@color/white"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:gravity="center" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:orientation="horizontal"
+                            android:gravity="start">
+
+                            <!-- COMMENTS BUTTON -->
+                            <ImageButton
+                                android:id="@+id/comments_button"
+                                android:layout_width="@dimen/image_button_size"
+                                android:layout_height="@dimen/image_button_size"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:src="@drawable/ic_comment"
+                                app:tint="@color/white"
+                                android:contentDescription="Comments"/>
+
+                            <!-- LOTTERY GUIDELINES BUTTON -->
+                            <ImageButton
+                                android:id="@+id/lottery_guidelines"
+                                android:layout_width="@dimen/image_button_size"
+                                android:layout_height="@dimen/image_button_size"
+                                android:layout_marginStart="12dp"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:src="@drawable/ic_guideline"
+                                app:tint="@color/white"
+                                android:contentDescription="Lottery Guidelines"/>
+
+                        </LinearLayout>
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
 
                 <!-- -->
                 <!-- BUTTONS -->
@@ -145,6 +171,14 @@
                     android:id="@+id/leave_waiting_list_button"
                     android:text="Leave Waiting List"
                     app:icon="@drawable/back"
+                    android:visibility="visible"/>
+
+                <!-- USER PRINT TICKET -->
+                <com.google.android.material.button.MaterialButton
+                    style="@style/AppButton"
+                    android:id="@+id/print_ticket_button"
+                    android:text="Print Ticket"
+                    app:icon="@drawable/ticket"
                     android:visibility="visible"/>
 
                 <!-- USER SELECTED -->

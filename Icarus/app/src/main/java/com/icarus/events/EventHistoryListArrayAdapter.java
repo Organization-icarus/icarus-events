@@ -67,9 +67,9 @@ public class EventHistoryListArrayAdapter extends ArrayAdapter<Event> {
         eventName.setText(event.getName());
         eventCategory.setText(event.getCategory());
         // Reformatting date to be more readable and convert to string
-        if (event.getDate() != null) {
+        if (event.getStartDate() != null) {
             SimpleDateFormat formatter = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
-            String dateString = formatter.format(event.getDate());
+            String dateString = formatter.format(event.getStartDate());
             eventDate.setText(dateString);
         } else {
             eventDate.setText(R.string.entrant_event_list_missing_date);

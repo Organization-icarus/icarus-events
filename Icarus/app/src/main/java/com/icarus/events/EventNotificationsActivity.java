@@ -8,9 +8,11 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Activity for viewing all notifications sent for a specific event.
@@ -20,7 +22,7 @@ import java.util.ArrayList;
  *
  * @author Ben Salmon
  */
-public class EventNotificationsActivity extends NavigationBarActivity {
+public class EventNotificationsActivity extends HeaderNavBarActivity {
 
     private FirebaseFirestore db;
     private String eventId;
@@ -64,12 +66,14 @@ public class EventNotificationsActivity extends NavigationBarActivity {
 
         db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
                 .whereEqualTo("eventId", eventId)
-                .orderBy("date", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .orderBy("date", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        ArrayList<String> recipients =
-                                (ArrayList<String>) doc.get("recipients");
+                        List<String> rawRecipients = (List<String>) doc.get("recipients");
+                        ArrayList<String> recipients = rawRecipients == null
+                                ? new ArrayList<>()
+                                : new ArrayList<>(rawRecipients);
 
                         Boolean isEvent = doc.getBoolean("isEvent");
                         if (isEvent == null) {
@@ -80,7 +84,7 @@ public class EventNotificationsActivity extends NavigationBarActivity {
                                 doc.getString("eventId"),
                                 doc.getString("sender"),
                                 isEvent,
-                                recipients != null ? recipients : new ArrayList<>(),
+                                recipients,
                                 doc.getString("message") != null ? doc.getString("message") : "",
                                 doc.getString("type") != null ? doc.getString("type") : "general"
                         );

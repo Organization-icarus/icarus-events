@@ -1,32 +1,36 @@
 package com.icarus.events;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * ArrayAdapter used in the administrator dashboard to display events in a ListView.
@@ -36,115 +40,183 @@ import java.util.Locale;
  *
  * @author Benjamin Hall
  */
-public class AdministratorDashboardEventArrayAdapter extends ArrayAdapter<Event> {
+public class AdministratorDashboardEventArrayAdapter extends RecyclerView.Adapter<AdministratorDashboardEventArrayAdapter.ViewHolder> {
     private ArrayList<Event> events;
     private Context context;
     private FirebaseFirestore db;
+    Map<String, String> categoryColors;
+
+    /**
+     * ViewHolder for the event list items.
+     */
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView eventName;
+        TextView eventCategory;
+        TextView eventDate;
+        ImageButton removeEventButton;
+        ImageView posterView;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            eventName = itemView.findViewById(R.id.admin_dashboard_event_list_event_name);
+            eventCategory = itemView.findViewById(R.id.admin_dashboard_event_list_event_category);
+            eventDate = itemView.findViewById(R.id.admin_dashboard_event_list_event_date);
+            posterView = itemView.findViewById(R.id.admin_dashboard_event_list_poster);
+            removeEventButton = itemView.findViewById(R.id.admin_dashboard_event_list_remove_event_button);
+        }
+    }
 
     /**
      * Constructs an adapter for displaying Event objects in the administrator
      * dashboard event list.
      *
      * @param context the context used to inflate views and access resources
-     * @param events the list of events to be displayed by the adapter
+     * @param events  the list of events to be displayed by the adapter
      */
-    public AdministratorDashboardEventArrayAdapter(Context context, ArrayList<Event> events){
-        super(context, 0, events);
+    public AdministratorDashboardEventArrayAdapter(Context context, ArrayList<Event> events, Map<String, String> categoryColors) {
         this.events = events;
         this.context = context;
+        this.categoryColors = categoryColors != null ? categoryColors : new HashMap<>();
         this.db = FirebaseFirestore.getInstance();
     }
 
-    /**
-     * Returns a view for displaying an event in the administrator event list.
-     * <p>
-     * Inflates the list item layout if necessary, binds the data to the UI
-     * components, and configures actions for viewing event details and
-     * removing the event from the database.
-     *
-     * @param position the position of the event in the adapter's data set
-     * @param convertView a view to reuse
-     * @param parent the parent view that this view will be attached to
-     * @return the view representing the event at the specified position
-     */
     @NonNull
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent){
-        View view = convertView;
-        if (view == null){
-            view = LayoutInflater.from(context)
-                    .inflate(R.layout.administrator_dashboard_event_list_content, parent, false);
-        }
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context)
+                .inflate(R.layout.administrator_dashboard_event_list_content, parent, false);
+        return new ViewHolder(view);
+    }
 
-        // Initializing views
+    @SuppressLint("ResourceType")
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = events.get(position);
-        TextView eventName = view
-                .findViewById(R.id.admin_dashboard_event_list_event_name);
-        LinearLayout eventDetails = view
-                .findViewById(R.id.admin_dashboard_event_list_details_layout);
-        ImageButton removeEventButton = view
-                .findViewById(R.id.admin_dashboard_event_list_remove_event_button);
-        TextView eventCategory = view.findViewById(R.id.admin_dashboard_event_list_event_category);
-        TextView eventDate = view.findViewById(R.id.admin_dashboard_event_list_event_date);
 
-        // Setting event details values
-        eventName.setText(event.getName());
-        eventCategory.setText(event.getCategory());
-        // Reformatting date to be more readable and convert to string
-        if (event.getDate() != null) {
-            SimpleDateFormat formatter = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
-            String dateString = formatter.format(event.getDate());
-            eventDate.setText(dateString);
+        // Apply rotating accent color to poster background
+        int[] accentColors = {
+                context.getColor(R.color.accent_third),
+                context.getColor(R.color.accent_second),
+                context.getColor(R.color.accent_first)
+        };
+
+        //holder.textContainer.setBackgroundColor(accentColors[position % accentColors.length]);
+        //((MaterialCardView) holder.itemView).setStrokeColor(accentColors[position % accentColors.length]);
+        //((MaterialCardView) holder.itemView).setStrokeColor(accentColors[0]);
+        // Load poster image
+        if (event.getImage() != null && !event.getImage().trim().isEmpty()) {
+            Picasso.get()
+                    .load(event.getImage())
+                    .error(R.drawable.poster)           // Optional: shows if link fails
+                    .into(holder.posterView);
         } else {
-            eventDate.setText(R.string.entrant_event_list_missing_date);
+            holder.posterView.setImageResource(R.drawable.poster);
         }
 
-        // Initializing click listeners
-        eventDetails.setOnClickListener(v -> {
+        holder.eventName.setText(event.getName());
+        holder.eventCategory.setText(event.getCategory());
+
+        // Generated by chatGPT Mar 28th 2026,
+        // "How can I safely parse my category color into the background of the category?"
+        GradientDrawable chipBackground =
+                (GradientDrawable) holder.eventCategory.getBackground().mutate();
+        // reset to default first
+        chipBackground.setColor(Color.parseColor(context.getString(R.color.accent_first)));
+        // Get attached color
+        String hexColor = categoryColors.get(event.getCategory());
+        if (hexColor != null && !hexColor.trim().isEmpty()) {
+            try {
+                chipBackground =
+                        (GradientDrawable) holder.eventCategory.getBackground().mutate();
+                chipBackground.setColor(Color.parseColor(hexColor));
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        // Reformatting date to be more readable and convert to string
+        if (event.getStartDate() != null) {
+            SimpleDateFormat formatter = new SimpleDateFormat("MMM d, yyyy", Locale.getDefault());
+            String dateString = formatter.format(event.getStartDate());
+            holder.eventDate.setText(dateString);
+        } else {
+            holder.eventDate.setText(R.string.entrant_event_list_missing_date);
+        }
+
+        // Navigate to event details
+        holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, EventDetailsActivity.class);
             intent.putExtra("eventId", event.getId());
             context.startActivity(intent);
         });
 
-        removeEventButton.setOnClickListener(v -> {
+        holder.removeEventButton.setOnClickListener(v -> {
             // Code generated by Claude AI March 11, 2026
             // "How to remove event ID from a users list of events for each user document in the
             // events 'entrants' subcollection."
             CollectionReference eventEntrantsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(event.getId()).collection("entrants");
-            eventEntrantsRef.get().addOnSuccessListener(userSnapshots -> {
-                WriteBatch batch = db.batch();
+            CollectionReference eventCommentsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(event.getId()).collection("comments");
+            CollectionReference eventNotificationsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(event.getId()).collection("notifications");
 
-                // remove event from each user's events array
-                for (DocumentSnapshot userDoc : userSnapshots.getDocuments()) {
-                    String userId = userDoc.getId();
-                    DocumentReference userRef = db.collection(FirestoreCollections.USERS_COLLECTION).document(userId);
-                    batch.update(userRef, "events", FieldValue.arrayRemove(event.getId()));
-                    // Delete the entrant document from the 'entrants' subcollection
-                    batch.delete(userDoc.getReference());
-                }
+            com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot> entrantsTask = eventEntrantsRef.get();
+            com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot> commentsTask = eventCommentsRef.get();
+            com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot> notificationsTask = eventNotificationsRef.get();
 
-                // remove the events poster from the database
-                db.collection(FirestoreCollections.IMAGES_COLLECTION)
-                        .whereEqualTo("URL", event.getImage())
-                        .get()
-                        .addOnSuccessListener(querySnapshot -> {
-                            for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                                Image poster = new Image(event.getImage(), doc.getId());
-                                poster.delete(context, db);
-                            }
-                        });
+            com.google.android.gms.tasks.Tasks.whenAllSuccess(entrantsTask, commentsTask, notificationsTask)
+                    .addOnSuccessListener(results -> {
+                        WriteBatch batch = db.batch();
 
-                // remove event document
-                DocumentReference eventRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(event.getId());
-                batch.delete(eventRef);
+                        com.google.firebase.firestore.QuerySnapshot userSnapshots = (com.google.firebase.firestore.QuerySnapshot) results.get(0);
+                        com.google.firebase.firestore.QuerySnapshot commentSnapshots = (com.google.firebase.firestore.QuerySnapshot) results.get(1);
+                        com.google.firebase.firestore.QuerySnapshot notificationSnapshots = (com.google.firebase.firestore.QuerySnapshot) results.get(2);
 
-                // commit the batch
-                batch.commit()
-                        .addOnSuccessListener(aVoid -> Log.d("Firestore", "Event deleted successfully"))
-                        .addOnFailureListener(e -> Log.e("Firestore", "Error deleting event", e));
-            }).addOnFailureListener(e -> Log.e("Firestore", "Error fetching event users", e));
+                        // Remove event from each user's events array and delete entrant docs
+                        for (DocumentSnapshot userDoc : userSnapshots.getDocuments()) {
+                            DocumentReference userRef = db.collection(FirestoreCollections.USERS_COLLECTION).document(userDoc.getId());
+                            Map<String, Object> updateData = new HashMap<>();
+                            updateData.put("events", FieldValue.arrayRemove(event.getId()));
+                            batch.set(userRef, updateData, SetOptions.merge());
+                            batch.delete(userDoc.getReference());
+                        }
 
+                        // Delete all comment documents
+                        for (DocumentSnapshot commentDoc : commentSnapshots.getDocuments()) {
+                            batch.delete(commentDoc.getReference());
+                        }
+
+                        // Delete all notification documents
+                        for (DocumentSnapshot notificationDoc : notificationSnapshots.getDocuments()) {
+                            batch.delete(notificationDoc.getReference());
+                        }
+
+                        // Remove the event's poster from the database
+                        db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                                .whereEqualTo("URL", event.getImage())
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                        new Image(event.getImage(), doc.getId()).delete(context, db);
+                                    }
+                                });
+
+                        // Delete event document and commit
+                        batch.delete(db.collection(FirestoreCollections.EVENTS_COLLECTION).document(event.getId()));
+
+                        batch.commit()
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("Firestore", "Event deleted successfully");
+                                    Toast.makeText(context, "Event deleted", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("Firestore", "Error deleting event", e);
+                                    Toast.makeText(context, "Failed to delete event", Toast.LENGTH_SHORT).show();
+                                });
+
+                    }).addOnFailureListener(e -> Log.e("Firestore", "Error fetching subcollections", e));
         });
+    }
 
-        return view;
+    @Override
+    public int getItemCount() {
+        return events.size();
     }
 }

@@ -2,14 +2,24 @@ package com.icarus.events;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,16 +35,22 @@ import java.util.Map;
  *
  * @author Alex Alves
  */
-public class UserProfileActivity extends NavigationBarActivity {
+public class UserProfileActivity extends HeaderNavBarActivity {
 
+    private ImageView profileImage;
     private EditText nameEditText;
     private EditText phoneEditText;
     private EditText emailEditText;
     private Button editProfileButton;
     private Button adminDeleteButton;
     private ImageButton userSettingsButton;
+
     private Button myNotificationsButton;
     private Button myOrganizedEventsButton;
+
+    private String profileImageURL;
+    private ActivityResultLauncher<String> imagePickerLauncher;
+
     private User user;
     private boolean editState = false;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -62,6 +78,11 @@ public class UserProfileActivity extends NavigationBarActivity {
         myNotificationsButton = findViewById(R.id.user_profile_my_notifications_button);
         myOrganizedEventsButton = findViewById(R.id.user_profile_my_organized_events_button);
 
+        // Initialize User Image View
+        profileImage = findViewById(R.id.user_profile_image);
+        // Initialize imagePickerLauncher
+        imagePickerLauncher = createImagePicker();
+
 
         // Initialize text fields
         nameEditText = findViewById(R.id.user_profile_name_edit);
@@ -78,18 +99,31 @@ public class UserProfileActivity extends NavigationBarActivity {
             userSettingsButton.setVisibility(View.GONE);
             editProfileButton.setVisibility(View.GONE);
             adminDeleteButton.setVisibility(View.VISIBLE);
+            myNotificationsButton.setVisibility(View.GONE);
+            myOrganizedEventsButton.setVisibility(View.GONE);
 
             nameEditText.setHint("Not provided");
             emailEditText.setHint("Not provided");
             phoneEditText.setHint("Not provided");
 
             // Bring context user information into the menu
-            db.collection("users").document(deviceId).get()
+            db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
                     .addOnSuccessListener(snapshot -> {
                         if (snapshot.exists()) {
                             if (snapshot.getString("name") != null) nameEditText.setText(snapshot.getString("name"));
                             if (snapshot.getString("email") != null) emailEditText.setText(snapshot.getString("email"));
                             if (snapshot.getString("phone") != null) phoneEditText.setText(snapshot.getString("phone"));
+                            if (snapshot.getString("image") != null && !snapshot.getString("image").isEmpty()) {
+                                profileImageURL = snapshot.getString("image");
+                                Picasso.get()
+                                        .load(profileImageURL)
+                                        .placeholder(R.drawable.poster)
+                                        .error(R.drawable.poster)           // Optional: shows if link fails
+                                        .into(profileImage);
+                            } else {
+                                profileImageURL = "";
+                                profileImage.setImageResource(R.drawable.poster);
+                            }
                         }
                     })
                     .addOnFailureListener( e -> {
@@ -99,13 +133,40 @@ public class UserProfileActivity extends NavigationBarActivity {
             // Retrieve device Id/User object
             user = UserSession.getInstance().getCurrentUser();
             deviceId = user.getId();
+
             myNotificationsButton.setVisibility(View.VISIBLE);
-            myNotificationsButton.setVisibility(View.VISIBLE);
+
             myOrganizedEventsButton.setVisibility(View.VISIBLE);
             //Pre fill text fields if user is logged in and information exists
+
+
+            //Pre-fill text fields if user is logged in and information exists
+
             nameEditText.setText(user.getName());
             if (user.getEmail() != null) emailEditText.setText(user.getEmail());
             if (user.getPhone() != null) phoneEditText.setText(user.getPhone());
+
+            // Display profile image
+            db.collection(FirestoreCollections.USERS_COLLECTION)
+                    .document(deviceId).get()
+                    .addOnSuccessListener(snapshot -> {
+                        if (snapshot.exists()) {
+                            String imageURL = snapshot.getString("image");
+                            profileImageURL = imageURL;
+                            if (imageURL != null && !imageURL.isEmpty()) {
+                                Picasso.get()
+                                        .load(profileImageURL)
+                                        .placeholder(R.drawable.poster)
+                                        .error(R.drawable.poster)           // Optional: shows if link fails
+                                        .into(profileImage);
+                            } else {
+                                profileImage.setImageResource(R.drawable.poster);
+                            }
+                        }
+                    })
+                    .addOnFailureListener( e -> {
+                        Toast.makeText(this, "Failed to load profile image", Toast.LENGTH_SHORT).show();
+                    });
         }
 
         // Set buttons on click listeners
@@ -125,7 +186,7 @@ public class UserProfileActivity extends NavigationBarActivity {
 
         adminDeleteButton.setOnClickListener(v -> {
             // First remove user from all event entrant subcollections
-            db.collection("events").get()
+            db.collection(FirestoreCollections.USERS_COLLECTION).get()
                     .addOnSuccessListener(eventSnapshots -> {
                         for (QueryDocumentSnapshot eventSnapshot : eventSnapshots) {
                             eventSnapshot.getReference()
@@ -133,17 +194,25 @@ public class UserProfileActivity extends NavigationBarActivity {
                                     .document(deviceId)
                                     .delete();
                         }
-                        // Then delete the user document itself
-                        db.collection("users").document(deviceId).delete()
-                                .addOnSuccessListener(unused -> {
-                                    Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
-                                    finish();
+
+                        // Delete profile image
+                        db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
+                                .addOnSuccessListener(userSnapshot -> {
+                                    String imageURL = userSnapshot.getString("image");
+                                    deleteOldProfileImage(imageURL);
+
+                                    // Then delete the user document itself
+                                    db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).delete()
+                                            .addOnSuccessListener(unused -> {
+                                                Toast.makeText(this, "Profile deleted", Toast.LENGTH_SHORT).show();
+                                                finish();
+                                            })
+                                            .addOnFailureListener(e ->
+                                                    Toast.makeText(this, "Failed to delete profile", Toast.LENGTH_SHORT).show());
                                 })
                                 .addOnFailureListener(e ->
                                         Toast.makeText(this, "Failed to delete profile", Toast.LENGTH_SHORT).show());
-                    })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "Failed to delete profile", Toast.LENGTH_SHORT).show());
+                    });
         });
 
         editProfileButton.setOnClickListener(v -> {
@@ -157,9 +226,11 @@ public class UserProfileActivity extends NavigationBarActivity {
                     Toast.makeText(this, "Please enter your name", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                /**@ TODO
-                 * Check if user entered email in text field IF THAT IS A REQUIREMENT
-                 */
+                // Check if user entered email in text fields
+                if (email.isEmpty()) {
+                    Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 // Send user data to database
                 Map<String, Object> userData = new HashMap<>();
                 userData.put("name", name);
@@ -179,6 +250,18 @@ public class UserProfileActivity extends NavigationBarActivity {
                         });
             } else {
                 changeEditState();
+            }
+        });
+
+        profileImage.setOnClickListener(v -> {
+            if(editState) {
+                // Get old profile image URL
+                db.collection(FirestoreCollections.USERS_COLLECTION).document(user.getId()).get()
+                        .addOnSuccessListener(document -> {
+                            profileImageURL = document.getString("image");
+                        });
+                // Update Profile Image
+                imagePickerLauncher.launch("image/*");
             }
         });
     }
@@ -235,5 +318,78 @@ public class UserProfileActivity extends NavigationBarActivity {
             editProfileButton.setText("Confirm Changes");
             editState = true;
         }
+    }
+
+    /**
+     * Delete image from firestore database
+     *
+     * @param URL   URL of image to delete
+     */
+    private void deleteOldProfileImage(String URL) {
+        db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                .whereEqualTo("URL", URL)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        Image oldImage = new Image(URL, doc.getId());
+                        oldImage.delete(this, db);
+                    }
+                });
+    }
+
+    /**
+     * Create image picker activity for selecting a new profile image.
+     *
+     * @return  Result of activity
+     */
+    private ActivityResultLauncher<String> createImagePicker() {
+        return registerForActivityResult(
+                new ActivityResultContracts.GetContent(), uri -> {
+                    if (uri != null) {
+                        // Add the new poster
+                        MediaManager.get().upload(uri)
+                                .option("upload_preset", "ml_default")
+                                .callback(new UploadCallback() {
+                                    @Override
+                                    public void onSuccess(String requestId, Map resultData) {
+                                        String newProfileImageURL = (String) resultData.get("secure_url");
+                                        String newPublicId = (String) resultData.get("public_id");
+                                        // Create new firebase document for the image
+                                        Map<String, Object> imageData = new HashMap<>();
+                                        imageData.put("URL", newProfileImageURL);
+                                        db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                                                .document(newPublicId)
+                                                .set(imageData)
+                                                .addOnSuccessListener(unused -> {
+                                                    deleteOldProfileImage(profileImageURL);
+                                                    db.collection(FirestoreCollections.USERS_COLLECTION)
+                                                            .document(user.getId())
+                                                            .update("image", newProfileImageURL);
+                                                    profileImageURL = newProfileImageURL;
+                                                    profileImage.setImageURI(uri);
+                                                    Toast.makeText(UserProfileActivity.this,
+                                                            "Image uploaded", Toast.LENGTH_SHORT).show();
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Toast.makeText(UserProfileActivity.this,
+                                                            "Image upload failed", Toast.LENGTH_SHORT).show();
+                                                });
+                                    }
+
+                                    @Override
+                                    public void onError(String requestId, ErrorInfo error) {
+                                        Toast.makeText(UserProfileActivity.this,
+                                                "Image upload failed", Toast.LENGTH_SHORT).show();
+                                        Log.e("UPLOAD_ERROR", error.getDescription());
+                                    }
+
+                                    @Override public void onStart(String requestId) {}
+                                    @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
+                                    @Override public void onReschedule(String requestId, ErrorInfo error) {}
+                                })
+                                .dispatch();
+                    }
+                }
+        );
     }
 }

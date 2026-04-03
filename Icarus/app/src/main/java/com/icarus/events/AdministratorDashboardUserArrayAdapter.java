@@ -1,15 +1,11 @@
 package com.icarus.events;
 
-import android.app.Activity;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,10 +13,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.firebase.firestore.DocumentReference;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.WriteBatch;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -72,13 +69,29 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
         }
 
         User user = users.get(position);
+        ShapeableImageView profileImage = view
+                .findViewById(R.id.admin_dashboard_user_list_image);
         TextView userName = view
                 .findViewById(R.id.admin_dashboard_user_list_user_name);
         ImageButton removeUserButton = view
                 .findViewById(R.id.admin_dashboard_user_list_remove_user_button);
 
+        // Set profile image
+        String imageUrl = user.getImage();
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            Picasso.get()
+                    .load(imageUrl)
+                    .placeholder(R.drawable.poster)
+                    .error(R.drawable.poster)
+                    .into(profileImage);
+        } else {
+            profileImage.setImageResource(R.drawable.poster);
+        }
+
+        // Set username
         userName.setText(user.getName());
 
+        // Click username to go to profile
         userName.setOnClickListener(v -> {
             if (user.getId().equals(UserSession.getInstance().getCurrentUser().getId())) {
                 Toast.makeText(context, "You cannot access your own account from this menu", Toast.LENGTH_SHORT).show();
@@ -89,8 +102,9 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
             context.startActivity(intent);
         });
 
+        // Remove user from database
         removeUserButton.setOnClickListener(v -> {
-            // Prevent admin from deleting his own profile from here
+            // Prevent admin from deleting their own profile from here
             if (user.getId().equals(UserSession.getInstance().getCurrentUser().getId())) {
                 Toast.makeText(context, "You cannot delete your own account", Toast.LENGTH_SHORT).show();
                 return;
@@ -104,13 +118,23 @@ public class AdministratorDashboardUserArrayAdapter extends ArrayAdapter<User> {
                                     .document(user.getId())
                                     .delete();
                         }
-                        // Then delete the user document itself
-                        db.collection(FirestoreCollections.USERS_COLLECTION).document(user.getId()).delete()
-                                .addOnSuccessListener(unused -> {
-                                    Toast.makeText(context, "Profile deleted", Toast.LENGTH_SHORT).show();
-                                })
-                                .addOnFailureListener(e ->
-                                        Toast.makeText(context, "Failed to delete profile", Toast.LENGTH_SHORT).show());
+
+                        // Remove the users poster from the database
+                        db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                                .whereEqualTo("URL", user.getImage())
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                        new Image(user.getImage(), doc.getId()).delete(context, db);
+                                    }
+                                    // Then delete the user document itself
+                                    db.collection(FirestoreCollections.USERS_COLLECTION).document(user.getId()).delete()
+                                            .addOnSuccessListener(unused -> {
+                                                Toast.makeText(context, "Profile deleted", Toast.LENGTH_SHORT).show();
+                                            })
+                                            .addOnFailureListener(e ->
+                                                    Toast.makeText(context, "Failed to delete profile", Toast.LENGTH_SHORT).show());
+                                });
                     })
                     .addOnFailureListener(e ->
                             Toast.makeText(context, "Failed to delete profile", Toast.LENGTH_SHORT).show());

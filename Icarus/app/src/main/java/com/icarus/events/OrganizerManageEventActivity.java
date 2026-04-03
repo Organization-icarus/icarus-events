@@ -28,7 +28,6 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,13 +40,13 @@ import java.util.Map;
  * The poster can be updated: chosen images upload to Cloudinary and update Firestore.
  * Old images are deleted, and the UI refreshes to show the new poster.
  * <p>
- * This activity extends {@link NavigationBarActivity} to include
+ * This activity extends {@link HeaderNavBarActivity} to include
  * the application's reusable navigation bar.
  *
  * @author Ben Salmon
  */
 
-public class OrganizerManageEventActivity extends NavigationBarActivity{
+public class OrganizerManageEventActivity extends HeaderNavBarActivity {
 
     private ImageView eventPoster;
     private Button UpdatePoster;
@@ -61,6 +60,7 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
     private String eventId;
     private String eventName;
     private String posterURL;
+    private Boolean locationEnabled;
     private Boolean isPrivate;
 
     private FirebaseFirestore db;
@@ -95,11 +95,12 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
                     eventName = document.getString("name");
                     eventTitle.setText(eventName);
                     isPrivate = document.getBoolean("isPrivate");
-                    if (isPrivate == null) {
-                        isPrivate = false;
-                    }
 
-                    if (isPrivate) {
+                    locationEnabled = document.getBoolean("geolocation");
+                    if(isPrivate == null){isPrivate = false;}
+                    if(locationEnabled == null){locationEnabled = false;}
+                    if(isPrivate){
+
                         inviteEntrant.setText("Invite Specific Entrant");
                         shareQRCode.setEnabled(false);
                         shareQRCode.setVisibility(Button.GONE);
@@ -144,10 +145,14 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
             imagePickerLauncher.launch("image/*");
         });
         ViewEntrantMap.setOnClickListener(v -> {
-            // View Entrant Map
-            Intent intent = new Intent(this, EntrantMapActivity.class);
-            intent.putExtra("eventId", eventId);
-            startActivity(intent);
+            if (locationEnabled) {
+                // View Entrant Map
+                Intent intent = new Intent(this, EntrantMapActivity.class);
+                intent.putExtra("eventId", eventId);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Geolocation is not enabled for this event.", Toast.LENGTH_SHORT).show();
+            }
         });
         ViewEntrantList.setOnClickListener(v -> {
             // View Entrant List
@@ -165,6 +170,7 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
             }else{
                 Intent intent = new Intent(this, SampleAttendeesActivity.class);
                 intent.putExtra("eventId", eventId);
+                intent.putExtra("ActivityName", eventName);
                 startActivity(intent);
             }
 
@@ -212,15 +218,25 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
      * @throws Exception if QR generation fails.
      */
     private Bitmap generateQRCodeBitmap(String content) throws Exception {
-        int size = 800;
-        BitMatrix bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, size, size);
+        int qrSize = 800;
+        int padding = 80;
+        BitMatrix bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, qrSize, qrSize);
 
-        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565);
-        for (int x = 0; x < size; x++) {
-            for (int y = 0; y < size; y++) {
-                bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+        int outputSize = qrSize + (padding * 2);
+        Bitmap bitmap = Bitmap.createBitmap(outputSize, outputSize, Bitmap.Config.RGB_565);
+
+        for (int x = 0; x < outputSize; x++) {
+            for (int y = 0; y < outputSize; y++) {
+                bitmap.setPixel(x, y, Color.WHITE);
             }
         }
+
+        for (int x = 0; x < qrSize; x++) {
+            for (int y = 0; y < qrSize; y++) {
+                bitmap.setPixel(x + padding, y + padding, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+            }
+        }
+
         return bitmap;
     }
 
@@ -259,6 +275,11 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
         startActivity(Intent.createChooser(shareIntent, "Share Event QR Code"));
     }
 
+    /**
+     * Removes image from firestore database
+     *
+     * @param URL   URL of image to delete
+     */
     private void deleteOldPoster(String URL) {
         db.collection(FirestoreCollections.IMAGES_COLLECTION)
                 .whereEqualTo("URL", URL)
@@ -270,6 +291,12 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
                     }
                 });
     }
+
+    /**
+     * Image picker activity for updating the event poster
+     *
+     * @return  result of activity
+     */
     private ActivityResultLauncher<String> createImagePicker() {
         return registerForActivityResult(
                 new ActivityResultContracts.GetContent(), uri -> {
@@ -295,17 +322,19 @@ public class OrganizerManageEventActivity extends NavigationBarActivity{
                                                             .update("image", newPosterURL);
                                                     posterURL = newPosterURL;
                                                     eventPoster.setImageURI(uri);
+                                                    Toast.makeText(OrganizerManageEventActivity.this,
+                                                            "Image uploaded", Toast.LENGTH_SHORT).show();
                                                 })
                                                 .addOnFailureListener(e -> {
                                                     Toast.makeText(OrganizerManageEventActivity.this,
-                                                            "Failed to add image to firestore", Toast.LENGTH_SHORT).show();
+                                                            "Image upload failed", Toast.LENGTH_SHORT).show();
                                                 });
                                     }
 
                                     @Override
                                     public void onError(String requestId, ErrorInfo error) {
                                         Toast.makeText(OrganizerManageEventActivity.this,
-                                                "Failed to Upload Image.", Toast.LENGTH_SHORT).show();
+                                                "Image upload failed.", Toast.LENGTH_SHORT).show();
                                         Log.e("UPLOAD_ERROR", error.getDescription());
                                     }
 
