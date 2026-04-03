@@ -43,6 +43,7 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
     private TextView activityName;
     private EditText searchBar;
     private String currentSearch = "";
+
     private Button confirmationButton;
     private ListView entrantList;
     private ArrayList<User> entrantUserList;
@@ -114,13 +115,41 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
                 Toast.makeText(this, "No users selected", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if(screenName.equals("Entrant Search")){
+
+            if (screenName.equals("Entrant Search")) {
                 addUsersToEvent(selectedIds, "waiting");
-            } else if(screenName.equals("Find Co-Organizers")){
+
+                ArrayList<String> privateRecipients = new ArrayList<>(selectedIds);
+
+                NotificationItem privateNotification = new NotificationItem(
+                        eventId,
+                        userId,
+                        true,
+                        privateRecipients,
+                        "You have been invited to join a private event waiting list.",
+                        "private_waitlist_invite"
+                );
+                privateNotification.sendNotification();
+
+            } else if (screenName.equals("Find Co-Organizers")) {
                 addUserstoOrganizersArray(selectedIds);
+
+                ArrayList<String> coOrganizerRecipients = new ArrayList<>(selectedIds);
+
+                NotificationItem coOrganizerNotification = new NotificationItem(
+                        eventId,
+                        userId,
+                        true,
+                        coOrganizerRecipients,
+                        "You have been invited to be a co-organizer.",
+                        "co_organizer_invite"
+                );
+                coOrganizerNotification.sendNotification();
+
             } else if (screenName.equals("Replace Declined")) {
-                // Check waiting list BEFORE marking anyone as replaced
-                db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants")
+                db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                        .document(eventId)
+                        .collection("entrants")
                         .get()
                         .addOnSuccessListener(document -> {
                             ArrayList<String> waitingIds = new ArrayList<>();
@@ -135,22 +164,23 @@ public class OrganizerEntrantSearchActivity extends NavigationBarActivity{
                                 Toast.makeText(this, "Waiting list is Empty, Cannot Replace", Toast.LENGTH_SHORT).show();
                                 return;
                             }
-                            if(waitingIds.size() < selectedIds.size()){
-                                Toast.makeText(this, "More Entrants Selected than in " +
-                                        "Waiting List, Cannot Replace", Toast.LENGTH_SHORT).show();
+
+                            if (waitingIds.size() < selectedIds.size()) {
+                                Toast.makeText(this,
+                                        "More Entrants Selected than in Waiting List, Cannot Replace",
+                                        Toast.LENGTH_SHORT).show();
                                 return;
                             }
 
-                            // Only now mark selected users as replaced and select new ones
                             addUsersToEvent(selectedIds, "rejected");
                             selectNewUsersFromWaitingList(selectedIds.size());
                             finish();
                         });
                 return;
             }
+
             finish();
         });
-
     }
 
     /*

@@ -69,6 +69,8 @@
         <activity android:name=".EventNotificationsActivity" />
         <activity android:name=".QRCodeActivity"/>
         <activity android:name=".UserNotificationsActivity" />
+        <activity android:name=".OrganizerMyEventsActivity" />
+
 
     </application>
 

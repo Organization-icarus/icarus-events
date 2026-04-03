@@ -33,6 +33,8 @@ public class UserProfileActivity extends NavigationBarActivity {
     private Button editProfileButton;
     private Button adminDeleteButton;
     private ImageButton userSettingsButton;
+    private Button myNotificationsButton;
+    private Button myOrganizedEventsButton;
     private User user;
     private boolean editState = false;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -57,6 +59,8 @@ public class UserProfileActivity extends NavigationBarActivity {
         editProfileButton = findViewById(R.id.user_profile_edit_confirm_button);
         userSettingsButton = findViewById(R.id.user_profile_settings_button);
         adminDeleteButton = findViewById(R.id.user_profile_admin_delete_button);
+        myNotificationsButton = findViewById(R.id.user_profile_my_notifications_button);
+        myOrganizedEventsButton = findViewById(R.id.user_profile_my_organized_events_button);
 
 
         // Initialize text fields
@@ -95,7 +99,9 @@ public class UserProfileActivity extends NavigationBarActivity {
             // Retrieve device Id/User object
             user = UserSession.getInstance().getCurrentUser();
             deviceId = user.getId();
-
+            myNotificationsButton.setVisibility(View.VISIBLE);
+            myNotificationsButton.setVisibility(View.VISIBLE);
+            myOrganizedEventsButton.setVisibility(View.VISIBLE);
             //Pre fill text fields if user is logged in and information exists
             nameEditText.setText(user.getName());
             if (user.getEmail() != null) emailEditText.setText(user.getEmail());
@@ -105,6 +111,15 @@ public class UserProfileActivity extends NavigationBarActivity {
         // Set buttons on click listeners
         userSettingsButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, UserSettingsActivity.class);
+            startActivity(intent);
+        });
+        myNotificationsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, UserNotificationsActivity.class);
+            startActivity(intent);
+        });
+
+        myOrganizedEventsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, OrganizerMyEventsActivity.class);
             startActivity(intent);
         });
 
