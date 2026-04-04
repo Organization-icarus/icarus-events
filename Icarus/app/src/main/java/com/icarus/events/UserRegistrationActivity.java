@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,10 +34,11 @@ import android.widget.ImageView;
 /**
  * Activity that allows a new user to register in the application.
  * <p>
- * Users enter their name and select a role before their information
- * is stored in the Firestore "users" collection. Once registered,
- * the user is stored in the {@link UserSession} and redirected to
- * the event list screen.
+ * Users enter their name, email, and optional phone number, and may also
+ * upload a profile image before registering. The entered information is
+ * validated and then stored in the Firestore users collection. Once
+ * registration succeeds, the user is stored in the {@link UserSession}
+ * and redirected to the entrant event list screen.
  *
  * @author Alex Alves
  */
@@ -55,9 +57,10 @@ public class UserRegistrationActivity extends AppCompatActivity {
     /**
      * Initializes the user registration interface.
      * <p>
-     * This method sets up the input fields and handles registration
-     * when the user submits their name and role. The user information
-     * is validated and then saved to Firestore.
+     * Sets up the registration input fields, profile image picker, and submit
+     * button behavior. When the user submits the form, the entered name, email,
+     * and optional phone number are validated and then stored in Firestore along
+     * with default notification settings and the selected profile image URL.
      *
      * @param savedInstanceState the previously saved activity state,
      *                           or null if the activity is newly created
@@ -115,6 +118,18 @@ public class UserRegistrationActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Optional phone validation (only if provided)
+            if (!phone.isEmpty() && !Patterns.PHONE.matcher(phone).matches()) {
+                Toast.makeText(this, "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             String userPhone = phone.isEmpty() ? null : phone;
 
             Boolean isAdmin = false;
@@ -160,6 +175,15 @@ public class UserRegistrationActivity extends AppCompatActivity {
 
     // Taken from ChatGPT March 29th 2026,
     // "How do I add functionality for uploading profile images through the registration page"
+    /**
+     * Uploads a selected profile image to Cloudinary and stores the returned URL.
+     * <p>
+     * When the upload succeeds, the secure image URL is saved for later inclusion
+     * in the user's Firestore profile record and the user is notified. If the
+     * upload fails, an error toast is shown.
+     *
+     * @param uri the URI of the selected image to upload
+     */
     private void uploadProfileImage(Uri uri) {
         MediaManager.get().upload(uri)
                 .option("upload_preset", "ml_default")

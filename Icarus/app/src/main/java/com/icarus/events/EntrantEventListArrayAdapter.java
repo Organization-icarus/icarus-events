@@ -28,7 +28,8 @@ import java.util.Map;
  * Adapter used to display events in the entrant event list.
  * <p>
  * Binds Event objects to the entrant event list item layout and displays
- * basic event information such as name, category, and formatted event date.
+ * event information such as poster image, name, category, category color,
+ * and formatted event date.
  *
  * @author Alex Alves
  */
@@ -39,7 +40,15 @@ public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEv
     private Map<String, String> categoryColors;
 
 
+    /**
+     * Listener interface for handling clicks on event list items.
+     */
     public interface OnItemClickListener {
+        /**
+         * Called when an event item is clicked.
+         *
+         * @param position the adapter position of the clicked item
+         */
         void onItemClick(int position);
     }
 
@@ -48,6 +57,8 @@ public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEv
      *
      * @param context the context used to inflate views and access resources
      * @param events the list of events to be displayed by the adapter
+     * @param listener the listener invoked when an event item is clicked
+     * @param categoryColors a mapping of category names to hex color strings
      */
     public EntrantEventListArrayAdapter(Context context, ArrayList<Event> events, OnItemClickListener listener, Map<String, String> categoryColors) {
         this.events = events;
@@ -56,6 +67,13 @@ public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEv
         this.categoryColors = categoryColors != null ? categoryColors : new HashMap<>();
     }
 
+    /**
+     * Creates a new ViewHolder for an entrant event list item.
+     *
+     * @param parent the parent ViewGroup that the new view will be attached to
+     * @param viewType the view type of the new view
+     * @return a ViewHolder containing the inflated event item view
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -104,7 +122,7 @@ public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEv
         GradientDrawable chipBackground =
                 (GradientDrawable) holder.eventCategory.getBackground().mutate();
         // reset to default first
-        chipBackground.setColor(Color.parseColor(context.getString(R.color.accent_first)));
+        chipBackground.setColor(context.getColor(R.color.accent_first));
         // Get attached color
         String hexColor = categoryColors.get(event.getCategory());
         if (hexColor != null && !hexColor.trim().isEmpty()) {
@@ -128,16 +146,29 @@ public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEv
         holder.itemView.setOnClickListener(v -> listener.onItemClick(position));
     }
 
+    /**
+     * Returns the number of events currently displayed by the adapter.
+     *
+     * @return the total number of event items
+     */
     @Override
     public int getItemCount() {
         return events.size();
     }
 
+    /**
+     * ViewHolder that stores references to the views for a single event item.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView eventName, eventCategory, eventDate;
         ImageView posterView;
         LinearLayout textContainer;
 
+        /**
+         * Constructs a ViewHolder for a single entrant event list item view.
+         *
+         * @param view the item view containing the event UI elements
+         */
         public ViewHolder(@NonNull View view) {
             super(view);
             eventName = view.findViewById(R.id.entrant_event_list_event_name);

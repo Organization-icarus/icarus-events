@@ -21,21 +21,22 @@ import java.util.Collections;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
-// Portions of this code were developed and adapted with assistance from ChatGPT to learn what libraries and
-// functions were needed/helping with debugging on March 29, 2026.
+// Portions of this code were developed and adapted with assistance from ChatGPT generations to
+// learn what libraries and functions were needed/helping with debugging on March 29, 2026.
 // Javadoc style function headers also generated with chatGPT
 
 /**
  * Activity responsible for scanning QR codes and navigating to the corresponding event.
+ * <p>
+ * Initializes a camera preview using ZXing's {@link BarcodeView}, scans for QR codes,
+ * validates the scanned payload format, verifies the corresponding event in Firebase
+ * Firestore, and redirects the user to {@link EventDetailsActivity} when a valid event
+ * QR code is detected.
+ * <p>
+ * Camera permissions are handled at runtime. The scanner lifecycle is managed carefully
+ * to release resources properly and help prevent performance issues.
  *
- * This activity initializes a camera preview using ZXing's {@link BarcodeView}, scans for QR codes,
- * and extracts the event ID encoded in the QR code. Upon a successful scan, the user is redirected
- * to {@link EventDetailsActivity} with the scanned event ID.
- *
- * Camera permissions are handled at runtime. The scanner lifecycle is carefully managed to ensure
- * resources are released properly and to prevent performance issues.
- *
- * Portions of this implementation were developed with assistance from ChatGPT (March 29, 2026).
+ * @author Alex Alves
  */
 public class QRCodeActivity extends HeaderNavBarActivity {
 
@@ -96,9 +97,10 @@ public class QRCodeActivity extends HeaderNavBarActivity {
 
     /**
      * Starts the QR code scanning process.
-     *
+     * <p>
      * Initializes the scanner if necessary and begins a single scan. When a QR code is detected,
-     * the event ID is extracted and the user is navigated to the event details screen.
+     * the scanned payload is trimmed, validated against the expected event ID format, and checked
+     * against Firebase Firestore before the user is navigated to the event details screen.
      *
      * Prevents multiple scanner instances from running simultaneously.
      */
@@ -206,7 +208,7 @@ public class QRCodeActivity extends HeaderNavBarActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        stopScanner(); // Testing this to see if it fixes lag issue
+        stopScanner();
     }
 
     /**

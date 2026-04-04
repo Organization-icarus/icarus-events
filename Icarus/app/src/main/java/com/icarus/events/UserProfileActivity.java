@@ -3,6 +3,7 @@ package com.icarus.events;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,11 +33,15 @@ import java.util.Map;
 /**
  * Activity that allows a user to view and update their profile information.
  * <p>
- * The screen displays the user's current name, email, and phone number.
- * Users can toggle between view mode and edit mode to modify their profile
- * details. When changes are confirmed, the updated information is written
- * to the Firestore "users" collection and the local {@link UserSession}
- * is updated accordingly.
+ * Displays the user's current name, email, phone number, and profile image.
+ * Users can toggle between view mode and edit mode to modify profile details,
+ * upload a new profile image, and navigate to user settings. When changes are
+ * confirmed, the updated information is written to the Firestore users collection
+ * and the local {@link UserSession} is updated accordingly.
+ * <p>
+ * When opened from the admin dashboard, the activity instead loads the selected
+ * user's profile in a read-only admin view and provides the option to delete
+ * that user profile.
  *
  * @author Alex Alves
  */
@@ -79,7 +84,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
         // Initialize User Image View
         profileImage = findViewById(R.id.user_profile_image);
         // Initialize imagePickerLauncher
-        ActivityResultLauncher<String> imagePickerLauncher = createImagePicker();
+        imagePickerLauncher = createImagePicker();
 
 
         // Initialize text fields
@@ -224,6 +229,17 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                     Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!phone.isEmpty() && !Patterns.PHONE.matcher(phone).matches()) {
+                    Toast.makeText(this, "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 // Send user data to database
                 Map<String, Object> userData = new HashMap<>();
                 userData.put("name", name);
@@ -314,9 +330,12 @@ public class UserProfileActivity extends HeaderNavBarActivity {
     }
 
     /**
-     * Delete image from firestore database
+     * Deletes the previously stored profile image associated with the given URL.
+     * <p>
+     * Looks up matching image records in the Firestore images collection and
+     * removes them using the {@link Image} helper.
      *
-     * @param URL   URL of image to delete
+     * @param URL the URL of the profile image to delete
      */
     private void deleteOldProfileImage(String URL) {
         db.collection(FirestoreCollections.IMAGES_COLLECTION)
@@ -331,9 +350,14 @@ public class UserProfileActivity extends HeaderNavBarActivity {
     }
 
     /**
-     * Create image picker activity for selecting a new profile image.
+     * Creates and registers the image picker launcher used to select and upload
+     * a new profile image.
+     * <p>
+     * When an image is selected, it is uploaded to Cloudinary, stored in the
+     * Firestore images collection, linked to the current user profile, and the
+     * previous profile image is removed.
      *
-     * @return  Result of activity
+     * @return the launcher used to pick an image from device storage
      */
     private ActivityResultLauncher<String> createImagePicker() {
         return registerForActivityResult(

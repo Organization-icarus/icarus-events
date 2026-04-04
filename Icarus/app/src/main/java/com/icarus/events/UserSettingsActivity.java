@@ -24,9 +24,12 @@ import java.util.Map;
 /**
  * Screen for users to manage personal settings and account deletion.
  * <p>
- * Loads current notification preferences from Firestore and allows
- * the user to update them. Provides functionality to delete the
- * user's account and remove them from all event entrant subcollections.
+ * Loads the current user's profile image and notification preferences from
+ * Firestore, allows the user to update notification settings, and provides
+ * functionality to delete the user's account. During account deletion, the
+ * user is removed from all event entrant subcollections, any stored profile
+ * image record is deleted, and the app returns to {@link MainActivity} with
+ * the session cleared.
  *
  * @author Alex Alves
  */
@@ -39,11 +42,17 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
     FirebaseFirestore db;
 
     /**
-     * Initializes the UserSettingsActivity.
+     * Initializes the user settings screen.
+     * <p>
+     * Loads the current user from {@link UserSession}, retrieves and displays the
+     * user's profile image, loads notification preferences from Firestore into the
+     * corresponding switches, and registers listeners to persist any switch changes.
+     * Also configures the delete profile button to remove the user from all event
+     * entrant subcollections, delete the user's stored profile image, remove the
+     * user document, and return to the main screen.
      *
-     * @param savedInstanceState If the activity is being re-initialized after previously
-     *                           being shut down, this Bundle contains the data it most
-     *                           recently supplied; otherwise, it is null.
+     * @param savedInstanceState the previously saved activity state,
+     *                           or null if the activity is newly created
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,9 +174,12 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
     }
 
     /**
-     * Delete image from firestore database
+     * Deletes the previously stored profile image associated with the given URL.
+     * <p>
+     * Looks up matching image records in the Firestore images collection and
+     * removes them using the {@link Image} helper.
      *
-     * @param URL   URL of image to delete
+     * @param URL the URL of the profile image to delete
      */
     private void deleteOldProfileImage(String URL) {
         db.collection(FirestoreCollections.IMAGES_COLLECTION)
