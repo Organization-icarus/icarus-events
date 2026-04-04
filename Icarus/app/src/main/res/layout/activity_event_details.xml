@@ -177,7 +177,7 @@
                 <com.google.android.material.button.MaterialButton
                     style="@style/AppButton"
                     android:id="@+id/print_ticket_button"
-                    android:text="Print Ticket"
+                    android:text="Share Ticket"
                     app:icon="@drawable/ticket"
                     android:visibility="visible"/>
 
