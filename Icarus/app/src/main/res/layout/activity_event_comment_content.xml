@@ -79,6 +79,6 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:src="@drawable/ic_circle"
-        app:tint="@color/lightTextSemi"
-        android:visibility="gone"/>
+        android:visibility="visible"
+        app:tint="@color/lightTextSemi" />
 </LinearLayout>
