@@ -13,6 +13,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.widget.ImageButton;
 
 /**
  * Activity for users to view their own notifications.
@@ -44,6 +45,7 @@ public class UserNotificationsActivity extends AppCompatActivity {
 
         titleText = findViewById(R.id.notifications_page_title);
         notificationsList = findViewById(R.id.notifications_list_view);
+        ImageButton backButton = findViewById(R.id.notifications_back_button);
 
         if (titleText == null || notificationsList == null) {
             Toast.makeText(this, "Notification layout failed to load", Toast.LENGTH_SHORT).show();
@@ -52,6 +54,7 @@ public class UserNotificationsActivity extends AppCompatActivity {
         }
 
         titleText.setText("My Notifications");
+        backButton.setOnClickListener(v -> finish());
 
         adapter = new NotificationListAdapter(this, notifications);
         notificationsList.setAdapter(adapter);
