@@ -51,6 +51,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
     private ArrayList<User> entrantList;
     private OraganizerEntrantViewListArrayAdapter eventListArrayAdapter;
     private String eventId;
+    private Boolean isPrivate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,24 +78,36 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
 
         //get eventId
         eventId = getIntent().getStringExtra("eventId");
-
-        //Set default as waiting
-        filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
-
-        MaterialButton defaultButton = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
-        defaultButton.setTextColor(getColor(R.color.darkText));
-        status.set("waiting");
-        loadList(status.get());
-
+        MaterialButton waitingButton = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
         //Set event Title
         db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId)
                 .addSnapshotListener((value, error) -> {
                     if (error != null || value == null) return;
 
                     String name = value.getString("name");
+                    isPrivate = value.getBoolean("isPrivate");
+                    if(isPrivate == null){isPrivate = false;}
 
                     runOnUiThread(() -> {
                         eventName.setText(name);
+                        //Set default as waiting if public event
+                        if(isPrivate){
+                            waitingButton.setEnabled(false);
+
+                            filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_chosen);
+
+                            MaterialButton defaultButton = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar_chosen);
+                            defaultButton.setTextColor(getColor(R.color.darkText));
+                            status.set("selected");
+                            loadList(status.get());
+                        }else{
+                            filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
+
+                            MaterialButton defaultButton = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
+                            defaultButton.setTextColor(getColor(R.color.darkText));
+                            status.set("waiting");
+                            loadList(status.get());
+                        }
                     });
                 });
 
