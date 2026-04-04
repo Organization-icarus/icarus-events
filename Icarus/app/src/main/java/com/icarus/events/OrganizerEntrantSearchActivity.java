@@ -17,6 +17,7 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -101,7 +102,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
         }
 
 
-        /*TODO: THIS CURRENTLY ADDS USERS TO THE WAITING LIST. A NOTIFICATION MUST BE SENT INSTEAD
+        /*TODO:  A NOTIFICATION MUST BE SENT INSTEAD
         * AWAITING NOTIFICATION SET UP FROM KITO AND YIFAN
         * March 25,2026 @ 4:23pm
         */
@@ -112,9 +113,13 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                 return;
             }
             if(screenName.equals("Entrant Search")){
-                addUsersToEvent(selectedIds, "waiting");
+                addUsersToEvent(selectedIds, "selected");
+                createNotification(selectedIds,"invite_entrant",
+                        "You have been invited to the private event:  " + eventName.getText().toString());
             } else if(screenName.equals("Find Co-Organizers")){
                 addUserstoOrganizersArray(selectedIds);
+                createNotification(selectedIds,"add_co-organizer",
+                        "You have invited as a Co-organizer for the event: " + eventName.getText().toString());
             } else if (screenName.equals("Replace Declined")) {
                 // Check waiting list BEFORE marking anyone as replaced
                 db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants")
@@ -141,6 +146,8 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                             // Only now mark selected users as replaced and select new ones
                             addUsersToEvent(selectedIds, "rejected");
                             selectNewUsersFromWaitingList(selectedIds.size());
+                            createNotification(selectedIds, "replace_declined",
+                                    "You have been Selected for the event: " + eventName.getText().toString());
                             finish();
                         });
                 return;
@@ -338,6 +345,29 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                     Toast.makeText(this,Math.min(size, waitingIds.size())
                             + " Entrants Selected for Event",Toast.LENGTH_SHORT).show();
 
+                });
+    }
+    private void createNotification(Set<String> Ids, String type,  String message){
+        Date now = new Date();
+        ArrayList<String> recipients = new ArrayList<>(Ids);
+
+        Map<String, Object> notification = new HashMap<>();
+        notification.put("date", now);
+        notification.put("eventID", eventId);
+        notification.put("isEvent", true);
+        notification.put("isSystem", false);
+        notification.put("message", message);
+        notification.put("recipients", recipients);
+        notification.put("sender", userId);
+        notification.put("type", type);
+
+        db.collection("notifications")
+                .add(notification)
+                .addOnSuccessListener(dummy -> {
+                    Toast.makeText(this, "Message sent", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to send message", Toast.LENGTH_SHORT).show();
                 });
     }
 }
