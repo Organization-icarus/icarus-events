@@ -172,13 +172,18 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
         });
         shareQRCode.setOnClickListener(v -> {
             // Open Share menu to share a QR code containing the event ID.
-            try {
-                Bitmap qrBitmap = generateQRCodeBitmap(eventId);
-                shareQRCodeBitmap(qrBitmap);
-            } catch (Exception e) {
-                Toast.makeText(this, "Failed to generate QR code", Toast.LENGTH_SHORT).show();
-                Log.e("QR_CODE_ERROR", "Failed to generate/share QR code", e);
+            if(!isPrivate){
+                try {
+                    Bitmap qrBitmap = generateQRCodeBitmap(eventId);
+                    shareQRCodeBitmap(qrBitmap);
+                } catch (Exception e) {
+                    Toast.makeText(this, "Failed to generate QR code", Toast.LENGTH_SHORT).show();
+                    Log.e("QR_CODE_ERROR", "Failed to generate/share QR code", e);
+                }
+            }else{
+                Toast.makeText(this, "This event is Private. No QR code will be created", Toast.LENGTH_SHORT).show();
             }
+
         });
         addOrganizers.setOnClickListener(v -> {
             // add Organizers as Co-Organzers
