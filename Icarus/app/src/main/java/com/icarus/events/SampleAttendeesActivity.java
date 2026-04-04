@@ -183,6 +183,8 @@ public class SampleAttendeesActivity extends HeaderNavBarActivity {
                                         .addOnSuccessListener(event -> {
                                             NotificationItem notification = new NotificationItem(
                                                     eventId,
+                                                    event.getString("name"),
+                                                    event.getString("image"),
                                                     UserSession.getInstance().getCurrentUser().getId(),
                                                     true,
                                                     new ArrayList<>(sampledEntrants),

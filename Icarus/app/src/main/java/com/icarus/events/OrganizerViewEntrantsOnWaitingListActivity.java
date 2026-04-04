@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +18,8 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import org.checkerframework.checker.units.qual.N;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -266,24 +269,28 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
             return;
         }
 
-        String userId = user.getId();
-        Date now = new Date();
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String eventName = documentSnapshot.getString("name");
+                        String eventImage = documentSnapshot.getString("image");
 
-        Map<String, Object> notification = new HashMap<>();
-        notification.put("date", now);
-        notification.put("eventId", eventId);
-        notification.put("isEvent", true);
-        notification.put("isSystem", false);
-        notification.put("message", message);
-        notification.put("recipients", recipients);
-        notification.put("sender", userId);
-        notification.put("type", type);
-
-        db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
-                .add(notification)
-                .addOnSuccessListener(dummy ->
-                        Toast.makeText(this, "Message sent", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Failed to send message", Toast.LENGTH_SHORT).show());
+                        NotificationItem notification = new NotificationItem(
+                                eventId,
+                                eventName,
+                                eventImage,
+                                user.getId(),
+                                true,
+                                recipients,
+                                message,
+                                type
+                        );
+                        notification.sendNotification();
+                    } else {
+                        Log.e("NotificationError", "Event not found for ID: " + eventId);
+                    }
+                });
     }
 }

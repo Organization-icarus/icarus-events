@@ -30,8 +30,8 @@ import java.util.ArrayList;
  *
  * @author Kito Lee Son
  */
-public class AdministratorDashboardNotificationArrayAdapter extends ArrayAdapter<Notification> {
-    private final ArrayList<Notification> notifications;
+public class AdministratorDashboardNotificationArrayAdapter extends ArrayAdapter<NotificationItem> {
+    private final ArrayList<NotificationItem> notifications;
     private final Context context;
     private final FirebaseFirestore db;
 
@@ -42,7 +42,7 @@ public class AdministratorDashboardNotificationArrayAdapter extends ArrayAdapter
      * @param context the context used to inflate views and access resources
      * @param notifications the list of users to be displayed by the adapter
      */
-    public AdministratorDashboardNotificationArrayAdapter(Context context, ArrayList<Notification> notifications){
+    public AdministratorDashboardNotificationArrayAdapter(Context context, ArrayList<NotificationItem> notifications){
         super(context, 0, notifications);
         this.notifications = notifications;
         this.context = context;
@@ -69,19 +69,20 @@ public class AdministratorDashboardNotificationArrayAdapter extends ArrayAdapter
                     .inflate(R.layout.administrator_dashboard_notification_list_content, parent, false);
         }
 
-        Notification notification = notifications.get(position);
+        NotificationItem notification = notifications.get(position);
         ShapeableImageView eventImage = view
                 .findViewById(R.id.admin_dashboard_notification_list_image);
         TextView eventName = view
                 .findViewById(R.id.admin_dashboard_notification_list_event_name);
-        TextView notificationMessage = view.findViewById((R.id.notification_message_text));
+        TextView notificationMessage = view.findViewById((R.id.admin_dashboard_notification_list_notification_message));
         ImageButton removeNotificationButton = view
                 .findViewById(R.id.admin_dashboard_notification_list_remove_notification_button);
 
-        Event event = notification.getEvent();
+        // set event name
+        eventName.setText(notification.getEventName());
 
-        // Set event image
-        String imageUrl = event.getImage();
+        // set event image
+        String imageUrl = notification.getEventImage();
         if (imageUrl != null && !imageUrl.isEmpty()) {
             Picasso.get()
                     .load(imageUrl)
@@ -92,30 +93,29 @@ public class AdministratorDashboardNotificationArrayAdapter extends ArrayAdapter
             eventImage.setImageResource(R.drawable.poster);
         }
 
-        // Set event name
-        eventName.setText(event.getName());
+        // set notification message
+        notificationMessage.setText(notification.getMessage());
 
         // Click event name to go to event
         eventName.setOnClickListener(v -> {
             Intent intent = new Intent(context, EventDetailsActivity.class);
-//            intent.putExtra("deviceId", user.getId());
+            intent.putExtra("eventId", notification.getEventId());
             context.startActivity(intent);
         });
 
         // Remove notification from database
         removeNotificationButton.setOnClickListener(v -> {
-            // Remove notification from event notifications subcollections
-            db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION).get()
-                    .addOnSuccessListener(notificationSnapshots -> {
-                        for (QueryDocumentSnapshot notificationSnapshot : notificationSnapshots) {
-                            notificationSnapshot.getReference()
-                                    .collection("notifications")
-                                    .document(notification.getId())
-                                    .delete();
-                        }
+            db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
+                    .document(notification.getId())
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        notifications.remove(position);
+                        notifyDataSetChanged();
+                        Toast.makeText(context, "Notification deleted", Toast.LENGTH_SHORT).show();
                     })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(context, "Failed to delete profile", Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(context, "Error deleting notification", Toast.LENGTH_SHORT).show();
+                    });
         });
 
         return view;

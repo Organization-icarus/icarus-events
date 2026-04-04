@@ -34,10 +34,10 @@
             tools:ignore="HardcodedText" />
 
         <TextView
-            android:id="@+id/admin_dashboard_notification_list_user_name"
+            android:id="@+id/admin_dashboard_notification_list_notification_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Notification message content try out this for a change maybe possibly lets try maybe another one out and i need a couple more lines to see whether this works well or not"
+            android:text="Notification message content"
             android:textColor="@color/lightText"
             android:textSize="@dimen/font_text_size"
             tools:ignore="HardcodedText" />

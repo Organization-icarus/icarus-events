@@ -9,8 +9,11 @@ import java.util.Map;
 
 public class NotificationItem {
 
-    private final String eventId;
-    private final String sender;
+    private String id;
+    private String eventId;
+    private final String eventName;
+    private final String eventImage;
+    private String sender;
     private boolean isEvent;
     private boolean isSystem;
     private ArrayList<String> recipients;
@@ -19,19 +22,11 @@ public class NotificationItem {
     private final FirebaseFirestore db;
 
     //    TO DO: add type can only be certain values
-    public NotificationItem(String eventId, String sender, String type) {
-        this.eventId = eventId;
-        this.sender = sender;
-        this.isEvent = true;
-        this.isSystem = false;
-        this.recipients = new ArrayList<>();
-        this.message = "";
-        this.type = type;
-        this.db = FirebaseFirestore.getInstance();
-    }
 
-    public NotificationItem(String eventId, String sender, Boolean isEvent, ArrayList<String> recipients, String message, String type) {
+    public NotificationItem(String eventId, String eventName, String eventImage, String sender, Boolean isEvent, ArrayList<String> recipients, String message, String type) {
         this.eventId = eventId;
+        this.eventName = eventName;
+        this.eventImage = eventImage;
         this.sender = sender;
         this.isEvent = isEvent;
         this.isSystem = !isEvent;
@@ -41,9 +36,24 @@ public class NotificationItem {
         this.db = FirebaseFirestore.getInstance();
     }
 
+    public NotificationItem(String id, String eventName, String eventImage, String message) {
+        this.id = id;
+        this.eventName = eventName;
+        this.eventImage = eventImage;
+        this.message = message;
+        this.db = FirebaseFirestore.getInstance();
+    }
+
+    public String getId() { return id; }
+
+    public void setId(String id) { this.id = id; }
+
     public String getEventId() {
         return this.eventId;
     }
+
+    public String getEventName() { return eventName; }
+    public String getEventImage() { return eventImage; }
 
     public String getSender() {
         return this.sender;
@@ -111,6 +121,8 @@ public class NotificationItem {
 
         Map<String, Object> data = new HashMap<>();
         data.put("eventId", this.eventId);
+        data.put("eventName", this.eventName);
+        data.put("eventImage", this.eventImage);
         data.put("sender", this.sender);
         data.put("isEvent", this.isEvent);
         data.put("isSystem", this.isSystem);

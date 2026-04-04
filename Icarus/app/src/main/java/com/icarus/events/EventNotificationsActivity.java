@@ -82,6 +82,8 @@ public class EventNotificationsActivity extends HeaderNavBarActivity {
 
                         NotificationItem notification = new NotificationItem(
                                 doc.getString("eventId"),
+                                doc.getString("eventName"),
+                                doc.getString("eventImage"),
                                 doc.getString("sender"),
                                 isEvent,
                                 recipients,
