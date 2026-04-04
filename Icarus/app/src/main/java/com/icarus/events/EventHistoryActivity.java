@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -46,6 +47,8 @@ import java.util.Map;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.core.util.Pair;
+import com.google.android.material.datepicker.MaterialDatePicker;
 
 /**
  * Activity that displays the event history for the current user.
@@ -520,13 +523,9 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
         capacityRow.setOnClickListener(v -> showMaxCapacityDialog(capacityRow));
         addFilterRow(container, capacityRow);
 
-        MaterialButton startDateRow = buildDialogRow(getStartDateSummaryText(), startDateFilter != null);
-        startDateRow.setOnClickListener(v -> showDatePicker(true, startDateRow));
-        addFilterRow(container, startDateRow);
-
-        MaterialButton endDateRow = buildDialogRow(getEndDateSummaryText(), endDateFilter != null);
-        endDateRow.setOnClickListener(v -> showDatePicker(false, endDateRow));
-        addFilterRow(container, endDateRow);
+        MaterialButton dateRangeRow = buildDialogRow(getDateRangeSummaryText(), startDateFilter != null || endDateFilter != null);
+        dateRangeRow.setOnClickListener(v -> showDateRangePicker(dateRangeRow));
+        addFilterRow(container, dateRangeRow);
 
         MaterialButton sortRow = buildDialogRow(getSortSummaryText(), sortOptionSelected);
         sortRow.setOnClickListener(v -> showSortDropdown(sortRow));
@@ -872,37 +871,54 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
     /**
      * Displays a date picker to choose the start or end date filter.
      *
-     * @param isStartDate true to set the start date, false for the end date
      * @param anchor the row text to refresh after selection
      */
-    private void showDatePicker(boolean isStartDate, MaterialButton anchor) {
-        Calendar calendar = Calendar.getInstance();
-        Date currentDate = isStartDate ? startDateFilter : endDateFilter;
+    private void showDateRangePicker(MaterialButton anchor) {
+        MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker()
+                .setTitleText("Select Event Date Range");
 
-        if (currentDate != null) {
-            calendar.setTime(currentDate);
+        if (startDateFilter != null && endDateFilter != null) {
+            builder.setSelection(new Pair<>(startDateFilter.getTime(), endDateFilter.getTime()));
         }
 
-        new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-            Calendar selectedCalendar = Calendar.getInstance();
-            selectedCalendar.set(year, month, dayOfMonth);
+        MaterialDatePicker<Pair<Long, Long>> picker = builder.build();
 
-            if (isStartDate) {
-                setStartOfDay(selectedCalendar);
-                startDateFilter = selectedCalendar.getTime();
-                anchor.setText(getStartDateSummaryText());
-            } else {
-                setEndOfDay(selectedCalendar);
-                endDateFilter = selectedCalendar.getTime();
-                anchor.setText(getEndDateSummaryText());
+        picker.addOnPositiveButtonClickListener(selection -> {
+            if (selection != null) {
+                Long start = selection.first;
+                Long end = selection.second;
+
+                if (start != null) {
+                    Calendar startCalendar = Calendar.getInstance();
+                    startCalendar.setTimeInMillis(start);
+                    setStartOfDay(startCalendar);
+                    startDateFilter = startCalendar.getTime();
+                } else {
+                    startDateFilter = null;
+                }
+
+                if (end != null) {
+                    Calendar endCalendar = Calendar.getInstance();
+                    endCalendar.setTimeInMillis(end);
+                    setEndOfDay(endCalendar);
+                    endDateFilter = endCalendar.getTime();
+                } else {
+                    endDateFilter = null;
+                }
+
+                anchor.setText(getDateRangeSummaryText());
+                anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
+                boolean hasDateRange = startDateFilter != null || endDateFilter != null;
+                anchor.setBackgroundTintList(ColorStateList.valueOf(
+                        hasDateRange ? getColor(R.color.accent_first) : getColor(R.color.white)
+                ));
+                anchor.setStrokeColor(ColorStateList.valueOf(
+                        hasDateRange ? getColor(R.color.accent_first) : getColor(R.color.white)
+                ));
             }
-            anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
-            anchor.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.accent_first)));
-            anchor.setStrokeColor(ColorStateList.valueOf(getColor(R.color.accent_first)));
-        },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)).show();
+        });
+
+        picker.show(getSupportFragmentManager(), "event_date_range_picker");
     }
 
     // Taken from ChatGPT March 29th 2026,
@@ -1003,25 +1019,22 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
     }
 
     /**
-     * Returns summary text for the start date row.
+     * Returns summary text for the start date and end date .
      *
-     * @return summary text for start date filter
+     * @return summary text for start and end date filter
      */
-    private String getStartDateSummaryText() {
-        return startDateFilter == null
-                ? "Start Date: Any"
-                : "Start Date: " + filterDateFormat.format(startDateFilter);
-    }
-
-    /**
-     * Returns summary text for the end date row.
-     *
-     * @return summary text for end date filter
-     */
-    private String getEndDateSummaryText() {
-        return endDateFilter == null
-                ? "End Date: Any"
-                : "End Date: " + filterDateFormat.format(endDateFilter);
+    private String getDateRangeSummaryText() {
+        if (startDateFilter == null && endDateFilter == null) {
+            return "Date Range: Any";
+        }
+        if (startDateFilter != null && endDateFilter != null) {
+            return "Date Range: " + filterDateFormat.format(startDateFilter)
+                    + " - " + filterDateFormat.format(endDateFilter);
+        }
+        if (startDateFilter != null) {
+            return "Date Range: From " + filterDateFormat.format(startDateFilter);
+        }
+        return "Date Range: Until " + filterDateFormat.format(endDateFilter);
     }
 
     @Override
