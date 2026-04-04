@@ -231,11 +231,8 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
                         continue;
                     }
                     String id = snapshot.getId();
-                    Boolean isPrivate = snapshot.getBoolean("isPrivate");
-                    // Hide private events
-                    if (Boolean.TRUE.equals(isPrivate)) {
-                        continue;
-                    }
+
+
 
                     String name = snapshot.getString("name");
                     String category  = snapshot.getString("category");

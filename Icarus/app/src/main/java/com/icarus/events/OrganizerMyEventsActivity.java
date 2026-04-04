@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OrganizerMyEventsActivity extends NavigationBarActivity {
+public class OrganizerMyEventsActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private RecyclerView eventListView;
@@ -27,9 +28,14 @@ public class OrganizerMyEventsActivity extends NavigationBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_my_events);
 
-
         db = FirebaseFirestore.getInstance();
         eventListView = findViewById(R.id.organizer_my_events_list);
+
+        if (eventListView == null) {
+            Toast.makeText(this, "Organizer events layout failed to load", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         organizerEvents = new ArrayList<>();
 
@@ -74,7 +80,13 @@ public class OrganizerMyEventsActivity extends NavigationBarActivity {
                         Double capacity = snapshot.getDouble("capacity");
                         Date regOpen = snapshot.getDate("open");
                         Date regClose = snapshot.getDate("close");
-                        Date date = snapshot.getDate("date");
+
+                        Date startDate = snapshot.getDate("date");
+                        Date endDate = snapshot.getDate("endDate");
+                        if (endDate == null) {
+                            endDate = startDate;
+                        }
+
                         String location = snapshot.getString("location");
                         String image = snapshot.getString("image");
 
@@ -90,7 +102,8 @@ public class OrganizerMyEventsActivity extends NavigationBarActivity {
                                 capacity,
                                 regOpen,
                                 regClose,
-                                date,
+                                startDate,
+                                endDate,
                                 location,
                                 image,
                                 organizers
