@@ -44,12 +44,12 @@
                 android:textColor="@color/lightText"/>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <!-- Event Category -->
                 <TextView
@@ -70,7 +70,7 @@
                     android:id="@+id/admin_dashboard_event_list_event_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingRight="4dp"
+                    android:layout_weight="1"
                     android:textColor="@color/lightText"
                     android:textSize="@dimen/font_text_size" />
 
@@ -78,7 +78,6 @@
                     android:id="@+id/admin_dashboard_event_list_remove_event_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:background="@color/secondary"
                     android:tint="@color/attention"
                     app:srcCompat="@drawable/delete" />
