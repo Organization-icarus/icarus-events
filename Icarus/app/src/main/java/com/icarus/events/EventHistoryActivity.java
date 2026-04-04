@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
@@ -59,6 +61,7 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
     private RecyclerView eventListView;
     private EditText searchTextFilter;
     private String currentSearch = "";
+    private MaterialButtonToggleGroup filterButtons;
     private MaterialButton filterCategoryButton;
     private MaterialButton qrButton;
     private ArrayList<Event> eventArrayList;
@@ -118,7 +121,11 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
         // Initialize buttons
         filterCategoryButton = findViewById(R.id.event_history_list_filter_button);
         qrButton = findViewById(R.id.event_history_list_qr_button);
-
+        filterButtons = findViewById(R.id.event_history_list_filter_bar);
+        //Set default as Registered
+        filterButtons.check(R.id.event_history_list_filter_bar_registered);
+        MaterialButton defaultButton = findViewById(R.id.event_history_list_filter_bar_registered);
+        defaultButton.setTextColor(getColor(R.color.darkText));
         // Retrieve current user role
         User currentUser = UserSession.getInstance().getCurrentUser();
         Boolean isAdmin = (currentUser != null) ? currentUser.getIsAdmin() : false;
@@ -185,6 +192,28 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
         });
 
         filterCategoryButton.setOnClickListener(v -> showFilterDialog());
+
+
+        filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) ->{
+            if (!isChecked) return; // ← ignore uncheck events entirely
+
+            for (int i = 0; i < group.getChildCount(); i++) {
+                View view = group.getChildAt(i);
+                if (view instanceof MaterialButton) {
+                    ((MaterialButton) view).setTextColor(getColor(R.color.lightText));
+                }
+            }
+            MaterialButton selectedButton = findViewById(checkedId);
+            selectedButton.setTextColor(getColor(R.color.darkText));
+
+            if(isChecked && (checkedId == R.id.event_history_list_filter_bar_registered)){
+                //view registered events
+                listenToUserEvents(currentUserId);
+            }else if(isChecked && (checkedId == R.id.event_history_list_filter_bar_organized)){
+                //View organizered events
+                findOrganizerEvents(currentUserId);
+            }
+        });
     }
 
     /**
@@ -315,6 +344,38 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
                     }
                 })
                 .addOnFailureListener(e -> Log.e("Firestore", "Failed to load user: " + e.toString()));
+    }
+
+    private void findOrganizerEvents(String userId) {
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .whereArrayContains("organizers", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    eventArrayList.clear();
+
+                    for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
+                        String id = snapshot.getId();
+                        String name = snapshot.getString("name");
+                        String category = snapshot.getString("category");
+                        Double capacity = snapshot.getDouble("capacity");
+                        Date regOpen = snapshot.getDate("open");
+                        Date regClose = snapshot.getDate("close");
+                        Date startDate = snapshot.getDate("startDate");
+                        Date endDate = snapshot.getDate("endDate");
+                        String location = snapshot.getString("location");
+                        String image = snapshot.getString("image");
+                        ArrayList<String> organizers =
+                                (ArrayList<String>) snapshot.get("organizers");
+
+                        eventArrayList.add(new Event(id, name, category, capacity,
+                                regOpen, regClose, startDate, endDate, location, image, organizers));
+
+                        attachWaitlistListener(id);
+                    }
+
+                    applyFilters();
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Failed to load organizer events: " + e.toString()));
     }
 
     /**
