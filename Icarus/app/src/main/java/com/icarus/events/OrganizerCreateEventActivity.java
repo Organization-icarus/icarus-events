@@ -613,9 +613,7 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (seekBar.getProgress() > 0) {
-                    selectedEntrantRange = seekBar.getProgress();
-                }
+                selectedEntrantRange = seekBar.getProgress();
             }
         });
 
@@ -624,7 +622,7 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
                 Toast.makeText(this, "Please tap a location on the map", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (selectedEntrantRange == null) {
+            if (selectedEntrantRange == null || selectedEntrantRange == 0) {
                 Toast.makeText(this, "Please select an entrant range", Toast.LENGTH_SHORT).show();
                 return;
             }
