@@ -95,13 +95,19 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
                     eventName = document.getString("name");
                     eventTitle.setText(eventName);
                     isPrivate = document.getBoolean("isPrivate");
+
                     locationEnabled = document.getBoolean("geolocation");
                     if(isPrivate == null){isPrivate = false;}
                     if(locationEnabled == null){locationEnabled = false;}
                     if(isPrivate){
+
                         inviteEntrant.setText("Invite Specific Entrant");
+                        shareQRCode.setEnabled(false);
+                        shareQRCode.setVisibility(Button.GONE);
                     } else {
                         inviteEntrant.setText("Sample Attendees");
+                        shareQRCode.setEnabled(true);
+                        shareQRCode.setVisibility(Button.VISIBLE);
                     }
                 });
 
@@ -171,7 +177,11 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
 
         });
         shareQRCode.setOnClickListener(v -> {
-            // Open Share menu to share a QR code containing the event ID.
+            if (Boolean.TRUE.equals(isPrivate)) {
+                Toast.makeText(this, "Private events do not generate promotional QR codes", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             try {
                 Bitmap qrBitmap = generateQRCodeBitmap(eventId);
                 shareQRCodeBitmap(qrBitmap);
@@ -180,6 +190,7 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
                 Log.e("QR_CODE_ERROR", "Failed to generate/share QR code", e);
             }
         });
+
         addOrganizers.setOnClickListener(v -> {
             // add Organizers as Co-Organzers
             Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);

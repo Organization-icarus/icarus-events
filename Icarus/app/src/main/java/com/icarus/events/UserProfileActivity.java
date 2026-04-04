@@ -1,4 +1,6 @@
+
 package com.icarus.events;
+
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,8 +12,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+
 
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
@@ -21,8 +25,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 
+
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * Activity that allows a user to view and update their profile information.
@@ -37,6 +43,7 @@ import java.util.Map;
  */
 public class UserProfileActivity extends HeaderNavBarActivity {
 
+
     private ImageView profileImage;
     private EditText nameEditText;
     private EditText phoneEditText;
@@ -44,11 +51,20 @@ public class UserProfileActivity extends HeaderNavBarActivity {
     private Button editProfileButton;
     private Button adminDeleteButton;
     private ImageButton userSettingsButton;
+
+
+    private Button myNotificationsButton;
+    private Button myOrganizedEventsButton;
+
+
     private String profileImageURL;
     private ActivityResultLauncher<String> imagePickerLauncher;
+
+
     private User user;
     private boolean editState = false;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
     /**
      * Initializes the user profile screen and populates the fields with
@@ -63,18 +79,25 @@ public class UserProfileActivity extends HeaderNavBarActivity {
         setContentView(R.layout.activity_user_profile);
         setupNavBar();
 
+
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
+
 
         // Initialize buttons
         editProfileButton = findViewById(R.id.user_profile_edit_confirm_button);
         userSettingsButton = findViewById(R.id.user_profile_settings_button);
         adminDeleteButton = findViewById(R.id.user_profile_admin_delete_button);
+        myNotificationsButton = findViewById(R.id.user_profile_my_notifications_button);
+        myOrganizedEventsButton = findViewById(R.id.user_profile_my_organized_events_button);
+
 
         // Initialize User Image View
         profileImage = findViewById(R.id.user_profile_image);
         // Initialize imagePickerLauncher
-        ActivityResultLauncher<String> imagePickerLauncher = createImagePicker();
+        imagePickerLauncher = createImagePicker();
+
+
 
 
         // Initialize text fields
@@ -82,9 +105,11 @@ public class UserProfileActivity extends HeaderNavBarActivity {
         emailEditText = findViewById(R.id.user_profile_email_edit);
         phoneEditText = findViewById(R.id.user_profile_phone_edit);
 
+
         // Checking if screen was entered from the admin dashboard or regular profile
         String deviceId;
         String passedId = getIntent().getStringExtra("deviceId");
+
 
         if (passedId != null) {
             deviceId = passedId;
@@ -92,10 +117,14 @@ public class UserProfileActivity extends HeaderNavBarActivity {
             userSettingsButton.setVisibility(View.GONE);
             editProfileButton.setVisibility(View.GONE);
             adminDeleteButton.setVisibility(View.VISIBLE);
+            myNotificationsButton.setVisibility(View.GONE);
+            myOrganizedEventsButton.setVisibility(View.GONE);
+
 
             nameEditText.setHint("Not provided");
             emailEditText.setHint("Not provided");
             phoneEditText.setHint("Not provided");
+
 
             // Bring context user information into the menu
             db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
@@ -123,12 +152,31 @@ public class UserProfileActivity extends HeaderNavBarActivity {
         } else {
             // Retrieve device Id/User object
             user = UserSession.getInstance().getCurrentUser();
+
+            if (user == null || user.getId() == null) {
+                Toast.makeText(this, "User session not found", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
             deviceId = user.getId();
 
+
+            myNotificationsButton.setVisibility(View.VISIBLE);
+
+
+            myOrganizedEventsButton.setVisibility(View.VISIBLE);
+            //Pre fill text fields if user is logged in and information exists
+
+
+
+
             //Pre-fill text fields if user is logged in and information exists
+
+
             nameEditText.setText(user.getName());
             if (user.getEmail() != null) emailEditText.setText(user.getEmail());
             if (user.getPhone() != null) phoneEditText.setText(user.getPhone());
+
 
             // Display profile image
             db.collection(FirestoreCollections.USERS_COLLECTION)
@@ -153,11 +201,23 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                     });
         }
 
+
         // Set buttons on click listeners
         userSettingsButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, UserSettingsActivity.class);
             startActivity(intent);
         });
+        myNotificationsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, UserNotificationsActivity.class);
+            startActivity(intent);
+        });
+
+
+        myOrganizedEventsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, OrganizerMyEventsActivity.class);
+            startActivity(intent);
+        });
+
 
         adminDeleteButton.setOnClickListener(v -> {
             // First remove user from all event entrant subcollections
@@ -170,11 +230,13 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                                     .delete();
                         }
 
+
                         // Delete profile image
                         db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
                                 .addOnSuccessListener(userSnapshot -> {
                                     String imageURL = userSnapshot.getString("image");
                                     deleteOldProfileImage(imageURL);
+
 
                                     // Then delete the user document itself
                                     db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).delete()
@@ -190,11 +252,13 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                     });
         });
 
+
         editProfileButton.setOnClickListener(v -> {
             if (editState) {
                 String name = nameEditText.getText().toString().trim();
                 String email = emailEditText.getText().toString().trim();
                 String phone = phoneEditText.getText().toString().trim();
+
 
                 // Check if user entered name in text fields
                 if (name.isEmpty()) {
@@ -212,6 +276,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                 if (!email.isEmpty()) userData.put("email", email);
                 if (!phone.isEmpty()) userData.put("phone", phone);
 
+
                 db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).update(userData)
                         .addOnSuccessListener(unused -> {
                             // Add information into global session
@@ -228,9 +293,16 @@ public class UserProfileActivity extends HeaderNavBarActivity {
             }
         });
 
+
         profileImage.setOnClickListener(v -> {
             if(editState) {
                 // Get old profile image URL
+                user = UserSession.getInstance().getCurrentUser();
+                if (user == null || user.getId() == null) {
+                    Toast.makeText(this, "User session not found", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
                 db.collection(FirestoreCollections.USERS_COLLECTION).document(user.getId()).get()
                         .addOnSuccessListener(document -> {
                             profileImageURL = document.getString("image");
@@ -240,6 +312,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
             }
         });
     }
+
 
     /**
      * Toggles the profile editing state.
@@ -273,6 +346,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
         } else {
             //User clicked edit profile
 
+
             // Enable text edits
             nameEditText.setEnabled(true);
             emailEditText.setEnabled(true);
@@ -295,6 +369,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
         }
     }
 
+
     /**
      * Delete image from firestore database
      *
@@ -311,6 +386,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                     }
                 });
     }
+
 
     /**
      * Create image picker activity for selecting a new profile image.
@@ -351,12 +427,14 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                                                 });
                                     }
 
+
                                     @Override
                                     public void onError(String requestId, ErrorInfo error) {
                                         Toast.makeText(UserProfileActivity.this,
                                                 "Image upload failed", Toast.LENGTH_SHORT).show();
                                         Log.e("UPLOAD_ERROR", error.getDescription());
                                     }
+
 
                                     @Override public void onStart(String requestId) {}
                                     @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
