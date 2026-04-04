@@ -481,7 +481,13 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
                         eventNameView.setText(this.eventName);
 
                         TextView descriptionView = findViewById(R.id.eventDescription);
-                        descriptionView.setText(this.eventDescription);
+                        // If the event does not have a description, hide the view
+                        if (eventDescription == null || eventDescription.trim().isEmpty()) {
+                            descriptionView.setVisibility(View.GONE);
+                        } else {
+                            descriptionView.setVisibility(View.VISIBLE);
+                            descriptionView.setText(eventDescription);
+                        }
 
                         refreshAdapter(finalEventId);
                     }
