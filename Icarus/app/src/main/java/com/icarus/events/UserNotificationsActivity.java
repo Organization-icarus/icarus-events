@@ -82,6 +82,8 @@ public class UserNotificationsActivity extends AppCompatActivity {
 
                         NotificationItem item = new NotificationItem(
                                 doc.getString("eventId"),
+                                doc.getString("eventName"),
+                                doc.getString("eventImage"),
                                 doc.getString("sender"),
                                 isEvent,
                                 recipients,
