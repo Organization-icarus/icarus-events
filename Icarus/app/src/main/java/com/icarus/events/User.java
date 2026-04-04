@@ -29,6 +29,7 @@ public class User {
      * @param name user's display name
      * @param email user's email address
      * @param phone user's phone number
+     * @param image URL of the user's profile image
      * @param isAdmin role assigned to the user (e.g., entrant, organizer, admin)
      * @param events list of event IDs associated with the user
      * @param settings map of user-specific configuration settings
@@ -182,10 +183,20 @@ public class User {
         this.settings = settings;
     }
 
+    /**
+     * Returns the profile image URL of the user
+     *
+     * @return the user's profile image URL
+     */
     public String getImage() {
         return image;
     }
 
+    /**
+     * Sets the profile image URL of the user
+     *
+     * @param image the user's new profile image URL
+     */
     public void setImage(String image) {
         this.image = image;
     }

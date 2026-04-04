@@ -349,6 +349,12 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
                 .addOnFailureListener(e -> Log.e("Firestore", "Failed to load user: " + e.toString()));
     }
 
+    /**
+     * Queries Firestore for all events where the given user is listed as an
+     * organizer and populates the event list with the results.
+     *
+     * @param userId the current user's ID
+     */
     private void findOrganizerEvents(String userId) {
         db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .whereArrayContains("organizers", userId)
@@ -1037,6 +1043,10 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
         return "Date Range: Until " + filterDateFormat.format(endDateFilter);
     }
 
+    /**
+     * Removes all active Firestore waitlist snapshot listeners when the
+     * activity is destroyed to prevent memory leaks.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
