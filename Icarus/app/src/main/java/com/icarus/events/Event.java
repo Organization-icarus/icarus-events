@@ -38,8 +38,8 @@ public class Event {
      * @param capacity the maximum number of entrants allowed
      * @param regOpen the date when registration opens
      * @param regClose the date when registration closes
-     * @param startDate the date the event takes place
-     * @param endDate the date the event takes place
+     * @param startDate the date the event starts
+     * @param endDate the date the event ends
      * @param location the location where the event is held
      * @param image the image associated with the event
      * @param organizers the identifier of the event organizer
@@ -59,6 +59,24 @@ public class Event {
         this.organizers = organizers;
     }
 
+    /**
+     * Creates a new Event object with user-specific waitlist information.
+     *
+     * @param id               the unique identifier of the event
+     * @param name             the name of the event
+     * @param category         the category of the event (e.g., Sports, Music, Education)
+     * @param capacity         the maximum number of entrants allowed
+     * @param regOpen          the date when registration opens
+     * @param regClose         the date when registration closes
+     * @param startDate        the date the event starts
+     * @param endDate          the date the event ends
+     * @param location         the location where the event is held
+     * @param image            the image associated with the event
+     * @param organizers       the identifiers of the event organizers
+     * @param user_status      the current user's status for this event
+     *                         (e.g., waitlist, selected, registered, or rejected)
+     * @param waiting_list_size the current number of entrants on the waitlist
+     */
     // A full constructor
     public Event(String id, String name, String category, Double capacity, Date regOpen,
                  Date regClose, Date startDate, Date endDate, String location, String image, ArrayList<String> organizers,
@@ -213,10 +231,32 @@ public class Event {
         this.endDate = date;
     }
 
+    /**
+     * Returns the current user's status for this event.
+     *
+     * @return the user status (e.g., waitlist, selected, registered, or rejected)
+     */
     public String getUser_status() { return user_status; }
+
+    /**
+     * Sets the current user's status for this event.
+     *
+     * @param user_status the new user status
+     */
     public void setUser_status(String user_status) { this.user_status = user_status; }
 
+    /**
+     * Returns the current number of entrants on the waitlist.
+     *
+     * @return the waiting list size
+     */
     public int getWaiting_list_size() { return waiting_list_size; }
+
+    /**
+     * Sets the current number of entrants on the waitlist.
+     *
+     * @param waiting_list_size the new waiting list size
+     */
     public void setWaiting_list_size(int waiting_list_size) { this.waiting_list_size = waiting_list_size; }
 
     /**

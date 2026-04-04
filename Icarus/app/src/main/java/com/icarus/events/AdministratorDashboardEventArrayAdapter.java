@@ -56,6 +56,12 @@ public class AdministratorDashboardEventArrayAdapter extends RecyclerView.Adapte
         ImageButton removeEventButton;
         ImageView posterView;
 
+        /**
+         * Constructs a ViewHolder and initializes view references
+         * from the provided item view.
+         *
+         * @param itemView the root view of the event list item layout
+         */
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             eventName = itemView.findViewById(R.id.admin_dashboard_event_list_event_name);
@@ -80,6 +86,13 @@ public class AdministratorDashboardEventArrayAdapter extends RecyclerView.Adapte
         this.db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Inflates the event list item layout and wraps it in a new ViewHolder.
+     *
+     * @param parent   the ViewGroup that the new view will be attached to
+     * @param viewType the view type of the new view
+     * @return a new ViewHolder holding the inflated event list item view
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -88,6 +101,18 @@ public class AdministratorDashboardEventArrayAdapter extends RecyclerView.Adapte
         return new ViewHolder(view);
     }
 
+    /**
+     * Binds event data to the views in the provided ViewHolder.
+     * <p>
+     * Populates the event name, category chip with its associated color,
+     * start date, and poster image. Configures a click listener to navigate
+     * to the event's detail screen, and a delete button listener that removes
+     * the event and all associated data from Firestore, including entrant
+     * subcollections, comments, notifications, and the event poster image.
+     *
+     * @param holder   the ViewHolder to bind data to
+     * @param position the position of the event in the adapter's data set
+     */
     @SuppressLint("ResourceType")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
@@ -215,6 +240,11 @@ public class AdministratorDashboardEventArrayAdapter extends RecyclerView.Adapte
         });
     }
 
+    /**
+     * Returns the total number of events in the adapter's data set.
+     *
+     * @return the number of events
+     */
     @Override
     public int getItemCount() {
         return events.size();

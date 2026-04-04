@@ -45,15 +45,15 @@ public class AdministratorDashboardImageArrayAdapter extends ArrayAdapter<Image>
     }
 
     /**
-     * Returns a view for displaying n image in the administrator image list.
+     * Returns a view for displaying an image in the administrator image list.
      * <p>
-     * Inflates the list item layout if necessary, binds the data to the UI
-     * components, and configures actions for viewing user details and
-     * removing the user from the database.
+     * Inflates the list item layout if necessary, loads the image from Firestore
+     * using its public ID, and configures a delete button that removes the image
+     * from both Firestore and Cloudinary.
      *
-     * @param position the position of the user in the adapter's data set
-     * @param convertView a view to reuse
-     * @param parent the parent view that this view will be attached to
+     * @param position    the position of the image in the adapter's data set
+     * @param convertView a view to reuse, or null if a new view must be inflated
+     * @param parent      the parent view that this view will be attached to
      * @return the view representing the image at the specified position
      */
     @NonNull
