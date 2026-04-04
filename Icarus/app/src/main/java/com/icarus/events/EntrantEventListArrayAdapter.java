@@ -122,7 +122,7 @@ public class EntrantEventListArrayAdapter extends RecyclerView.Adapter<EntrantEv
         GradientDrawable chipBackground =
                 (GradientDrawable) holder.eventCategory.getBackground().mutate();
         // reset to default first
-        chipBackground.setColor(Color.parseColor(context.getString(R.color.accent_first)));
+        chipBackground.setColor(context.getColor(R.color.accent_first));
         // Get attached color
         String hexColor = categoryColors.get(event.getCategory());
         if (hexColor != null && !hexColor.trim().isEmpty()) {
