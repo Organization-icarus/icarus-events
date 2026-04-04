@@ -3,6 +3,7 @@ package com.icarus.events;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -206,6 +207,17 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                     Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!phone.isEmpty() && !Patterns.PHONE.matcher(phone).matches()) {
+                    Toast.makeText(this, "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 // Send user data to database
                 Map<String, Object> userData = new HashMap<>();
                 userData.put("name", name);
