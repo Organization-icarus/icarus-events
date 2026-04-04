@@ -22,6 +22,7 @@
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
+            android:id="@+id/registered_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/registered"
@@ -29,6 +30,7 @@
             android:contentDescription="Registered Events"/>
 
         <TextView
+            android:id="@+id/registered_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Registered"
@@ -49,6 +51,7 @@
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
+            android:id="@+id/events_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/event_list"
@@ -56,6 +59,7 @@
             android:contentDescription="Event List"/>
 
         <TextView
+            android:id="@+id/events_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Events"
@@ -76,6 +80,7 @@
         android:background="?attr/selectableItemBackgroundBorderless">
 
         <ImageView
+            android:id="@+id/profile_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/profile"
@@ -83,6 +88,7 @@
             android:contentDescription="Profile"/>
 
         <TextView
+            android:id="@+id/profile_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Profile"
