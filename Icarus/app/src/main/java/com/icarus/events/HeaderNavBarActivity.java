@@ -48,7 +48,7 @@ public class HeaderNavBarActivity extends AppCompatActivity {
      * This method should be called by subclasses after setting their layout
      * with setContentView().
      */
-    protected void setupNavBar() {
+    protected void setupNavBar(int activeTab) {
         View navBar = findViewById(R.id.nav_bar);
 
         // Profile will be a class named "UserRegistrationActivity"
@@ -60,7 +60,6 @@ public class HeaderNavBarActivity extends AppCompatActivity {
         eventsTab.setOnClickListener(v -> openActivity(EntrantEventListActivity.class));
         profileTab.setOnClickListener(v -> openActivity(UserProfileActivity.class));
 
-        int activeTab = 2;
         highlightNavTab(navBar, activeTab);
     }
 

@@ -42,7 +42,7 @@ public class EntrantMapActivity extends HeaderNavBarActivity {
         super.onCreate(savedInstanceState);
         Configuration.getInstance().setUserAgentValue(getPackageName());
         setContentView(R.layout.activity_entrant_map);
-        setupNavBar();
+        setupNavBar(TAB_NONE);
         db = FirebaseFirestore.getInstance();
 
         // Get the map view and set properties

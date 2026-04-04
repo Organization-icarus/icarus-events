@@ -107,7 +107,7 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
         setupHeaderBar("Details");
-        setupNavBar();
+        setupNavBar(TAB_EVENTS);
 
         eventOrganizers = new ArrayList<String>();
         // Retrieve data passed to the intent

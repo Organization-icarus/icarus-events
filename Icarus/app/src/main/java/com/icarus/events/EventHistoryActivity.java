@@ -112,7 +112,7 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_history);
-        setupNavBar();
+        setupNavBar(TAB_REGISTERED);
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();

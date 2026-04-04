@@ -111,7 +111,7 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entrant_event_list);
-        setupNavBar();
+        setupNavBar(TAB_EVENTS);
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
