@@ -122,6 +122,12 @@ public class UserRegistrationActivity extends AppCompatActivity {
                 return;
             }
 
+            // Optional phone validation (only if provided)
+            if (!phone.isEmpty() && !Patterns.PHONE.matcher(phone).matches()) {
+                Toast.makeText(this, "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             String userPhone = phone.isEmpty() ? null : phone;
 
             Boolean isAdmin = false;
