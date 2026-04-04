@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="16dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/admin_dashboard_notification_list_image"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/poster"
+        app:shapeAppearance="@style/ShapeAppearanceOverlay.App.RoundImageView" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_margin="16dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/admin_dashboard_notification_list_event_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Event Name"
+            android:textColor="@color/lightText"
+            android:textSize="@dimen/font_subheading_size"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/admin_dashboard_notification_list_user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Notification message content try out this for a change maybe possibly lets try maybe another one out and i need a couple more lines to see whether this works well or not"
+            android:textColor="@color/lightText"
+            android:textSize="@dimen/font_text_size"
+            tools:ignore="HardcodedText" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/admin_dashboard_notification_list_remove_notification_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?android:attr/windowBackground"
+        android:contentDescription="remove_notification_button"
+        app:srcCompat="@drawable/delete"
+        app:tint="@color/attention"
+        tools:ignore="HardcodedText" />
+
+</LinearLayout>
