@@ -34,7 +34,6 @@ import java.util.Set;
  *
  * @author Ben Salmon
  */
-
 public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
     private FirebaseFirestore db;
     private TextView eventName;
@@ -48,6 +47,14 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
     private String eventId;
     private String userId;
 
+    /**
+     * Initializes the activity, sets up the navigation bar, loads event data,
+     * configures the search bar and entrant list, and attaches the confirmation
+     * button behavior for adding entrants, assigning co-organizers, or replacing
+     * declined entrants.
+     *
+     * @param savedInstanceState the saved instance state bundle, or null if none exists
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -76,18 +83,23 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                         eventName.setText(name);
                     });
                 });
+
         //Create EditText
         searchBar = findViewById(R.id.OrganizerEntrantSearchBar);
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 currentSearch = s.toString().trim().toLowerCase();
                 applySearch();
             }
+
             @Override public void afterTextChanged(Editable s) {}
         });
+
         //Create Button
         confirmationButton = findViewById(R.id.OrganizerEntrantConfirmationButton);
+
         //Create ListView
         entrantList = findViewById(R.id.OrganizerEntrantList);
         entrantUserList = new ArrayList<>();
@@ -101,11 +113,10 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
             loadList();
         }
 
-
         /*TODO:  A NOTIFICATION MUST BE SENT INSTEAD
-        * AWAITING NOTIFICATION SET UP FROM KITO AND YIFAN
-        * March 25,2026 @ 4:23pm
-        */
+         * AWAITING NOTIFICATION SET UP FROM KITO AND YIFAN
+         * March 25,2026 @ 4:23pm
+         */
         confirmationButton.setOnClickListener(v -> {
             Set<String> selectedIds = eventListArrayAdapter.getSelectedIds();
             if (selectedIds.isEmpty()) {
@@ -157,6 +168,11 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
 
     }
 
+    /**
+     * Loads all users who are eligible to be shown in the entrant selection list.
+     * A user is included only if they are not already in the event's entrant list,
+     * are not an admin, are not the current user, and are not already an organizer.
+     */
     /*
      * Written by Claude, March 25,2026
      * "Can you write a firebase query that find all users in the users
@@ -204,7 +220,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                                 boolean userIsAdmin = isAdmin != null && isAdmin;
                                                 boolean notInEntrants = !entrantIds.contains(deviceId);
                                                 boolean isCurrentUser = deviceId.equals(userId);
-                                                boolean isOrganizer = organizerSet.contains(deviceId); // ← new
+                                                boolean isOrganizer = organizerSet.contains(deviceId);
 
                                                 if (notInEntrants && !userIsAdmin && !isCurrentUser && !isOrganizer) {
                                                     entrantUserList.add(new User(deviceId, name, email, phone, image,
@@ -220,10 +236,17 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                 .addOnFailureListener(e -> Log.e("loadList", "Failed to fetch event", e));
     }
 
+    /**
+     * Adds the selected users to the event's entrant subcollection with the given status.
+     * If the new status is {@code rejected}, the entrant is also marked as replaced.
+     *
+     * @param selectedIds the IDs of the users to add or update
+     * @param newStatus the status to assign to each selected user
+     */
     /*
-    * Written by Claude, March 25,2026
-    * "How can I make the listView selectable to add users to an event"
-    * */
+     * Written by Claude, March 25,2026
+     * "How can I make the listView selectable to add users to an event"
+     * */
     private void addUsersToEvent(Set<String> selectedIds, String newStatus) {
         WriteBatch batch = db.batch();
 
@@ -250,6 +273,12 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                 .addOnFailureListener(e -> Log.e("addUsers", "Failed to add users", e));
     }
 
+    /**
+     * Adds the selected user IDs to the event's organizers array, making them
+     * co-organizers for the event.
+     *
+     * @param selectedIds the IDs of the users to add as co-organizers
+     */
     private void addUserstoOrganizersArray(Set<String> selectedIds){
         db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(eventId)
@@ -261,11 +290,17 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                             .document(eventId)
                             .update("organizers", organizers)
                             .addOnSuccessListener(dummy ->{
-                               Toast.makeText(this,selectedIds.size()
-                                       + " organizers added as Co-Organizers",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this,selectedIds.size()
+                                        + " organizers added as Co-Organizers",Toast.LENGTH_SHORT).show();
                             });
                 });
     }
+
+    /**
+     * Filters the currently loaded entrant list using the text entered in the search bar.
+     * The search checks each user's name, email, and phone number for a match.
+     * If the search string is empty, the full eligible list is reloaded.
+     */
     private void applySearch(){
         if (currentSearch.isEmpty()) {
             loadList();
@@ -284,6 +319,13 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
         entrantUserList.addAll(filteredEntrants);
         eventListArrayAdapter.notifyDataSetChanged();
     }
+
+    /**
+     * Loads entrants from the event's entrant subcollection whose status matches
+     * the provided status string and who have not already been marked as replaced.
+     *
+     * @param listStatus the entrant status to filter by
+     */
     private void loadEntrantList(String listStatus) {
         //events -> eventID -> entrants -> entrantId -> status
         entrantUserList.clear();
@@ -298,7 +340,6 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                         Boolean isReplaced = snapshot.getBoolean("isReplaced");
 
                         if (Objects.equals(status, listStatus)  && (isReplaced == null || !isReplaced)) {
-                            //If user has waiting role look for name in user collection
                             db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId)
                                     .get()
                                     .addOnSuccessListener(userSnapshot -> {
@@ -314,8 +355,14 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                     }
                 });
     }
+
+    /**
+     * Randomly selects a given number of users from the waiting list and updates
+     * their entrant status to {@code selected}.
+     *
+     * @param size the number of waiting-list users to select
+     */
     private void selectNewUsersFromWaitingList(int size) {
-        //Find users with waiting status in entrant subcollection
         db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants")
                 .get()
                 .addOnSuccessListener(document ->{
@@ -347,6 +394,14 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
 
                 });
     }
+
+    /**
+     * Creates and stores a notification document for the given recipients.
+     *
+     * @param Ids the IDs of the users who should receive the notification
+     * @param type the notification type
+     * @param message the notification message content
+     */
     private void createNotification(Set<String> Ids, String type,  String message){
         Date now = new Date();
         ArrayList<String> recipients = new ArrayList<>(Ids);

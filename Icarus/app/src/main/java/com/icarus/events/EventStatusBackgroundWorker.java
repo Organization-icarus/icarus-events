@@ -18,10 +18,24 @@ import com.google.firebase.firestore.WriteBatch;
  * @author Ben Salmon
  */
 public class EventStatusBackgroundWorker extends Worker {
+
+    /**
+     * Creates a new background worker for updating entrant statuses after
+     * an event's registration deadline has passed.
+     *
+     * @param context the application context
+     * @param params the parameters needed to configure this worker
+     */
     public EventStatusBackgroundWorker(@NonNull Context context, @NonNull WorkerParameters params) {
         super(context, params);
     }
 
+    /**
+     * Checks for events whose registration close time has passed and updates
+     * all entrants with status {@code selected} to {@code rejected}.
+     *
+     * @return {@link Result#success()} after the background task is started
+     */
     @NonNull
     @Override
     public Result doWork() {
@@ -29,9 +43,9 @@ public class EventStatusBackgroundWorker extends Worker {
         Timestamp now = Timestamp.now();
 
         /*This query was written by Claude, March 26, 2026
-        * "I need a query that will update a users status in the entrant subcollection
-        * from selected to rejected after a event's registration close date passes"
-        */
+         * "I need a query that will update a users status in the entrant subcollection
+         * from selected to rejected after a event's registration close date passes"
+         */
         // Find all events where registration has ended
         db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .whereLessThan("close", now)  // Events where close date has passed

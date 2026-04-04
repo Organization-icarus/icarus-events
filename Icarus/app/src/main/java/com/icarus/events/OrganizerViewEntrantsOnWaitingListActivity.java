@@ -53,6 +53,14 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
     private String eventId;
     private Boolean isPrivate;
 
+    /**
+     * Initializes the activity, sets up the navigation bar, loads the event data,
+     * configures the filter buttons, and sets up the entrant list, messaging,
+     * CSV export, and selection controls.
+     *
+     * @param savedInstanceState the previously saved activity state, or {@code null}
+     *                           if no state exists
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,22 +98,21 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
 
                     runOnUiThread(() -> {
                         eventName.setText(name);
-                        //Set default as waiting if public event
-                        if(isPrivate){
-                            waitingButton.setEnabled(false);
 
-                            filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_chosen);
-
-                            MaterialButton defaultButton = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar_chosen);
-                            defaultButton.setTextColor(getColor(R.color.darkText));
-                            status.set("selected");
-                            loadList(status.get());
-                        }else{
-                            filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
-
-                            MaterialButton defaultButton = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
-                            defaultButton.setTextColor(getColor(R.color.darkText));
-                            status.set("waiting");
+                        // Only set the default filter on the very first snapshot
+                        if (filterButtons.getCheckedButtonId() == View.NO_ID) {
+                            if (isPrivate) {
+                                waitingButton.setEnabled(false);
+                                filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_chosen);
+                                MaterialButton defaultButton = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar_chosen);
+                                defaultButton.setTextColor(getColor(R.color.darkText));
+                                status.set("selected");
+                            } else {
+                                filterButtons.check(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
+                                MaterialButton defaultButton = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
+                                defaultButton.setTextColor(getColor(R.color.darkText));
+                                status.set("waiting");
+                            }
                             loadList(status.get());
                         }
                     });
@@ -159,7 +166,8 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
             /*
             * The Material Alert DialogBuilder was created by Claude
             * March 31, 2026. "I need a pop up that will allow a user to
-            * type in a message without having to create an additional XML file"*/
+            * type in a message without having to create an additional XML file"
+            * */
             EditText input = new EditText(this);
             input.setHint("The Message you wish to send");
             input.setPadding(48, 24, 48, 24);
@@ -182,7 +190,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                     .show();
         });
         selectAllButton.setOnClickListener(v -> {
-        //Select all users from the list
+            //Select all users from the list
             if (selectedIds.size() == entrantList.size() && !entrantList.isEmpty()) {
                 eventListArrayAdapter.clearSelections();
                 selectAllButton.setText("Select All");
@@ -192,6 +200,14 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
             }
         });
     }
+
+    /**
+     * Loads all entrants for the current event whose status matches the
+     * provided list status, then populates the list view with their user data.
+     *
+     * @param listStatus the entrant status to display, such as waiting,
+     *                   selected, rejected, or registered
+     */
     private void loadList(String listStatus) {
         //events -> eventID -> entrants -> entrantId -> status
         entrantList.clear();
@@ -222,6 +238,10 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                 });
     }
 
+    /**
+     * Creates and exports a CSV file of the currently displayed entrant list
+     * into the device's Downloads directory.
+     */
     private void createCSV(){
         //CSV file
         //row seperated by '\n', columns seperated by ','
@@ -252,6 +272,13 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
         }
     }
 
+    /**
+     * Creates and sends a notification message to the provided recipients.
+     *
+     * @param message the message body to send
+     * @param type the notification type associated with the selected entrant status
+     * @param recipients the list of user IDs that should receive the message
+     */
     private void sendMessage(String message, String type, ArrayList<String> recipients) {
         User user = UserSession.getInstance().getCurrentUser();
         String userId = user.getId();
