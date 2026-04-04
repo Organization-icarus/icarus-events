@@ -78,6 +78,14 @@
     </style>
 
     <!-- -->
+    <!-- For framing event pictures in rounded squares -->
+    <!-- -->
+    <style name="ShapeAppearanceOverlay.App.RoundImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">25%</item>
+    </style>
+
+    <!-- -->
     <!-- For Alert dialogs-->
     <!-- -->
     <style name="CustomAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">

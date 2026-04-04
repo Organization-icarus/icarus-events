@@ -118,31 +118,58 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
 
                 ArrayList<String> privateRecipients = new ArrayList<>(selectedIds);
 
-                NotificationItem privateNotification = new NotificationItem(
-                        eventId,
-                        userId,
-                        true,
-                        privateRecipients,
-                        "You have been invited to join a private event waiting list.",
-                        "private_waitlist_invite"
-                );
-                privateNotification.sendNotification();
+                db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                        .document(eventId)
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                String eventName = documentSnapshot.getString("name");
+                                String eventImage = documentSnapshot.getString("image");
+
+                                NotificationItem privateNotification = new NotificationItem(
+                                        eventId,
+                                        eventName,
+                                        eventImage,
+                                        userId,
+                                        true,
+                                        privateRecipients,
+                                        "You have been invited to join a private event waiting list.",
+                                        "private_waitlist_invite"
+                                );
+                                privateNotification.sendNotification();
+                            } else {
+                                Log.e("NotificationError", "Event not found for ID: " + eventId);
+                            }
+                        });
 
             } else if (screenName.equals("Find Co-Organizers")) {
                 addUserstoOrganizersArray(selectedIds);
 
                 ArrayList<String> coOrganizerRecipients = new ArrayList<>(selectedIds);
 
-                NotificationItem coOrganizerNotification = new NotificationItem(
-                        eventId,
-                        userId,
-                        true,
-                        coOrganizerRecipients,
-                        "You have been invited to be a co-organizer.",
-                        "co_organizer_invite"
-                );
-                coOrganizerNotification.sendNotification();
+                db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                        .document(eventId)
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                String eventName = documentSnapshot.getString("name");
+                                String eventImage = documentSnapshot.getString("image");
 
+                                NotificationItem coOrganizerNotification = new NotificationItem(
+                                        eventId,
+                                        eventName,
+                                        eventImage,
+                                        userId,
+                                        true,
+                                        coOrganizerRecipients,
+                                        "You have been invited to be a co-organizer.",
+                                        "co_organizer_invite"
+                                );
+                                coOrganizerNotification.sendNotification();
+                            } else {
+                                Log.e("NotificationError", "Event not found for ID: " + eventId);
+                            }
+                        });
             } else if (screenName.equals("Replace Declined")) {
                 db.collection(FirestoreCollections.EVENTS_COLLECTION)
                         .document(eventId)
