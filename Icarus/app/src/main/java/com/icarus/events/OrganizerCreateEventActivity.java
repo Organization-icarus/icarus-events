@@ -522,7 +522,7 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
 
     /**
      * Sets up Dialog to let organizers select the event location on a map
-     * and set the area entrants must join from. Fires when the geolcation switch is flipped.
+     * and set the area entrants must join from. Fires when the geolocation switch is flipped.
      */
     private void showEventLocationPickerDialog() {
         Dialog dialog = new Dialog(this, android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen);
