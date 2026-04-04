@@ -6,6 +6,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -22,7 +23,7 @@ import java.util.List;
  *
  * @author Ben Salmon
  */
-public class EventNotificationsActivity extends HeaderNavBarActivity {
+public class EventNotificationsActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private String eventId;
@@ -36,7 +37,6 @@ public class EventNotificationsActivity extends HeaderNavBarActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_notifications);
-        setupNavBar();
 
         db = FirebaseFirestore.getInstance();
 
