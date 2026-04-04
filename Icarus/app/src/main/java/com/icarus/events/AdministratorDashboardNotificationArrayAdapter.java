@@ -109,7 +109,7 @@ public class AdministratorDashboardNotificationArrayAdapter extends ArrayAdapter
                     .document(notification.getId())
                     .delete()
                     .addOnSuccessListener(aVoid -> {
-                        notifications.remove(position);
+                        notifications.remove(notification);
                         notifyDataSetChanged();
                         Toast.makeText(context, "Notification deleted", Toast.LENGTH_SHORT).show();
                     })
