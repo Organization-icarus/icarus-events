@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -115,6 +116,12 @@ public class UserRegistrationActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             String userPhone = phone.isEmpty() ? null : phone;
 
             Boolean isAdmin = false;
