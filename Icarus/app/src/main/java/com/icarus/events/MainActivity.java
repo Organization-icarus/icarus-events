@@ -167,7 +167,4 @@ public class MainActivity extends AppCompatActivity {
             throw new RuntimeException("SHA-256 not available", e);
         }
     }
-
-//    ciUGaVOqSnGrELmZXo9Jn6:APA91bEjfpmqG7n5vvN46zlHgbuuLj2FtvQB3Qh3tlEmGx5rr3Uhd2fI26feZXZvVybOOi39Sp6pkQqngW-Jh0toBv6hQNVfouvAnxsKZPOxk9dtRCaCWsw
-
 }

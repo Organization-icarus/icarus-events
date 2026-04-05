@@ -18,7 +18,24 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Helper class for managing Firebase Cloud Messaging (FCM) operations.
+ * <p>
+ * Provides static utility methods to retrieve the current device's FCM registration token
+ * and to send push notifications directly from the application using a Google Service Account
+ * for OAuth2 authentication.
+ *
+ * @author Kito Lee Son
+ */
 public class NotificationHelper {
+    /**
+     * Retrieves the current FCM registration token for the device asynchronously.
+     * <p>
+     * Uses the FirebaseMessaging service to fetch the unique token that identifies this
+     * app instance on the Google servers. Results are returned via the provided listener.
+     *
+     * @param listener the callback listener to handle the retrieved token or errors
+     */
     public static void getCurrentToken(OnTokenReceivedListener listener) {
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
             if (task.isSuccessful()) listener.onTokenReceived(task.getResult());
@@ -26,10 +43,25 @@ public class NotificationHelper {
         });
     }
 
+    /**
+     * Interface definition for a callback to be invoked when an FCM token is received.
+     */
     public interface OnTokenReceivedListener {
         void onTokenReceived(String token);
     }
 
+    /**
+     * Sends a push notification to a specific target device using the FCM HTTP v1 API.
+     * <p>
+     * This method runs on a background thread to perform network operations. It loads
+     * service account credentials from the local assets, generates an OAuth2 access token,
+     * and dispatches a POST request to the Firebase messaging endpoint.
+     *
+     * @param context the context used to access assets and initialize the Volley request queue
+     * @param targetToken the FCM registration token of the recipient device
+     * @param eventName the title of the notification (typically the name of the associated event)
+     * @param body the message content to be displayed in the notification
+     */
     public static void sendPush(Context context, String targetToken, String eventName, String body) {
         new Thread(() -> {
             try {
