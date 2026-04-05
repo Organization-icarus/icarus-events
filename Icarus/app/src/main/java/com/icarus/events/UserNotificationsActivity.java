@@ -54,7 +54,10 @@ public class UserNotificationsActivity extends AppCompatActivity {
         }
 
         titleText.setText("My Notifications");
-        backButton.setOnClickListener(v -> finish());
+        backButton.setOnClickListener(v -> {
+            Toast.makeText(this, "back clicked", Toast.LENGTH_SHORT).show();
+            finish();
+        });
 
         adapter = new NotificationListAdapter(this, notifications);
         notificationsList.setAdapter(adapter);

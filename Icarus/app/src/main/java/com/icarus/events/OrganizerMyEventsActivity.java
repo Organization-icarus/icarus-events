@@ -33,7 +33,10 @@ public class OrganizerMyEventsActivity extends AppCompatActivity {
         eventListView = findViewById(R.id.organizer_my_events_list);
         ImageButton backButton = findViewById(R.id.organizer_my_events_back_button);
 
-        backButton.setOnClickListener(v -> finish());
+        backButton.setOnClickListener(v -> {
+            Toast.makeText(this, "back clicked", Toast.LENGTH_SHORT).show();
+            finish();
+        });
 
         if (eventListView == null) {
             Toast.makeText(this, "Organizer events layout failed to load", Toast.LENGTH_SHORT).show();
