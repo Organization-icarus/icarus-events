@@ -174,8 +174,8 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
                     String name = snapshot.getString("name");
                     String image = snapshot.getString("image");
 
-                    userArrayList.add(new User(id, name, null, null,
-                            image, null, null, null, null));
+                    userArrayList.add(new User(id, name, null, null, image,
+                            null, null, null, null, null));
                 }
                 userArrayAdapter.notifyDataSetChanged();
             }
