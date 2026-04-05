@@ -125,6 +125,13 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
             }
             if(screenName.equals("Entrant Search")){
                 addUsersToEvent(selectedIds, "selected");
+                //Add to event array
+                for (String selectedUserId : selectedIds) {
+                    db.collection(FirestoreCollections.USERS_COLLECTION)
+                            .document(selectedUserId)
+                            .update("events", com.google.firebase.firestore.FieldValue.arrayUnion(eventId));
+                }
+
                 createNotification(selectedIds,"invite_entrant",
                         "You have been invited to the private event:  " + eventName.getText().toString());
             } else if(screenName.equals("Find Co-Organizers")){

@@ -113,7 +113,6 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                                 defaultButton.setTextColor(getColor(R.color.darkText));
                                 status.set("waiting");
                             }
-                            loadList(status.get());
                         }
                     });
                 });
