@@ -8,19 +8,28 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Screen for users to manage personal settings and account deletion.
  * <p>
- * Loads current notification preferences from Firestore and allows
- * the user to update them. Provides functionality to delete the
- * user's account and remove them from all event entrant subcollections.
+ * Loads the current user's profile image and notification preferences from
+ * Firestore, allows the user to update notification settings, and provides
+ * functionality to delete the user's account. During account deletion, the
+ * user is removed from all event entrant subcollections, any stored profile
+ * image record is deleted, and the app returns to {@link MainActivity} with
+ * the session cleared.
  *
  * @author Alex Alves
  */
@@ -33,17 +42,23 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
     FirebaseFirestore db;
 
     /**
-     * Initializes the UserSettingsActivity.
+     * Initializes the user settings screen.
+     * <p>
+     * Loads the current user from {@link UserSession}, retrieves and displays the
+     * user's profile image, loads notification preferences from Firestore into the
+     * corresponding switches, and registers listeners to persist any switch changes.
+     * Also configures the delete profile button to remove the user from all event
+     * entrant subcollections, delete the user's stored profile image, remove the
+     * user document, and return to the main screen.
      *
-     * @param savedInstanceState If the activity is being re-initialized after previously
-     *                           being shut down, this Bundle contains the data it most
-     *                           recently supplied; otherwise, it is null.
+     * @param savedInstanceState the previously saved activity state,
+     *                           or null if the activity is newly created
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_settings);
-        setupNavBar();
+        setupNavBar(TAB_PROFILE);
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
@@ -88,6 +103,19 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
                                     .document(deviceId)
                                     .delete();
                         }
+
+                        // Remove all events organized by ONLY this user
+                        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                                .whereArrayContains("organizers", user.getId())
+                                .get()
+                                .addOnSuccessListener(snapshot -> {
+                                    for (QueryDocumentSnapshot eventSnapshot : snapshot) {
+                                        java.util.List<String> organizers = (java.util.List<String>) eventSnapshot.get("organizers");
+                                        if (organizers != null && organizers.size() == 1) {
+                                            removeEvent(eventSnapshot.getId(), eventSnapshot.getString("image"), appContext);
+                                        }
+                                    }
+                                });
 
                         // Delete profile image
                         db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
@@ -146,9 +174,12 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
     }
 
     /**
-     * Delete image from firestore database
+     * Deletes the previously stored profile image associated with the given URL.
+     * <p>
+     * Looks up matching image records in the Firestore images collection and
+     * removes them using the {@link Image} helper.
      *
-     * @param URL   URL of image to delete
+     * @param URL the URL of the profile image to delete
      */
     private void deleteOldProfileImage(String URL) {
         db.collection(FirestoreCollections.IMAGES_COLLECTION)
@@ -161,4 +192,75 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
                     }
                 });
     }
+
+    /**
+     * Performs logic to remove event from the Firestore Database, including any references to that event
+     *
+     * @param eventId   Firestore ID of event
+     * @param eventImage    Image URL of event poster
+     */
+    private void removeEvent(String eventId, String eventImage, android.content.Context context) {
+        // Code generated by Claude AI March 11, 2026
+        // "How to remove event ID from a users list of events for each user document in the
+        // events 'entrants' subcollection."
+        CollectionReference eventEntrantsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants");
+        CollectionReference eventCommentsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("comments");
+        CollectionReference eventNotificationsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("notifications");
+
+        com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot> entrantsTask = eventEntrantsRef.get();
+        com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot> commentsTask = eventCommentsRef.get();
+        com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot> notificationsTask = eventNotificationsRef.get();
+
+        com.google.android.gms.tasks.Tasks.whenAllSuccess(entrantsTask, commentsTask, notificationsTask)
+                .addOnSuccessListener(results -> {
+                    WriteBatch batch = db.batch();
+
+                    com.google.firebase.firestore.QuerySnapshot userSnapshots = (com.google.firebase.firestore.QuerySnapshot) results.get(0);
+                    com.google.firebase.firestore.QuerySnapshot commentSnapshots = (com.google.firebase.firestore.QuerySnapshot) results.get(1);
+                    com.google.firebase.firestore.QuerySnapshot notificationSnapshots = (com.google.firebase.firestore.QuerySnapshot) results.get(2);
+
+                    // Remove event from each user's events array and delete entrant docs
+                    for (DocumentSnapshot userDoc : userSnapshots.getDocuments()) {
+                        DocumentReference userRef = db.collection(FirestoreCollections.USERS_COLLECTION).document(userDoc.getId());
+                        Map<String, Object> updateData = new HashMap<>();
+                        updateData.put("events", FieldValue.arrayRemove(eventId));
+                        batch.set(userRef, updateData, SetOptions.merge());
+                        batch.delete(userDoc.getReference());
+                    }
+
+                    // Delete all comment documents
+                    for (DocumentSnapshot commentDoc : commentSnapshots.getDocuments()) {
+                        batch.delete(commentDoc.getReference());
+                    }
+
+                    // Delete all notification documents
+                    for (DocumentSnapshot notificationDoc : notificationSnapshots.getDocuments()) {
+                        batch.delete(notificationDoc.getReference());
+                    }
+
+                    // Remove the event's poster from the database
+                    db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                            .whereEqualTo("URL", eventImage)
+                            .get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                    new Image(eventImage, doc.getId()).delete(context, db);
+                                }
+                            });
+
+                    // Delete event document and commit
+                    batch.delete(db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId));
+
+                    batch.commit()
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("Firestore", "Event deleted successfully");
+                                Toast.makeText(context, "Event deleted", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("Firestore", "Error deleting event", e);
+                                Toast.makeText(context, "Failed to delete event", Toast.LENGTH_SHORT).show();
+                            });
+
+                }).addOnFailureListener(e -> Log.e("Firestore", "Error fetching subcollections", e));
+    };
 }

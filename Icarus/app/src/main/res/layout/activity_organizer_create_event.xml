@@ -162,8 +162,8 @@
                         android:text="Geolocation "
                         android:textColor="@color/lightText"
                         android:textSize="@dimen/font_subheading_size"
-                        app:trackTint="@color/primary"
                         app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@id/OrganizerCreateEventEventLocation"
                         app:layout_constraintBottom_toBottomOf="@id/OrganizerCreateEventEventLocation"/>
@@ -214,8 +214,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:padding="12dp"
-                        android:backgroundTint="@color/accent_first"
+                        android:background="@color/accent_first"
+                        android:popupBackground="@color/accent_first"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventLimitWaitingListLimit"/>
@@ -225,8 +225,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        app:trackTint="@color/primary"
                         app:thumbTint="@color/switch_thumb_selector"
+                        app:trackTint="@color/switch_track_selector"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/OrganizerCreateEventCategory"/>
 

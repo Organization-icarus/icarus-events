@@ -18,86 +18,132 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/primary"
-            android:elevation="2dp"
             android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingTop="20dp"
-            android:paddingEnd="16dp"
+            android:orientation="vertical"
             app:layout_scrollFlags="scroll|enterAlways|snap">
 
-            <!-- Search Filter -->
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:background="@color/primary"
                 android:elevation="2dp"
-                android:hint="Search events..."
-                android:outlineAmbientShadowColor="@color/lightText"
-                android:textColorHint="@color/lightText"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="@color/search_box_stroke"
-                app:hintTextColor="@color/accent_first"
-                app:startIconDrawable="@android:drawable/ic_menu_search">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="16dp">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/event_history_list_search_filter"
-                    android:layout_width="match_parent"
+                <!-- Search Filter -->
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@color/primary"
+                    android:elevation="2dp"
+                    android:hint="Search events..."
+                    android:outlineAmbientShadowColor="@color/lightText"
+                    android:textColorHint="@color/lightText"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxStrokeColor="@color/search_box_stroke"
+                    app:hintTextColor="@color/accent_first"
+                    app:startIconDrawable="@android:drawable/ic_menu_search">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/event_history_list_search_filter"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_gravity="center_vertical"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:outlineSpotShadowColor="@color/lightText"
+                        android:textColor="@color/lightText"
+                        android:textColorHighlight="@color/lightText"
+                        android:textColorHint="@color/lightTextSemi"
+                        android:textCursorDrawable="@color/accent_first"
+                        android:textSize="@dimen/font_subheading_size" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Filter buttons -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/event_history_list_filter_button"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="56dp"
                     android:layout_height="56dp"
                     android:layout_gravity="center_vertical"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:outlineSpotShadowColor="@color/lightText"
-                    android:textColor="@color/lightText"
-                    android:textColorHighlight="@color/lightText"
-                    android:textColorHint="@color/lightTextSemi"
-                    android:textCursorDrawable="@color/accent_first"
-                    android:textSize="@dimen/font_subheading_size" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginStart="12dp"
+                    android:contentDescription="Filter events"
+                    android:elevation="2dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:padding="0dp"
+                    app:backgroundTint="@color/filter_button_tint"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_filter"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconTint="@color/primary" />
 
-            <!-- Filter buttons -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/event_history_list_filter_button"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="12dp"
-                android:contentDescription="Filter events"
-                android:elevation="2dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:padding="0dp"
-                app:backgroundTint="@color/filter_button_tint"
-                app:cornerRadius="12dp"
-                app:icon="@drawable/ic_filter"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconTint="@color/primary" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/event_history_list_qr_button"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="12dp"
+                    android:contentDescription="QR button"
+                    android:elevation="2dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:padding="0dp"
+                    app:backgroundTint="@color/filter_button_tint"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/twotone_all_out_24"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconTint="@color/primary" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/event_history_list_qr_button"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="12dp"
-                android:contentDescription="QR button"
-                android:elevation="2dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:padding="0dp"
-                app:backgroundTint="@color/filter_button_tint"
-                app:cornerRadius="12dp"
-                app:icon="@drawable/twotone_all_out_24"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp"
-                app:iconTint="@color/primary" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/event_history_list_filter_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@color/primary"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:layout_scrollFlags="scroll|enterAlways|snap">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/event_history_list_filter_bar_registered"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Registered Events"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/toggle_button_color"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/event_history_list_filter_bar_organized"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Organized Events"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/toggle_button_color"
+                    android:textSize="12sp" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
 
         </LinearLayout>
 
@@ -114,22 +160,19 @@
         android:text="@string/entrants_event_list_empty_events"
         android:textSize="@dimen/font_subheading_size"
         android:visibility="gone"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <!-- Event list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/event_history_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="20dp"
         android:paddingBottom="64dp"
         android:clipToPadding="false"
         android:background="@color/primary"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <!-- Add Event button-->
-
+    <!-- Nav bar -->
     <include
         android:id="@+id/nav_bar"
         layout="@layout/nav_bar"

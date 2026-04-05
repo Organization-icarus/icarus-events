@@ -73,7 +73,8 @@
             android:textSize="@dimen/font_text_size"
             android:inputType="textMultiLine"
             android:maxLines="4"
-            android:minLines="1"/>
+            android:minLines="1"
+            android:maxLength="200" />
 
         <!-- Post Button -->
         <com.google.android.material.button.MaterialButton

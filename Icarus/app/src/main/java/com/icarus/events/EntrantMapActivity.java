@@ -42,7 +42,7 @@ public class EntrantMapActivity extends HeaderNavBarActivity {
         super.onCreate(savedInstanceState);
         Configuration.getInstance().setUserAgentValue(getPackageName());
         setContentView(R.layout.activity_entrant_map);
-        setupNavBar();
+        setupNavBar(TAB_NONE);
         db = FirebaseFirestore.getInstance();
 
         // Get the map view and set properties
@@ -93,10 +93,12 @@ public class EntrantMapActivity extends HeaderNavBarActivity {
     }
 
     /**
-     * Adds new marker to the enrantMap view.
+     * Adds a new marker to the entrantMap view.
      *
-     * @param lat Latitude of the markers location
-     * @param lon Longitude of the markers location
+     * @param lat     latitude of the marker's location
+     * @param lon     longitude of the marker's location
+     * @param isEvent if true, uses a star icon to distinguish the event
+     *                location from entrant markers
      */
     @SuppressLint("UseCompatLoadingForDrawables")
     private void addMarker(double lat, double lon, Boolean isEvent) {
@@ -113,12 +115,18 @@ public class EntrantMapActivity extends HeaderNavBarActivity {
         entrantMap.getOverlays().add(marker);
     }
 
+    /**
+     * Resumes the map view when the activity returns to the foreground.
+     */
     @Override
     protected void onResume() {
         super.onResume();
         entrantMap.onResume();
     }
 
+    /**
+     * Pauses the map view when the activity moves to the background.
+     */
     @Override
     protected void onPause() {
         super.onPause();

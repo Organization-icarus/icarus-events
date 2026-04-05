@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,7 +25,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -44,6 +47,8 @@ import java.util.Map;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.core.util.Pair;
+import com.google.android.material.datepicker.MaterialDatePicker;
 
 /**
  * Activity that displays the event history for the current user.
@@ -59,6 +64,7 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
     private RecyclerView eventListView;
     private EditText searchTextFilter;
     private String currentSearch = "";
+    private MaterialButtonToggleGroup filterButtons;
     private MaterialButton filterCategoryButton;
     private MaterialButton qrButton;
     private ArrayList<Event> eventArrayList;
@@ -106,7 +112,7 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_history);
-        setupNavBar();
+        setupNavBar(TAB_REGISTERED);
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
@@ -118,7 +124,11 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
         // Initialize buttons
         filterCategoryButton = findViewById(R.id.event_history_list_filter_button);
         qrButton = findViewById(R.id.event_history_list_qr_button);
-
+        filterButtons = findViewById(R.id.event_history_list_filter_bar);
+        //Set default as Registered
+        filterButtons.check(R.id.event_history_list_filter_bar_registered);
+        MaterialButton defaultButton = findViewById(R.id.event_history_list_filter_bar_registered);
+        defaultButton.setTextColor(getColor(R.color.darkText));
         // Retrieve current user role
         User currentUser = UserSession.getInstance().getCurrentUser();
         Boolean isAdmin = (currentUser != null) ? currentUser.getIsAdmin() : false;
@@ -185,6 +195,28 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
         });
 
         filterCategoryButton.setOnClickListener(v -> showFilterDialog());
+
+
+        filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) ->{
+            if (!isChecked) return; // ← ignore uncheck events entirely
+
+            for (int i = 0; i < group.getChildCount(); i++) {
+                View view = group.getChildAt(i);
+                if (view instanceof MaterialButton) {
+                    ((MaterialButton) view).setTextColor(getColor(R.color.lightText));
+                }
+            }
+            MaterialButton selectedButton = findViewById(checkedId);
+            selectedButton.setTextColor(getColor(R.color.darkText));
+
+            if(isChecked && (checkedId == R.id.event_history_list_filter_bar_registered)){
+                //view registered events
+                listenToUserEvents(currentUserId);
+            }else if(isChecked && (checkedId == R.id.event_history_list_filter_bar_organized)){
+                //View organizered events
+                findOrganizerEvents(currentUserId);
+            }
+        });
     }
 
     /**
@@ -315,6 +347,44 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
                     }
                 })
                 .addOnFailureListener(e -> Log.e("Firestore", "Failed to load user: " + e.toString()));
+    }
+
+    /**
+     * Queries Firestore for all events where the given user is listed as an
+     * organizer and populates the event list with the results.
+     *
+     * @param userId the current user's ID
+     */
+    private void findOrganizerEvents(String userId) {
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .whereArrayContains("organizers", userId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    eventArrayList.clear();
+
+                    for (QueryDocumentSnapshot snapshot : queryDocumentSnapshots) {
+                        String id = snapshot.getId();
+                        String name = snapshot.getString("name");
+                        String category = snapshot.getString("category");
+                        Double capacity = snapshot.getDouble("capacity");
+                        Date regOpen = snapshot.getDate("open");
+                        Date regClose = snapshot.getDate("close");
+                        Date startDate = snapshot.getDate("startDate");
+                        Date endDate = snapshot.getDate("endDate");
+                        String location = snapshot.getString("location");
+                        String image = snapshot.getString("image");
+                        ArrayList<String> organizers =
+                                (ArrayList<String>) snapshot.get("organizers");
+
+                        eventArrayList.add(new Event(id, name, category, capacity,
+                                regOpen, regClose, startDate, endDate, location, image, organizers));
+
+                        attachWaitlistListener(id);
+                    }
+
+                    applyFilters();
+                })
+                .addOnFailureListener(e -> Log.e("Firestore", "Failed to load organizer events: " + e.toString()));
     }
 
     /**
@@ -459,13 +529,9 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
         capacityRow.setOnClickListener(v -> showMaxCapacityDialog(capacityRow));
         addFilterRow(container, capacityRow);
 
-        MaterialButton startDateRow = buildDialogRow(getStartDateSummaryText(), startDateFilter != null);
-        startDateRow.setOnClickListener(v -> showDatePicker(true, startDateRow));
-        addFilterRow(container, startDateRow);
-
-        MaterialButton endDateRow = buildDialogRow(getEndDateSummaryText(), endDateFilter != null);
-        endDateRow.setOnClickListener(v -> showDatePicker(false, endDateRow));
-        addFilterRow(container, endDateRow);
+        MaterialButton dateRangeRow = buildDialogRow(getDateRangeSummaryText(), startDateFilter != null || endDateFilter != null);
+        dateRangeRow.setOnClickListener(v -> showDateRangePicker(dateRangeRow));
+        addFilterRow(container, dateRangeRow);
 
         MaterialButton sortRow = buildDialogRow(getSortSummaryText(), sortOptionSelected);
         sortRow.setOnClickListener(v -> showSortDropdown(sortRow));
@@ -811,37 +877,54 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
     /**
      * Displays a date picker to choose the start or end date filter.
      *
-     * @param isStartDate true to set the start date, false for the end date
      * @param anchor the row text to refresh after selection
      */
-    private void showDatePicker(boolean isStartDate, MaterialButton anchor) {
-        Calendar calendar = Calendar.getInstance();
-        Date currentDate = isStartDate ? startDateFilter : endDateFilter;
+    private void showDateRangePicker(MaterialButton anchor) {
+        MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker()
+                .setTitleText("Select Event Date Range");
 
-        if (currentDate != null) {
-            calendar.setTime(currentDate);
+        if (startDateFilter != null && endDateFilter != null) {
+            builder.setSelection(new Pair<>(startDateFilter.getTime(), endDateFilter.getTime()));
         }
 
-        new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-            Calendar selectedCalendar = Calendar.getInstance();
-            selectedCalendar.set(year, month, dayOfMonth);
+        MaterialDatePicker<Pair<Long, Long>> picker = builder.build();
 
-            if (isStartDate) {
-                setStartOfDay(selectedCalendar);
-                startDateFilter = selectedCalendar.getTime();
-                anchor.setText(getStartDateSummaryText());
-            } else {
-                setEndOfDay(selectedCalendar);
-                endDateFilter = selectedCalendar.getTime();
-                anchor.setText(getEndDateSummaryText());
+        picker.addOnPositiveButtonClickListener(selection -> {
+            if (selection != null) {
+                Long start = selection.first;
+                Long end = selection.second;
+
+                if (start != null) {
+                    Calendar startCalendar = Calendar.getInstance();
+                    startCalendar.setTimeInMillis(start);
+                    setStartOfDay(startCalendar);
+                    startDateFilter = startCalendar.getTime();
+                } else {
+                    startDateFilter = null;
+                }
+
+                if (end != null) {
+                    Calendar endCalendar = Calendar.getInstance();
+                    endCalendar.setTimeInMillis(end);
+                    setEndOfDay(endCalendar);
+                    endDateFilter = endCalendar.getTime();
+                } else {
+                    endDateFilter = null;
+                }
+
+                anchor.setText(getDateRangeSummaryText());
+                anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
+                boolean hasDateRange = startDateFilter != null || endDateFilter != null;
+                anchor.setBackgroundTintList(ColorStateList.valueOf(
+                        hasDateRange ? getColor(R.color.accent_first) : getColor(R.color.white)
+                ));
+                anchor.setStrokeColor(ColorStateList.valueOf(
+                        hasDateRange ? getColor(R.color.accent_first) : getColor(R.color.white)
+                ));
             }
-            anchor.setTextColor(ColorStateList.valueOf(getColor(R.color.darkText)));
-            anchor.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.accent_first)));
-            anchor.setStrokeColor(ColorStateList.valueOf(getColor(R.color.accent_first)));
-        },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)).show();
+        });
+
+        picker.show(getSupportFragmentManager(), "event_date_range_picker");
     }
 
     // Taken from ChatGPT March 29th 2026,
@@ -942,27 +1025,28 @@ public class EventHistoryActivity extends HeaderNavBarActivity {
     }
 
     /**
-     * Returns summary text for the start date row.
+     * Returns summary text for the start date and end date .
      *
-     * @return summary text for start date filter
+     * @return summary text for start and end date filter
      */
-    private String getStartDateSummaryText() {
-        return startDateFilter == null
-                ? "Start Date: Any"
-                : "Start Date: " + filterDateFormat.format(startDateFilter);
+    private String getDateRangeSummaryText() {
+        if (startDateFilter == null && endDateFilter == null) {
+            return "Date Range: Any";
+        }
+        if (startDateFilter != null && endDateFilter != null) {
+            return "Date Range: " + filterDateFormat.format(startDateFilter)
+                    + " - " + filterDateFormat.format(endDateFilter);
+        }
+        if (startDateFilter != null) {
+            return "Date Range: From " + filterDateFormat.format(startDateFilter);
+        }
+        return "Date Range: Until " + filterDateFormat.format(endDateFilter);
     }
 
     /**
-     * Returns summary text for the end date row.
-     *
-     * @return summary text for end date filter
+     * Removes all active Firestore waitlist snapshot listeners when the
+     * activity is destroyed to prevent memory leaks.
      */
-    private String getEndDateSummaryText() {
-        return endDateFilter == null
-                ? "End Date: Any"
-                : "End Date: " + filterDateFormat.format(endDateFilter);
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

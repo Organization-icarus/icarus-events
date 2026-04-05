@@ -115,7 +115,7 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_create_event);
-        setupNavBar();
+        setupNavBar(TAB_NONE);
         User user = UserSession.getInstance().getCurrentUser();
         String userId = user.getId();
         db = FirebaseFirestore.getInstance();
@@ -522,7 +522,7 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
 
     /**
      * Sets up Dialog to let organizers select the event location on a map
-     * and set the area entrants must join from. Fires when the geolcation switch is flipped.
+     * and set the area entrants must join from. Fires when the geolocation switch is flipped.
      */
     private void showEventLocationPickerDialog() {
         Dialog dialog = new Dialog(this, android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen);
@@ -613,9 +613,7 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (seekBar.getProgress() > 0) {
-                    selectedEntrantRange = seekBar.getProgress();
-                }
+                selectedEntrantRange = seekBar.getProgress();
             }
         });
 
@@ -624,7 +622,7 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
                 Toast.makeText(this, "Please tap a location on the map", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (selectedEntrantRange == null) {
+            if (selectedEntrantRange == null || selectedEntrantRange == 0) {
                 Toast.makeText(this, "Please select an entrant range", Toast.LENGTH_SHORT).show();
                 return;
             }

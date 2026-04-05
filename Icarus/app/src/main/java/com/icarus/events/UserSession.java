@@ -13,7 +13,9 @@ public class UserSession {
     private User currentUser;
 
 
-    /** Private constructor to prevent external instantiation */
+    /**
+     * Private constructor to prevent external instantiation.
+     */
     private UserSession() {}
 
     /**
@@ -44,6 +46,8 @@ public class UserSession {
      */
     public void setCurrentUser(User user) { this.currentUser = user; }
 
-    /** Clears the current user from the session */
+    /**
+     * Clears the current user from the session.
+     */
     public void clear() { currentUser = null; }
 }

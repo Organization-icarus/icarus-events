@@ -45,7 +45,6 @@ import java.util.Map;
  *
  * @author Ben Salmon
  */
-
 public class OrganizerManageEventActivity extends HeaderNavBarActivity {
 
     private ImageView eventPoster;
@@ -65,11 +64,18 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
 
     private FirebaseFirestore db;
 
+    /**
+     * Initializes the activity, loads the selected event from Firestore, populates
+     * the UI with event information, configures poster loading, and sets up button
+     * actions for managing entrants, organizers, QR code sharing, and poster updates.
+     *
+     * @param savedInstanceState the saved activity state, or {@code null} if none exists
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_manage_event);
-        setupNavBar();
+        setupNavBar(TAB_NONE);
 
         //Create Image
         eventPoster = findViewById(R.id.OrganizerManageEventViewImage);
@@ -111,7 +117,6 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
                     }
                 });
 
-
         // Initialize imagePickerLauncher
         ActivityResultLauncher<String> imagePickerLauncher = createImagePicker();
 
@@ -124,7 +129,7 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
                         if (imageURL != null && !imageURL.isEmpty()) {
                             Picasso.get()
                                     .load(snapshot.getString("image"))
-                                    .error(R.drawable.poster)           // Optional: shows if link fails
+                                    .error(R.drawable.poster)
                                     .into(eventPoster);
                         } else {
                             eventPoster.setImageResource(R.drawable.poster);
@@ -144,6 +149,7 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
             // Update Poster
             imagePickerLauncher.launch("image/*");
         });
+
         ViewEntrantMap.setOnClickListener(v -> {
             if (locationEnabled) {
                 // View Entrant Map
@@ -154,12 +160,14 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
                 Toast.makeText(this, "Geolocation is not enabled for this event.", Toast.LENGTH_SHORT).show();
             }
         });
+
         ViewEntrantList.setOnClickListener(v -> {
             // View Entrant List
             Intent intent = new Intent(this, OrganizerViewEntrantsOnWaitingListActivity.class);
             intent.putExtra("eventId", eventId);
             startActivity(intent);
         });
+
         inviteEntrant.setOnClickListener(v -> {
             // Invite Entrants to a private event
             if(isPrivate){
@@ -173,10 +181,10 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
                 intent.putExtra("ActivityName", eventName);
                 startActivity(intent);
             }
-
-
         });
+
         shareQRCode.setOnClickListener(v -> {
+
             if (Boolean.TRUE.equals(isPrivate)) {
                 Toast.makeText(this, "Private events do not generate promotional QR codes", Toast.LENGTH_SHORT).show();
                 return;
@@ -188,6 +196,8 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
             } catch (Exception e) {
                 Toast.makeText(this, "Failed to generate QR code", Toast.LENGTH_SHORT).show();
                 Log.e("QR_CODE_ERROR", "Failed to generate/share QR code", e);
+
+
             }
         });
 
@@ -198,25 +208,26 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
             intent.putExtra("ActivityName", "Find Co-Organizers");
             startActivity(intent);
         });
+
         ReplaceDeclined.setOnClickListener(v -> {
             // Replaced Declined
             Intent intent = new Intent(this, OrganizerEntrantSearchActivity.class);
             intent.putExtra("eventId", eventId);
             intent.putExtra("ActivityName", "Replace Declined");
             startActivity(intent);
-
         });
     }
 
+    /**
+     * Generates a QR code bitmap that encodes the provided content string.
+     * The generated bitmap includes white padding around the QR code.
+     *
+     * @param content the string to encode into the QR code
+     * @return a bitmap containing the generated QR code
+     * @throws Exception if QR code generation fails
+     */
     // Taken from ChatGPT March 29th 2026,
     // "How do I generate a QR code bitmap from a string using ZXing"
-    /**
-     * Generates a QR code bitmap that encodes the provided event ID.
-     *
-     * @param content The event ID to encode into the QR code.
-     * @return A bitmap representation of the QR code.
-     * @throws Exception if QR generation fails.
-     */
     private Bitmap generateQRCodeBitmap(String content) throws Exception {
         int qrSize = 800;
         int padding = 80;
@@ -240,14 +251,15 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
         return bitmap;
     }
 
+    /**
+     * Shares the given QR code bitmap by writing it to cache storage and launching
+     * Android's share sheet with a content URI.
+     *
+     * @param bitmap the bitmap image to share
+     * @throws IOException if the bitmap cannot be written to cache storage
+     */
     // Taken from ChatGPT March 29th 2026,
     // "How do I implement sharing a generated bitmap image"
-    /**
-     * Shares the generated QR code bitmap using Android's share sheet.
-     *
-     * @param bitmap The QR code bitmap to share.
-     * @throws IOException if the bitmap cannot be written to cache.
-     */
     private void shareQRCodeBitmap(Bitmap bitmap) throws IOException {
         File cachePath = new File(getCacheDir(), "images");
         if (!cachePath.exists()) {
@@ -276,9 +288,10 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
     }
 
     /**
-     * Removes image from firestore database
+     * Deletes the previously stored poster image record associated with the given URL
+     * from the images collection.
      *
-     * @param URL   URL of image to delete
+     * @param URL the URL of the image to delete
      */
     private void deleteOldPoster(String URL) {
         db.collection(FirestoreCollections.IMAGES_COLLECTION)
@@ -293,9 +306,11 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
     }
 
     /**
-     * Image picker activity for updating the event poster
+     * Creates and returns an activity result launcher that opens the system image picker.
+     * When the user selects an image, the image is uploaded to Cloudinary, stored in
+     * Firestore, the old poster is deleted, and the UI is updated with the new poster.
      *
-     * @return  result of activity
+     * @return an {@link ActivityResultLauncher} used to select an image from device storage
      */
     private ActivityResultLauncher<String> createImagePicker() {
         return registerForActivityResult(
@@ -339,7 +354,9 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
                                     }
 
                                     @Override public void onStart(String requestId) {}
+
                                     @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
+
                                     @Override public void onReschedule(String requestId, ErrorInfo error) {}
                                 })
                                 .dispatch();

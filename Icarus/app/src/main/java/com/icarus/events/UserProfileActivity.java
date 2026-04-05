@@ -5,6 +5,8 @@ package com.icarus.events;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,9 +22,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
 import com.squareup.picasso.Picasso;
 
 
@@ -33,11 +40,15 @@ import java.util.Map;
 /**
  * Activity that allows a user to view and update their profile information.
  * <p>
- * The screen displays the user's current name, email, and phone number.
- * Users can toggle between view mode and edit mode to modify their profile
- * details. When changes are confirmed, the updated information is written
- * to the Firestore "users" collection and the local {@link UserSession}
- * is updated accordingly.
+ * Displays the user's current name, email, phone number, and profile image.
+ * Users can toggle between view mode and edit mode to modify profile details,
+ * upload a new profile image, and navigate to user settings. When changes are
+ * confirmed, the updated information is written to the Firestore users collection
+ * and the local {@link UserSession} is updated accordingly.
+ * <p>
+ * When opened from the admin dashboard, the activity instead loads the selected
+ * user's profile in a read-only admin view and provides the option to delete
+ * that user profile.
  *
  * @author Alex Alves
  */
@@ -77,7 +88,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
-        setupNavBar();
+        setupNavBar(TAB_PROFILE);
 
 
         // Initialize database reference and collection references
@@ -96,7 +107,6 @@ public class UserProfileActivity extends HeaderNavBarActivity {
         profileImage = findViewById(R.id.user_profile_image);
         // Initialize imagePickerLauncher
         imagePickerLauncher = createImagePicker();
-
 
 
 
@@ -231,6 +241,19 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                         }
 
 
+                        // Remove all events organized by ONLY this user
+                        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                                .whereArrayContains("organizers", deviceId)
+                                .get()
+                                .addOnSuccessListener(snapshot -> {
+                                    for (QueryDocumentSnapshot eventSnapshot : snapshot) {
+                                        java.util.List<String> organizers = (java.util.List<String>) eventSnapshot.get("organizers");
+                                        if (organizers != null && organizers.size() == 1) {
+                                            removeEvent(eventSnapshot.getId(), eventSnapshot.getString("image"));
+                                        }
+                                    }
+                                });
+
                         // Delete profile image
                         db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).get()
                                 .addOnSuccessListener(userSnapshot -> {
@@ -270,6 +293,17 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                     Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    Toast.makeText(this, "Please enter a valid email", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!phone.isEmpty() && !Patterns.PHONE.matcher(phone).matches()) {
+                    Toast.makeText(this, "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 // Send user data to database
                 Map<String, Object> userData = new HashMap<>();
                 userData.put("name", name);
@@ -371,9 +405,12 @@ public class UserProfileActivity extends HeaderNavBarActivity {
 
 
     /**
-     * Delete image from firestore database
+     * Deletes the previously stored profile image associated with the given URL.
+     * <p>
+     * Looks up matching image records in the Firestore images collection and
+     * removes them using the {@link Image} helper.
      *
-     * @param URL   URL of image to delete
+     * @param URL the URL of the profile image to delete
      */
     private void deleteOldProfileImage(String URL) {
         db.collection(FirestoreCollections.IMAGES_COLLECTION)
@@ -389,9 +426,14 @@ public class UserProfileActivity extends HeaderNavBarActivity {
 
 
     /**
-     * Create image picker activity for selecting a new profile image.
+     * Creates and registers the image picker launcher used to select and upload
+     * a new profile image.
+     * <p>
+     * When an image is selected, it is uploaded to Cloudinary, stored in the
+     * Firestore images collection, linked to the current user profile, and the
+     * previous profile image is removed.
      *
-     * @return  Result of activity
+     * @return the launcher used to pick an image from device storage
      */
     private ActivityResultLauncher<String> createImagePicker() {
         return registerForActivityResult(
@@ -445,4 +487,75 @@ public class UserProfileActivity extends HeaderNavBarActivity {
                 }
         );
     }
+
+    /**
+     * Performs logic to remove event from the Firestore Database, including any references to that event
+     *
+     * @param eventId   Firestore ID of event
+     * @param eventImage    Image URL of event poster
+     */
+    public void removeEvent(String eventId, String eventImage) {
+        // Code generated by Claude AI March 11, 2026
+        // "How to remove event ID from a users list of events for each user document in the
+        // events 'entrants' subcollection."
+        CollectionReference eventEntrantsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants");
+        CollectionReference eventCommentsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("comments");
+        CollectionReference eventNotificationsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("notifications");
+
+        com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot> entrantsTask = eventEntrantsRef.get();
+        com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot> commentsTask = eventCommentsRef.get();
+        com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot> notificationsTask = eventNotificationsRef.get();
+
+        com.google.android.gms.tasks.Tasks.whenAllSuccess(entrantsTask, commentsTask, notificationsTask)
+                .addOnSuccessListener(results -> {
+                    WriteBatch batch = db.batch();
+
+                    com.google.firebase.firestore.QuerySnapshot userSnapshots = (com.google.firebase.firestore.QuerySnapshot) results.get(0);
+                    com.google.firebase.firestore.QuerySnapshot commentSnapshots = (com.google.firebase.firestore.QuerySnapshot) results.get(1);
+                    com.google.firebase.firestore.QuerySnapshot notificationSnapshots = (com.google.firebase.firestore.QuerySnapshot) results.get(2);
+
+                    // Remove event from each user's events array and delete entrant docs
+                    for (DocumentSnapshot userDoc : userSnapshots.getDocuments()) {
+                        DocumentReference userRef = db.collection(FirestoreCollections.USERS_COLLECTION).document(userDoc.getId());
+                        Map<String, Object> updateData = new HashMap<>();
+                        updateData.put("events", FieldValue.arrayRemove(eventId));
+                        batch.set(userRef, updateData, SetOptions.merge());
+                        batch.delete(userDoc.getReference());
+                    }
+
+                    // Delete all comment documents
+                    for (DocumentSnapshot commentDoc : commentSnapshots.getDocuments()) {
+                        batch.delete(commentDoc.getReference());
+                    }
+
+                    // Delete all notification documents
+                    for (DocumentSnapshot notificationDoc : notificationSnapshots.getDocuments()) {
+                        batch.delete(notificationDoc.getReference());
+                    }
+
+                    // Remove the event's poster from the database
+                    db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                            .whereEqualTo("URL", eventImage)
+                            .get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                    new Image(eventImage, doc.getId()).delete(UserProfileActivity.this, db);
+                                }
+                            });
+
+                    // Delete event document and commit
+                    batch.delete(db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId));
+
+                    batch.commit()
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("Firestore", "Event deleted successfully");
+                                Toast.makeText(UserProfileActivity.this, "Event deleted", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("Firestore", "Error deleting event", e);
+                                Toast.makeText(UserProfileActivity.this, "Failed to delete event", Toast.LENGTH_SHORT).show();
+                            });
+
+                }).addOnFailureListener(e -> Log.e("Firestore", "Error fetching subcollections", e));
+    };
 }

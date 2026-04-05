@@ -32,10 +32,11 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Entry activity for the application.
  * <p>
- * Determines whether the current device is associated with an existing user
- * in Firebase Firestore. If a user is found, the user is loaded into the
- * global session and the event list activity is launched. Otherwise, the
- * user is redirected to the registration activity.
+ * Initializes core app services (Cloudinary and background workers), determines
+ * whether the current device is associated with an existing user in Firebase
+ * Firestore, and routes the user to the appropriate screen. If a user is found,
+ * the user is loaded into the global session and the entrant event list activity
+ * is launched. Otherwise, the user is redirected to the registration activity.
  *
  * @author Alex Alves
  */

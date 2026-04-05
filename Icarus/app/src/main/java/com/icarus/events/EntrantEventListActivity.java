@@ -51,7 +51,7 @@ import java.util.Map;
 /**
  * Activity that displays the list of available events for entrants.
  * <p>
- * Retrieves events from Firebase Firestore, displays them in a ListView,
+ * Retrieves events from Firebase Firestore, displays them in a RecyclerView,
  * and allows users to filter events by search text and category. Users
  * can also navigate to create a new event.
  *
@@ -111,7 +111,7 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entrant_event_list);
-        setupNavBar();
+        setupNavBar(TAB_EVENTS);
 
         // Initialize database reference and collection references
         db = FirebaseFirestore.getInstance();
@@ -962,6 +962,9 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
         return "Date Range: Until " + filterDateFormat.format(endDateFilter);
     }
 
+    /**
+     * Cleans up active Firestore waitlist listeners when the activity is destroyed.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
