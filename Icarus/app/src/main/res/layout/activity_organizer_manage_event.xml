@@ -91,59 +91,44 @@
                         <Button
                             android:id="@+id/OrganizerManageEventUpdatePoster"
                             style="@style/AppButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
-                            android:layout_marginTop="12dp"
                             android:text="Update Poster"
-                            android:textSize="@dimen/font_text_size" />
+                            app:icon="@drawable/ic_poster" />
 
                         <Button
                             android:id="@+id/OrganizerManageEventViewEntrantMap"
                             style="@style/AppButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
                             android:text="View Entrant Map"
-                            android:textSize="@dimen/font_text_size" />
+                            app:icon="@drawable/ic_map" />
 
                         <Button
                             android:id="@+id/OrganizerManageEventViewEntrantList"
                             style="@style/AppButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
                             android:text="View Entrant List"
-                            android:textSize="@dimen/font_text_size" />
+                            app:icon="@drawable/event_list" />
 
                         <Button
                             android:id="@+id/OrganizerManageEventInviteEntrant"
                             style="@style/AppButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
                             android:text="Invite Specific Entrant"
-                            android:textSize="@dimen/font_text_size" />
+                            app:icon="@drawable/profile" />
 
                         <Button
                             android:id="@+id/OrganizerManageEventShareQRCode"
                             style="@style/AppButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
                             android:text="Share QR code"
-                            android:textSize="@dimen/font_text_size" />
+                            app:icon="@drawable/ic_camera" />
 
                         <Button
                             android:id="@+id/OrganizerManageEventAddOrganizer"
                             style="@style/AppButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
                             android:text="Add Organizers"
-                            android:textSize="@dimen/font_text_size" />
+                            app:icon="@drawable/ic_plus_circle" />
 
                         <Button
                             android:id="@+id/OrganizerManageEventReplaceDeclined"
                             style="@style/AppButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="56dp"
                             android:text="Replace Declined"
-                            android:textSize="@dimen/font_text_size" />
+                            app:icon="@drawable/ic_arrows"/>
 
                     </LinearLayout>
 

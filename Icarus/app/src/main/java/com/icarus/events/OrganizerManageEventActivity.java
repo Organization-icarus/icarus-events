@@ -75,6 +75,7 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_manage_event);
+        setupHeaderBar("Manage Event");
         setupNavBar(TAB_NONE);
 
         //Create Image
