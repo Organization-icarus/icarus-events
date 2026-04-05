@@ -97,6 +97,11 @@
         <item name="buttonBarNegativeButtonStyle">@style/CustomAlertDialogNegativeButton</item>
     </style>
 
+    <style name="CircleImage">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">28dp</item>
+    </style>
+
     <style name="CustomAlertDialogTitle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
         <item name="android:textColor">@color/lightText</item>
         <item name="android:textSize">@dimen/font_subheading_size</item>

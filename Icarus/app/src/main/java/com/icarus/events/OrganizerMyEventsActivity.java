@@ -15,6 +15,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import android.widget.ImageButton;
 
 public class OrganizerMyEventsActivity extends AppCompatActivity {
 
@@ -30,6 +31,9 @@ public class OrganizerMyEventsActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         eventListView = findViewById(R.id.organizer_my_events_list);
+        ImageButton backButton = findViewById(R.id.organizer_my_events_back_button);
+
+        backButton.setOnClickListener(v -> finish());
 
         if (eventListView == null) {
             Toast.makeText(this, "Organizer events layout failed to load", Toast.LENGTH_SHORT).show();
