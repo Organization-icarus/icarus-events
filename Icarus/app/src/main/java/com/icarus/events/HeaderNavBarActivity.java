@@ -14,12 +14,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 /**
- * Base activity class that provides a reusable navigation bar for subclasses.
+ * Base activity that provides a reusable header and bottom navigation bar.
  * <p>
- * Subclasses should call setupNavBar() after setContentView() in their onCreate()
- * to initialize the navigation bar's click listeners.
+ * Subclasses are expected to call {@link #setupNavBar(int)} and optionally
+ * {@link #setupHeaderBar(String)} after {@code setContentView()} to initialize
+ * navigation behavior and UI state.
  *
- * @author Bradley Bradley
+ * @author Bradley Bravender
  */
 public class HeaderNavBarActivity extends AppCompatActivity {
 
@@ -28,25 +29,24 @@ public class HeaderNavBarActivity extends AppCompatActivity {
     protected static final int TAB_EVENTS = 1;
     protected static final int TAB_PROFILE = 2;
 
-
     /**
-     * Initializes the base navigation bar activity.
+     * Initializes the activity.
      *
-     * @param savedInstanceState the previously saved activity state, or null if
-     *                           the activity is being created for the first time
+     * @param savedInstanceState the previously saved state, or null if none
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
-
     /**
-     * Initializes the navigation bar and assigns click listeners to its buttons.
+     * Sets up the navigation bar, assigns click listeners, and highlights
+     * the active tab.
      * <p>
-     * Each navigation item launches the corresponding activity when selected.
-     * This method should be called by subclasses after setting their layout
-     * with setContentView().
+     * Each tab navigates to its corresponding activity. The Events tab
+     * clears intermediate activities from the back stack.
+     *
+     * @param activeTab the currently active tab (one of the TAB_* constants)
      */
     protected void setupNavBar(int activeTab) {
         View navBar = findViewById(R.id.nav_bar);
@@ -63,15 +63,22 @@ public class HeaderNavBarActivity extends AppCompatActivity {
         highlightNavTab(navBar, activeTab);
     }
 
-
-    // Whenever we go to the events (home) page, clear the stack
+    /**
+     * Launches the root Events screen and clears intermediate activities
+     * from the back stack if present.
+     */
     private void openEventsRoot() {
         Intent intent = new Intent(this, EntrantEventListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
     }
 
-
+    /**
+     * Updates the navigation bar UI to reflect the active tab.
+     *
+     * @param navBar the navigation bar view
+     * @param activeTab the currently active tab
+     */
     private void highlightNavTab(View navBar, int activeTab) {
         ImageView registeredIcon = navBar.findViewById(R.id.registered_icon);
         TextView registeredText = navBar.findViewById(R.id.registered_text);
@@ -95,7 +102,11 @@ public class HeaderNavBarActivity extends AppCompatActivity {
         profileText.setTextColor(activeTab == TAB_PROFILE ? activeColor : inactiveColor);
     }
 
-
+    /**
+     * Configures the header bar with a title and back navigation behavior.
+     *
+     * @param activityTitle the title displayed in the header
+     */
     protected void setupHeaderBar(String activityTitle) {
         View headerBar = findViewById(R.id.header_bar);
 
@@ -105,10 +116,9 @@ public class HeaderNavBarActivity extends AppCompatActivity {
     }
 
     /**
-     * Launches the specified activity if it is not already the current activity.
+     * Launches the specified activity if it is not already active.
      * <p>
-     * The transition animation is disabled to provide seamless navigation
-     * between screens using the navigation bar.
+     * Prevents redundant launches of the current activity.
      *
      * @param cls the activity class to launch
      */
@@ -121,6 +131,12 @@ public class HeaderNavBarActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Converts density-independent pixels (dp) to raw pixels.
+     *
+     * @param dp the value in dp
+     * @return the equivalent value in pixels
+     */
     private int dpToPx(int dp) {
         return (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
