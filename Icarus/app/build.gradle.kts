@@ -49,7 +49,8 @@ dependencies {
     implementation("com.squareup.picasso:picasso:2.71828") // For Displaying Images via URL
     implementation("com.google.android.gms:play-services-location:21.3.0")
     //implementation(libs.play.services.maps) // For location services
-    implementation("org.osmdroid:osmdroid-android:6.1.20") // For maps
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
+    implementation(libs.espresso.intents) // For maps
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
