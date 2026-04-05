@@ -83,7 +83,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
         entrantsOnWaitingList.setAdapter(eventListArrayAdapter);
         Set<String> selectedIds = eventListArrayAdapter.getSelectedIds();
         AtomicReference<String> status = new AtomicReference<>();
-
+        backButton.setText("Cancel Selected");
         //get eventId
         eventId = getIntent().getStringExtra("eventId");
         MaterialButton waitingButton = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting);
@@ -129,7 +129,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
             MaterialButton selectedButton = findViewById(checkedId);
             selectedButton.setTextColor(getColor(R.color.darkText));
 
-            backButton.setText("Go Back");
+            backButton.setText("Cancel Selected");
             eventListArrayAdapter.clearSelections();
             selectAllButton.setText("Select All");
             status.set(null);
@@ -152,7 +152,39 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                 createCSV();
             }
             else{
-                finish();
+                if(selectedIds.size() == 0){
+                    Toast.makeText(this, "No Users selected", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(this, R.style.CustomAlertDialog)
+                        .setTitle("Remove Entrants")
+                        .setMessage("Are you sure you want to remove " + selectedIds.size() + " selected user(s) from the list?")
+                        .setPositiveButton("Remove", (d, which) -> {
+                            for (String id : new ArrayList<>(selectedIds)) {
+                                db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                                        .document(eventId)
+                                        .collection("entrants")
+                                        .document(id)
+                                        .update("status", "rejected")
+                                        .addOnSuccessListener(unused -> {
+                                            entrantList.removeIf(u -> u.getId().equals(id));
+                                            eventListArrayAdapter.notifyDataSetChanged();
+                                        })
+                                        .addOnFailureListener(e ->
+                                                Toast.makeText(this, "Failed to remove " + id, Toast.LENGTH_SHORT).show()
+                                        );
+                            }
+                            eventListArrayAdapter.clearSelections();
+                            selectAllButton.setText("Select All");
+                            Toast.makeText(this, "Users removed", Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("Cancel", (d, which) -> d.dismiss())
+                        .show();
+
+                TextView messageView = dialog.findViewById(android.R.id.message);
+                if (messageView != null) {
+                    messageView.setTextColor(getColor(R.color.lightText));
+                }
             }
 
         });
