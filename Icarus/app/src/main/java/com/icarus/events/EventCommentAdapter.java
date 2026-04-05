@@ -21,11 +21,30 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * RecyclerView adapter for displaying a list of Comments.
+ * RecyclerView adapter for rendering and managing a list of {@link Comment} items.
+ * <p>
+ * Supports:
+ * <ul>
+ *   <li>Displaying comment content, author information, and timestamps</li>
+ *   <li>Optional selection mode for deletion (admin/organizer)</li>
+ *   <li>Soft-deleted comment handling</li>
+ * </ul>
+ * </p>
+ *
+ * @author Bradley Bravender
  */
 public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapter.CommentViewHolder> {
 
+    /**
+     * Callback interface for selection state changes.
+     */
     public interface OnSelectionChangedListener {
+
+        /**
+         * Called when the number of selected comments changes.
+         *
+         * @param selectedCount number of currently selected comments
+         */
         void onSelectionChanged(int selectedCount);
     }
 
@@ -38,6 +57,13 @@ public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapte
     private final SimpleDateFormat dateFormat =
             new SimpleDateFormat("MMM d, h:mm a", Locale.getDefault());
 
+    /**
+     * Creates a new adapter instance.
+     *
+     * @param comments                  list of comments to display
+     * @param canDelete                 whether selection (delete mode) is enabled
+     * @param selectionChangedListener  listener for selection state updates
+     */
     public EventCommentAdapter(List<Comment> comments,
                                boolean canDelete,
                                OnSelectionChangedListener selectionChangedListener) {
@@ -46,7 +72,13 @@ public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapte
         this.selectionChangedListener =selectionChangedListener;
 }
 
-
+    /**
+     * Inflates the comment item layout and creates a ViewHolder.
+     *
+     * @param parent   parent view group
+     * @param viewType view type (unused)
+     * @return new CommentViewHolder instance
+     */
     @NonNull
     @Override
     public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -55,7 +87,21 @@ public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapte
         return new CommentViewHolder(view);
     }
 
-
+    /**
+     * Binds comment data to the ViewHolder.
+     * <p>
+     * Handles:
+     * <ul>
+     *   <li>Profile image loading</li>
+     *   <li>Deleted comment display</li>
+     *   <li>Date formatting</li>
+     *   <li>Selection UI for deletion</li>
+     * </ul>
+     * </p>
+     *
+     * @param holder   view holder to bind data to
+     * @param position position of the item in the dataset
+     */
     @Override
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = comments.get(position);
@@ -106,13 +152,21 @@ public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapte
         }
     }
 
-
+    /**
+     * Returns the total number of comments.
+     *
+     * @return item count
+     */
     @Override
     public int getItemCount() {
         return comments.size();
     }
 
-
+    /**
+     * Toggles the selection state of a comment at the given position.
+     *
+     * @param position adapter position of the comment
+     */
     private void toggleSelection(int position) {
         if (position == RecyclerView.NO_POSITION) return;
 
@@ -129,7 +183,11 @@ public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapte
         }
     }
 
-
+    /**
+     * Returns the list of currently selected comments.
+     *
+     * @return selected comments
+     */
     public List<Comment> getSelectedComments() {
         List<Comment> selectedComments = new ArrayList<>();
 
@@ -142,12 +200,18 @@ public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapte
         return selectedComments;
     }
 
-
+    /**
+     * Returns the adapter positions of selected comments.
+     *
+     * @return list of selected positions
+     */
     public List<Integer> getSelectedPositions() {
         return new ArrayList<>(selectedPositions);
     }
 
-
+    /**
+     * Clears all selected comments and updates the UI.
+     */
     public void clearSelection() {
         List<Integer> oldSelections = new ArrayList<>(selectedPositions);
         selectedPositions.clear();
@@ -161,12 +225,22 @@ public class EventCommentAdapter extends RecyclerView.Adapter<EventCommentAdapte
         }
     }
 
-
+    /**
+     * ViewHolder for a single comment item.
+     * <p>
+     * Holds references to UI elements for efficient binding.
+     * </p>
+     */
     static class CommentViewHolder extends RecyclerView.ViewHolder {
         TextView authorName, commentTextView, createdAtTextView;
         ImageView selectIcon;
         ShapeableImageView profileImage;
 
+        /**
+         * Initializes view references for a comment item.
+         *
+         * @param itemView root view of the item layout
+         */
         CommentViewHolder(@NonNull View itemView) {
             super(itemView);
             authorName          = itemView.findViewById(R.id.comment_author_name);
