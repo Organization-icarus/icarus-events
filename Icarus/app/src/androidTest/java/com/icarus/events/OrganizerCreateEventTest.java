@@ -43,6 +43,7 @@ import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
 import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.After;
@@ -50,11 +51,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -101,7 +109,7 @@ public class OrganizerCreateEventTest {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ActivityScenario<OrganizerCreateEventActivity> scenario;
-    private String uploadedDeleteToken;
+    private String uploadedEventImageUrl;
 
     /** Firestore document ID of any event created during a test run. */
     private String createdEventId;
@@ -166,7 +174,7 @@ public class OrganizerCreateEventTest {
             scenario.close();
         }
 
-        deleteUploadedImageFromCloudinary();
+        deleteUploadedImageFromCloudinary(uploadedEventImageUrl);
         FirestoreCollections.endTest();
     }
 
@@ -392,7 +400,7 @@ public class OrganizerCreateEventTest {
                                     createdEventId = doc.getId();
 
                                     String imageUrl = doc.getString("image");
-
+                                    this.uploadedEventImageUrl = imageUrl;
                                     if (imageUrl != null && !imageUrl.isEmpty()) {
                                         foundCorrectDoc[0] = true;
                                     }
@@ -1311,46 +1319,94 @@ public class OrganizerCreateEventTest {
 
         return posterUrl[0];
     }
-    private void deleteUploadedImageFromCloudinary() throws Exception {
-        if (uploadedDeleteToken == null || uploadedDeleteToken.isEmpty()) {
+    private void deleteUploadedImageFromCloudinary(String imageUrl) throws Exception {
+        if (imageUrl == null || imageUrl.isEmpty() || "No Image".equals(imageUrl)) {
             return;
         }
 
-        java.net.URL url = new java.net.URL(
-                "https://api.cloudinary.com/v1_1/icarus-images/delete_by_token");
+        CountDownLatch latch = new CountDownLatch(1);
+        final String[] deleteToken = {null};
+        final String[] imageDocId = {null};
+        final Throwable[] lookupFailure = {null};
 
-        java.net.HttpURLConnection connection =
-                (java.net.HttpURLConnection) url.openConnection();
+        db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                .whereEqualTo("URL", imageUrl)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(query -> {
+                    try {
+                        if (!query.isEmpty()) {
+                            DocumentSnapshot doc = query.getDocuments().get(0);
+                            imageDocId[0] = doc.getId();
+                            deleteToken[0] = doc.getString("deleteToken");
+                        }
+                    } catch (Exception e) {
+                        lookupFailure[0] = e;
+                    } finally {
+                        latch.countDown();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    lookupFailure[0] = e;
+                    latch.countDown();
+                });
 
+        if (!latch.await(15, TimeUnit.SECONDS)) {
+            throw new RuntimeException("Timed out looking up image delete token");
+        }
+
+        if (lookupFailure[0] != null) {
+            throw new RuntimeException("Failed to look up image metadata", lookupFailure[0]);
+        }
+
+        if (deleteToken[0] == null || deleteToken[0].isEmpty()) {
+            return;
+        }
+
+        URL url = new URL("https://api.cloudinary.com/v1_1/icarus-images/delete_by_token");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
-        connection.setRequestProperty(
-                "Content-Type", "application/x-www-form-urlencoded");
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-        String body = "token=" + java.net.URLEncoder.encode(
-                uploadedDeleteToken, java.nio.charset.StandardCharsets.UTF_8.name());
+        String body = "token=" + URLEncoder.encode(
+                deleteToken[0],
+                StandardCharsets.UTF_8.name()
+        );
 
-        try (java.io.OutputStream os = connection.getOutputStream()) {
-            os.write(body.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        try (OutputStream os = connection.getOutputStream()) {
+            os.write(body.getBytes(StandardCharsets.UTF_8));
         }
 
         int responseCode = connection.getResponseCode();
         if (responseCode < 200 || responseCode >= 300) {
-            java.io.InputStream errorStream = connection.getErrorStream();
+            InputStream errorStream = connection.getErrorStream();
             String errorBody = "";
+
             if (errorStream != null) {
-                try (java.util.Scanner s = new java.util.Scanner(errorStream)
-                        .useDelimiter("\\A")) {
+                try (Scanner s = new Scanner(errorStream).useDelimiter("\\A")) {
                     errorBody = s.hasNext() ? s.next() : "";
                 }
             }
+
             throw new RuntimeException(
-                    "Cloudinary delete_by_token failed: HTTP "
-                            + responseCode + " " + errorBody);
+                    "Cloudinary delete_by_token failed: HTTP " + responseCode + " " + errorBody
+            );
         }
 
         connection.disconnect();
-        uploadedDeleteToken = null;
+
+        if (imageDocId[0] != null) {
+            CountDownLatch deleteDocLatch = new CountDownLatch(1);
+
+            db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                    .document(imageDocId[0])
+                    .delete()
+                    .addOnSuccessListener(unused -> deleteDocLatch.countDown())
+                    .addOnFailureListener(e -> deleteDocLatch.countDown());
+
+            deleteDocLatch.await(5, TimeUnit.SECONDS);
+        }
     }
 
 }
