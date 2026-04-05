@@ -57,10 +57,18 @@ public class HeaderNavBarActivity extends AppCompatActivity {
         View profileTab = navBar.findViewById(R.id.profile);
 
         registeredTab.setOnClickListener(v -> openActivity(EventHistoryActivity.class));
-        eventsTab.setOnClickListener(v -> openActivity(EntrantEventListActivity.class));
+        eventsTab.setOnClickListener(v -> openEventsRoot());
         profileTab.setOnClickListener(v -> openActivity(UserProfileActivity.class));
 
         highlightNavTab(navBar, activeTab);
+    }
+
+
+    // Whenever we go to the events (home) page, clear the stack
+    private void openEventsRoot() {
+        Intent intent = new Intent(this, EntrantEventListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
     }
 
 
@@ -107,7 +115,7 @@ public class HeaderNavBarActivity extends AppCompatActivity {
     private void openActivity(Class<?> cls) {
         if (!this.getClass().equals(cls)) {
             Intent intent = new Intent(this, cls);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION); // Turn off transition
+            // intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION); // Turn off transition
             startActivity(intent);
 
         }
@@ -134,7 +142,7 @@ public class HomeActivity extends NavigationBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        setupNavBar();
+        setupNavBar(TAB_NONE);
     }
 }
 */
