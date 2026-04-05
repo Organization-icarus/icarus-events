@@ -16,7 +16,13 @@ import java.util.List;
 import android.widget.ImageButton;
 
 /**
- * Activity for users to view their own notifications.
+ * Activity that allows users to view a personalized list of notifications.
+ * <p>
+ * This activity retrieves notification documents from Firestore where the current
+ * user's ID is present in the recipients array. It manages the user session
+ * verification and populates a ListView using the {@link NotificationListAdapter}.
+ *
+ * @author Yifan Jiao
  */
 public class UserNotificationsActivity extends AppCompatActivity {
 
@@ -28,6 +34,16 @@ public class UserNotificationsActivity extends AppCompatActivity {
     private NotificationListAdapter adapter;
     private String currentUserId;
 
+    /**
+     * Initializes the activity, sets up the UI components, and verifies the user session.
+     * <p>
+     * If no valid user session is found, the activity displays a toast and finishes
+     * immediately to prevent unauthorized access to the notification data.
+     *
+     * @param savedInstanceState if the activity is being re-initialized after
+     * previously being shut down, this contains the most
+     * recent data; otherwise it is null.
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +81,14 @@ public class UserNotificationsActivity extends AppCompatActivity {
         loadStoredNotifications();
     }
 
+    /**
+     * Queries the Firestore database for notifications targeted at the current user.
+     * <p>
+     * This method searches the notifications collection for documents where the
+     * "recipients" array contains the current user's ID. Each document is parsed into
+     * a {@link NotificationItem} and added to the local list. Upon completion,
+     * the adapter is notified to refresh the UI.
+     */
     private void loadStoredNotifications() {
         notifications.clear();
 

@@ -16,7 +16,13 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 /**
- * Adapter for displaying notification items.
+ * Custom adapter for displaying a list of notification items in a ListView.
+ * <p>
+ * This adapter handles the inflation of notification list items and dynamically
+ * retrieves sender information (name and profile image) from Firestore based on
+ * the sender's unique ID.
+ *
+ * @author Kito Lee Son
  */
 public class NotificationListAdapter extends ArrayAdapter<NotificationItem> {
 
@@ -24,6 +30,12 @@ public class NotificationListAdapter extends ArrayAdapter<NotificationItem> {
     private final ArrayList<NotificationItem> notifications;
     private final FirebaseFirestore db;
 
+    /**
+     * Constructs a new NotificationListAdapter.
+     *
+     * @param context       the activity context used for layout inflation
+     * @param notifications the list of {@link NotificationItem} objects to display
+     */
     public NotificationListAdapter(Activity context, ArrayList<NotificationItem> notifications) {
         super(context, R.layout.notification_list_item, notifications);
         this.context = context;
@@ -31,6 +43,19 @@ public class NotificationListAdapter extends ArrayAdapter<NotificationItem> {
         this.db = FirebaseFirestore.getInstance();
     }
 
+    /**
+     * Prepares and returns the view for a specific notification item in the list.
+     * <p>
+     * This method populates the notification message and then performs an
+     * asynchronous Firestore lookup to resolve the sender's identity. If the
+     * sender is a system account or the data is missing, it applies default
+     * branding; otherwise, it loads the user's profile via Picasso.
+     *
+     * @param position    the position of the item within the data set
+     * @param convertView the recycled view to reuse, if available
+     * @param parent      the parent view group
+     * @return the completed View for the notification item
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
