@@ -26,6 +26,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Activity for displaying and managing comments associated with a specific event.
+ * <p>
+ * Supports:
+ * <ul>
+ *   <li>Real-time comment updates via Firestore listeners</li>
+ *   <li>Posting new comments</li>
+ *   <li>Soft deletion of comments (admin/organizer only)</li>
+ *   <li>Dynamic UI adjustments for keyboard visibility</li>
+ * </ul>
+ * </p>
+ *
+ * @author Bradley Bravender
+ */
 public class EventCommentActivity extends HeaderNavBarActivity {
 
     private static final String TAG = "EventCommentActivity";
@@ -58,6 +72,22 @@ public class EventCommentActivity extends HeaderNavBarActivity {
     /* This code was created with the help of ChatGPT on March 31. The prompt
     was, "How do I delete comments based on if the user organized the event,
     or if they're an admin?". */
+
+    /**
+     * Initializes the activity, UI components, and Firestore listeners.
+     * <p>
+     * Sets up:
+     * <ul>
+     *   <li>Header and navigation bar</li>
+     *   <li>RecyclerView and adapter</li>
+     *   <li>User session data</li>
+     *   <li>Comment input and submission handling</li>
+     *   <li>Permission listeners and comment stream</li>
+     * </ul>
+     * </p>
+     *
+     * @param savedInstanceState previously saved state, if any
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,7 +154,17 @@ public class EventCommentActivity extends HeaderNavBarActivity {
         loadComments();
     }
 
-
+    /**
+     * Subscribes to Firestore updates to determine user permissions.
+     * <p>
+     * Tracks whether the current user is:
+     * <ul>
+     *   <li>An event organizer</li>
+     *   <li>An administrator</li>
+     * </ul>
+     * Updates deletion permissions dynamically when either changes.
+     * </p>
+     */
     private void listenToPermissions() {
         eventListener = db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(eventId)
@@ -168,6 +208,14 @@ public class EventCommentActivity extends HeaderNavBarActivity {
 
     /* This code was created with the help of ChatGPT on March 31. The prompt
     was, "How do I delete comments in Firebase using the 'isDeleted' field?". */
+
+    /**
+     * Marks selected comments as deleted in Firestore.
+     * <p>
+     * Performs a soft delete by setting the "deleted" field to true.
+     * Only applies to comments currently selected in the adapter.
+     * </p>
+     */
     private void deleteComment() {
         List<Comment> selectedComments = adapter.getSelectedComments();
 
@@ -188,7 +236,13 @@ public class EventCommentActivity extends HeaderNavBarActivity {
         adapter.clearSelection();
     }
 
-
+    /**
+     * Updates whether the current user can delete comments.
+     * <p>
+     * Reconfigures the adapter when permissions change and updates UI
+     * elements such as the manage button accordingly.
+     * </p>
+     */
     private void updateDeletePermission() {
         boolean newCanDelete = isOrganizer || isAdmin;
 
@@ -219,7 +273,13 @@ public class EventCommentActivity extends HeaderNavBarActivity {
                 + ", canDelete=" + canDelete);
     }
 
-
+    /**
+     * Validates input and posts a new comment to Firestore.
+     * <p>
+     * Clears the input field on success and handles failure states
+     * by displaying an error to the user.
+     * </p>
+     */
     private void postComment() {
         String text = commentInput.getText().toString().trim();
 
@@ -255,6 +315,13 @@ public class EventCommentActivity extends HeaderNavBarActivity {
     }
 
 
+    /**
+     * Subscribes to real-time comment updates for the event.
+     * <p>
+     * Retrieves comments ordered by creation time (descending),
+     * filters out deleted comments, and updates the RecyclerView.
+     * </p>
+     */
     private void loadComments() {
         commentsListener = db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(eventId)
@@ -287,7 +354,13 @@ public class EventCommentActivity extends HeaderNavBarActivity {
     The prompt was, "How do I prevent the pop-up keyboard from blocking the input
     text field?" */
 
-    // This is used to dynamically space the text input above the keyboard.
+    /**
+     * Adjusts the comment input UI in response to keyboard (IME) visibility.
+     * <p>
+     * Ensures the input bar remains visible above the keyboard and temporarily
+     * hides the navigation bar when the keyboard is open.
+     * </p>
+     */
     private void setupImeInsets() {
         View inputBar = findViewById(R.id.comment_input_bar);
         View navBar = findViewById(R.id.nav_bar);
@@ -329,6 +402,12 @@ public class EventCommentActivity extends HeaderNavBarActivity {
         ViewCompat.requestApplyInsets(inputBar);
     }
 
+    /**
+     * Converts density-independent pixels (dp) to raw pixel units.
+     *
+     * @param dp value in dp
+     * @return equivalent value in pixels
+     */
     private int dpToPx(int dp) {
         return (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
@@ -337,7 +416,9 @@ public class EventCommentActivity extends HeaderNavBarActivity {
         );
     }
 
-
+    /**
+     * Cleans up Firestore listeners to prevent memory leaks.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();

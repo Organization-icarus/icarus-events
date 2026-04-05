@@ -24,8 +24,11 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 /**
- * Adapter to display an Event's fields in a ListView using ArrayAdapter.
- * Each row shows field name and field value.
+ * RecyclerView adapter that displays labeled event details.
+ * <p>
+ * Each row contains a field name and its corresponding value derived from an
+ * {@link Event}. Organizer information is initially populated from the event
+ * data and then updated asynchronously from Firestore when available.
  *
  * @author Bradley Bravender
  */
@@ -35,6 +38,15 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
     private final LayoutInflater inflater;
     private final List<EventField> fields;
 
+    /**
+     * Creates an adapter for displaying the details of the given event.
+     * <p>
+     * This constructor formats date fields, builds the list of displayable
+     * event fields, and requests the organizer's display name from Firestore.
+     *
+     * @param context the context used to obtain a {@link LayoutInflater}
+     * @param event the event whose details will be displayed
+     */
     public EventDetailsAdapter(@NonNull Context context, Event event) {
 
         this.inflater = LayoutInflater.from(context);
@@ -90,8 +102,20 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
                 });
     }
 
+    /**
+     * ViewHolder for a single event detail row.
+     * <p>
+     * Holds references to the label and value views used to display one
+     * {@link EventField}.
+     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView nameView, valueView;
+
+        /**
+         * Creates a ViewHolder for an event detail row.
+         *
+         * @param view the row view containing the field name and value views
+         */
         public ViewHolder(View view) {
             super(view);
             nameView = view.findViewById(R.id.field_name);
@@ -99,6 +123,13 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
         }
     }
 
+    /**
+     * Creates and inflates a new view holder for an event detail row.
+     *
+     * @param parent the parent view that the new row will be attached to
+     * @param viewType the view type of the new row
+     * @return a new {@link ViewHolder} for the inflated row
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -106,6 +137,12 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
         return new ViewHolder(view);
     }
 
+    /**
+     * Binds the event field at the given position to the provided view holder.
+     *
+     * @param holder the view holder to bind
+     * @param position the position of the field in the adapter
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         EventField field = fields.get(position);
@@ -113,6 +150,11 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
         holder.valueView.setText(field.getValue());
     }
 
+    /**
+     * Returns the number of event detail rows managed by this adapter.
+     *
+     * @return the number of fields displayed by the adapter
+     */
     @Override
     public int getItemCount() { return fields.size(); }
 
