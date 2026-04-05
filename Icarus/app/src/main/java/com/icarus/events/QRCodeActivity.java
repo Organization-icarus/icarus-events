@@ -58,7 +58,7 @@ public class QRCodeActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qrcode);
-        setupNavBar();
+        setupNavBar(TAB_NONE);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {

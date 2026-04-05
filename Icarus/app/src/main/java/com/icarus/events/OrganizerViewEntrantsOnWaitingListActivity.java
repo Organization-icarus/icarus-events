@@ -65,7 +65,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_view_entrants_on_waiting_list);
-        setupNavBar();
+        setupNavBar(TAB_NONE);
         db = FirebaseFirestore.getInstance();
 
         //Create TextView

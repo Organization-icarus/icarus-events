@@ -67,7 +67,7 @@ public class EventCommentActivity extends HeaderNavBarActivity {
         // SET UP HEADER AND NAV BAR
         //--------------------------------
         setupHeaderBar("Comments");
-        setupNavBar();
+        setupNavBar(TAB_EVENTS);
 
         eventId = getIntent().getStringExtra("EVENT_ID");
         if (eventId == null || eventId.isEmpty()) {

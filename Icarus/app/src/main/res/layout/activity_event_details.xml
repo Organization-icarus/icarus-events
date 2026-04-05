@@ -130,7 +130,7 @@
                 <com.google.android.material.button.MaterialButton
                     style="@style/AppButton"
                     android:id="@+id/event_organizer_button"
-                    android:text="Organize"
+                    android:text="Organizer"
                     app:icon="@drawable/profile"
                     android:visibility="visible"/>
 

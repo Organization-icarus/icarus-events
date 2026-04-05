@@ -55,7 +55,7 @@ public class SampleAttendeesActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sample_attendees);
-        setupNavBar();
+        setupNavBar(TAB_NONE);
 
         eventId = getIntent().getStringExtra("eventId");
         String name  = getIntent().getStringExtra("ActivityName");

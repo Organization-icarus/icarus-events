@@ -115,7 +115,7 @@ public class OrganizerCreateEventActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_create_event);
-        setupNavBar();
+        setupNavBar(TAB_NONE);
         User user = UserSession.getInstance().getCurrentUser();
         String userId = user.getId();
         db = FirebaseFirestore.getInstance();

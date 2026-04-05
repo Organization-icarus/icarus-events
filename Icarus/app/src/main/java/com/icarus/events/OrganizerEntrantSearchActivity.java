@@ -59,7 +59,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_organizer_entrant_search);
-        setupNavBar();
+        setupNavBar(TAB_NONE);
         User user = UserSession.getInstance().getCurrentUser();
         userId = user.getId();
 
