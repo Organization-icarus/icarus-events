@@ -42,6 +42,7 @@ import androidx.test.filters.LargeTest;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
+import com.cloudinary.utils.ObjectUtils;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -176,6 +177,9 @@ public class OrganizerCreateEventTest {
 
         deleteUploadedImageFromCloudinary(uploadedEventImageUrl);
         FirestoreCollections.endTest();
+        uploadedEventImageUrl = null;
+        createdEventId = null;
+        scenario = null;
     }
 
     // =========================================================================
@@ -426,6 +430,7 @@ public class OrganizerCreateEventTest {
             latch.countDown();
 
             assertTrue("Event was not saved with a non-empty image URL", foundCorrectDoc[0]);
+            addImageToImagesCollection(uploadedEventImageUrl);
             assertFalse("Assertion failed while checking Firestore", assertionFailed[0]);
 
         } finally {
@@ -1265,68 +1270,14 @@ public class OrganizerCreateEventTest {
         scrollFieldIntoView(viewId);
         onView(withId(viewId)).perform(click());
     }
-    private String uploadImageUriAndWait(Uri posterUri) throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-        final String[] posterUrl = {null};
-        final Throwable[] uploadFailure = {null};
-
-        MediaManager.get().upload(posterUri)
-                .option("upload_preset", "ml_default")
-                .callback(new UploadCallback() {
-                    @Override
-                    public void onSuccess(String requestId, Map resultData) {
-                        posterUrl[0] = (String) resultData.get("secure_url");
-                        String publicId = (String) resultData.get("public_id");
-
-                        Map<String, Object> imageData = new HashMap<>();
-                        imageData.put("URL", posterUrl[0]);
-
-                        db.collection(FirestoreCollections.IMAGES_COLLECTION)
-                                .document(publicId)
-                                .set(imageData)
-                                .addOnSuccessListener(unused -> latch.countDown())
-                                .addOnFailureListener(e -> {
-                                    uploadFailure[0] = e;
-                                    latch.countDown();
-                                });
-                    }
-
-                    @Override
-                    public void onError(String requestId, ErrorInfo error) {
-                        uploadFailure[0] = new RuntimeException(error.getDescription());
-                        latch.countDown();
-                    }
-
-                    @Override
-                    public void onStart(String requestId) {}
-
-                    @Override
-                    public void onProgress(String requestId, long bytes, long totalBytes) {}
-
-                    @Override
-                    public void onReschedule(String requestId, ErrorInfo error) {}
-                })
-                .dispatch();
-
-        assertTrue("Cloudinary upload timed out", latch.await(30, TimeUnit.SECONDS));
-
-        if (uploadFailure[0] != null) {
-            throw new AssertionError("Image upload failed", uploadFailure[0]);
-        }
-
-        assertNotNull("Poster URL must not be null after upload", posterUrl[0]);
-        assertFalse("Poster URL must not be empty after upload", posterUrl[0].isEmpty());
-
-        return posterUrl[0];
-    }
     private void deleteUploadedImageFromCloudinary(String imageUrl) throws Exception {
         if (imageUrl == null || imageUrl.isEmpty() || "No Image".equals(imageUrl)) {
             return;
         }
 
         CountDownLatch latch = new CountDownLatch(1);
-        final String[] deleteToken = {null};
-        final String[] imageDocId = {null};
+        final String[] publicId = {null};
+        final String[] storedUrl = {null};
         final Throwable[] lookupFailure = {null};
 
         db.collection(FirestoreCollections.IMAGES_COLLECTION)
@@ -1337,8 +1288,8 @@ public class OrganizerCreateEventTest {
                     try {
                         if (!query.isEmpty()) {
                             DocumentSnapshot doc = query.getDocuments().get(0);
-                            imageDocId[0] = doc.getId();
-                            deleteToken[0] = doc.getString("deleteToken");
+                            publicId[0] = doc.getId();          // file name / Cloudinary public ID
+                            storedUrl[0] = doc.getString("URL");
                         }
                     } catch (Exception e) {
                         lookupFailure[0] = e;
@@ -1352,61 +1303,90 @@ public class OrganizerCreateEventTest {
                 });
 
         if (!latch.await(15, TimeUnit.SECONDS)) {
-            throw new RuntimeException("Timed out looking up image delete token");
+            throw new RuntimeException("Timed out looking up image in IMAGES collection");
         }
 
         if (lookupFailure[0] != null) {
             throw new RuntimeException("Failed to look up image metadata", lookupFailure[0]);
         }
 
-        if (deleteToken[0] == null || deleteToken[0].isEmpty()) {
+        if (publicId[0] == null || publicId[0].isEmpty()) {
             return;
         }
 
-        URL url = new URL("https://api.cloudinary.com/v1_1/icarus-images/delete_by_token");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        Map result = MediaManager.get()
+                .getCloudinary()
+                .uploader()
+                .destroy(publicId[0], ObjectUtils.emptyMap());
 
-        String body = "token=" + URLEncoder.encode(
-                deleteToken[0],
-                StandardCharsets.UTF_8.name()
-        );
-
-        try (OutputStream os = connection.getOutputStream()) {
-            os.write(body.getBytes(StandardCharsets.UTF_8));
-        }
-
-        int responseCode = connection.getResponseCode();
-        if (responseCode < 200 || responseCode >= 300) {
-            InputStream errorStream = connection.getErrorStream();
-            String errorBody = "";
-
-            if (errorStream != null) {
-                try (Scanner s = new Scanner(errorStream).useDelimiter("\\A")) {
-                    errorBody = s.hasNext() ? s.next() : "";
-                }
-            }
-
+        if (!"ok".equals(result.get("result"))) {
             throw new RuntimeException(
-                    "Cloudinary delete_by_token failed: HTTP " + responseCode + " " + errorBody
+                    "Cloudinary destroy failed for publicId=" + publicId[0]
+                            + ", url=" + storedUrl[0]
+                            + ", result=" + result
             );
         }
 
-        connection.disconnect();
+        CountDownLatch deleteDocLatch = new CountDownLatch(1);
+        final Throwable[] deleteFailure = {null};
 
-        if (imageDocId[0] != null) {
-            CountDownLatch deleteDocLatch = new CountDownLatch(1);
+        db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                .document(publicId[0])
+                .delete()
+                .addOnSuccessListener(unused -> deleteDocLatch.countDown())
+                .addOnFailureListener(e -> {
+                    deleteFailure[0] = e;
+                    deleteDocLatch.countDown();
+                });
 
-            db.collection(FirestoreCollections.IMAGES_COLLECTION)
-                    .document(imageDocId[0])
-                    .delete()
-                    .addOnSuccessListener(unused -> deleteDocLatch.countDown())
-                    .addOnFailureListener(e -> deleteDocLatch.countDown());
+        if (!deleteDocLatch.await(15, TimeUnit.SECONDS)) {
+            throw new RuntimeException("Timed out deleting image document from Firestore");
+        }
 
-            deleteDocLatch.await(5, TimeUnit.SECONDS);
+        if (deleteFailure[0] != null) {
+            throw new RuntimeException("Failed to delete image document from Firestore", deleteFailure[0]);
         }
     }
+    private void addImageToImagesCollection(String imageUrl) throws Exception {
+        if (imageUrl == null || imageUrl.isEmpty() || "No Image".equals(imageUrl)) {
+            return;
+        }
 
+        CountDownLatch latch = new CountDownLatch(1);
+        final Throwable[] failure = {null};
+
+        db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                .whereEqualTo("URL", imageUrl)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(query -> {
+                    if (!query.isEmpty()) {
+                        latch.countDown();
+                        return;
+                    }
+
+                    Map<String, Object> imageData = new HashMap<>();
+                    imageData.put("URL", imageUrl);
+
+                    db.collection(FirestoreCollections.IMAGES_COLLECTION)
+                            .add(imageData)
+                            .addOnSuccessListener(unused -> latch.countDown())
+                            .addOnFailureListener(e -> {
+                                failure[0] = e;
+                                latch.countDown();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    failure[0] = e;
+                    latch.countDown();
+                });
+
+        if (!latch.await(15, TimeUnit.SECONDS)) {
+            throw new RuntimeException("Timed out adding image to IMAGES collection");
+        }
+
+        if (failure[0] != null) {
+            throw new RuntimeException("Failed to add image to IMAGES collection", failure[0]);
+        }
+    }
 }
