@@ -6,22 +6,23 @@
     android:background="@color/primary"
     android:fitsSystemWindows="true" >
 
+    <!-- The Header -->
+    <include
+        layout="@layout/header_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <!-- MAIN CONTENT -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/header_height" >
 
         <!-- FULL_WIDTH EVENT POSTER -->
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-
-                <!-- The Header -->
-                <include
-                    layout="@layout/header_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
 
                 <!-- POSTER: edge-to-edge -->
                 <ImageView

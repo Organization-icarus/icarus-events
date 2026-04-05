@@ -4,21 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary">
+    android:background="@color/primary"
+    android:fitsSystemWindows="true" >
 
-    <TextView
-        android:id="@+id/user_settings_header"
-        android:layout_width="wrap_content"
+    <!-- The Header (replaces title) -->
+    <include
+        android:id="@+id/header_bar"
+        layout="@layout/header_bar"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="112dp"
-        android:text="Settings"
-        android:textColor="@color/lightText"
-        android:textSize="@dimen/font_super_heading_size"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+<!--    <TextView-->
+<!--        android:id="@+id/user_settings_header"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="112dp"-->
+<!--        android:text="Settings"-->
+<!--        android:textColor="@color/lightText"-->
+<!--        android:textSize="@dimen/font_super_heading_size"-->
+<!--        android:textStyle="bold"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.498"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/user_settings_profile_image_container"
@@ -27,7 +38,7 @@
         android:layout_marginTop="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_settings_header"
+        app:layout_constraintTop_toBottomOf="@+id/header_bar"
         app:cardCornerRadius="80dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp">

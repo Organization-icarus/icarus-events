@@ -4,22 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary">
+    android:background="@color/primary"
+    android:fitsSystemWindows="true" >
+
+    <!-- The Header -->
+    <include
+        android:id="@+id/header_bar"
+        layout="@layout/header_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <!-- Title for profile page-->
-    <TextView
-        android:id="@+id/user_profile_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Profile"
-        android:textColor="@color/lightText"
-        android:textSize="@dimen/font_super_heading_size"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/user_profile_name_edit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.309" />
+<!--    <TextView-->
+<!--        android:id="@+id/user_profile_title"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Profile"-->
+<!--        android:textColor="@color/lightText"-->
+<!--        android:textSize="@dimen/font_super_heading_size"-->
+<!--        android:textStyle="bold"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/user_profile_name_edit"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.309" />-->
 
     <!-- Profile icon -->
     <com.google.android.material.card.MaterialCardView
@@ -30,7 +41,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_profile_title"
+        app:layout_constraintTop_toBottomOf="@+id/header_bar"
         app:layout_constraintVertical_bias="0.2"
         app:cardCornerRadius="80dp"
         app:cardElevation="0dp"
@@ -141,7 +152,7 @@
         app:layout_constraintEnd_toEndOf="@+id/user_profile_name_edit"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/user_profile_name_edit"
-        app:layout_constraintTop_toBottomOf="@+id/user_profile_title"
+        app:layout_constraintTop_toBottomOf="@+id/header_bar"
         app:layout_constraintVertical_bias="1.0" />
 
     <!-- Settings button + icon -->
