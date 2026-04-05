@@ -68,6 +68,7 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_administrator_dashboard);
+        setupHeaderBar("Administrator Dashboard");
         setupNavBar(TAB_NONE);
 
         // Initialize database reference and collection references
