@@ -228,8 +228,15 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
                 for (QueryDocumentSnapshot snapshot : value) {
                     String id = snapshot.getId();
                     Boolean isPrivate = snapshot.getBoolean("isPrivate");
+                    Date regClose = snapshot.getDate("close");
+
                     // Hide private events
                     if (Boolean.TRUE.equals(isPrivate)) {
+                        continue;
+                    }
+
+                    // Hide events whose registration date has already passed
+                    if (regClose != null && regClose.before(new Date())) {
                         continue;
                     }
 
@@ -237,7 +244,6 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
                     String category  = snapshot.getString("category");
                     Double capacity = snapshot.getDouble("capacity");
                     Date regOpen = snapshot.getDate("open");
-                    Date regClose = snapshot.getDate("close");
                     Date startDate = snapshot.getDate("startDate");
                     Date endDate = snapshot.getDate("endDate");
                     String location = snapshot.getString("location");
