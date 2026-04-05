@@ -7,7 +7,7 @@
     android:background="@color/primary"
     android:fitsSystemWindows="true" >
 
-    <!-- The Header (replaces title) -->
+    <!-- The Header -->
     <include
         android:id="@+id/header_bar"
         layout="@layout/header_bar"
