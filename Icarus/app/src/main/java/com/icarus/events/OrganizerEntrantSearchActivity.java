@@ -136,7 +136,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                         "You have been invited to join a private event waiting list.",
                                         "private_waitlist_invite"
                                 );
-                                privateNotification.sendNotification();
+                                privateNotification.sendNotification(this);
                             } else {
                                 Log.e("NotificationError", "Event not found for ID: " + eventId);
                             }
@@ -165,7 +165,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                         "You have been invited to be a co-organizer.",
                                         "co_organizer_invite"
                                 );
-                                coOrganizerNotification.sendNotification();
+                                coOrganizerNotification.sendNotification(this);
                             } else {
                                 Log.e("NotificationError", "Event not found for ID: " + eventId);
                             }
@@ -257,7 +257,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                                 boolean isOrganizer = organizerSet.contains(deviceId); // ← new
 
                                                 if (notInEntrants && !userIsAdmin && !isCurrentUser && !isOrganizer) {
-                                                    entrantUserList.add(new User(deviceId, name, email, phone, image,
+                                                    entrantUserList.add(new User(deviceId, name, email, phone, image, null,
                                                             null, null, null, null));
                                                 }
                                             }
@@ -356,7 +356,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                         String email = userSnapshot.getString("email");
                                         String phone = userSnapshot.getString("phone");
                                         String image = userSnapshot.getString("image");
-                                        entrantUserList.add(new User(deviceId, name, email, phone, image,
+                                        entrantUserList.add(new User(deviceId, name, email, phone, image, null,
                                                 null, null, null, null));
                                         eventListArrayAdapter.notifyDataSetChanged();
                                     });

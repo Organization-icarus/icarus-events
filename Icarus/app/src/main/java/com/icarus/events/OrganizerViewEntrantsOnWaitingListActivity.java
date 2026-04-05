@@ -208,17 +208,8 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                                         String email = userSnapshot.getString("email");
                                         String phone = userSnapshot.getString("phone");
                                         String image = userSnapshot.getString("image");
-                                        entrantList.add(new User(
-                                                deviceId,
-                                                name,
-                                                email,
-                                                phone,
-                                                image,
-                                                null,
-                                                null,
-                                                null,
-                                                null
-                                        ));
+                                        entrantList.add(new User(deviceId, name, email, phone, image, null, null,
+                                                null, null, null));
                                         eventListArrayAdapter.notifyDataSetChanged();
                                     });
                         }
@@ -287,7 +278,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                                 message,
                                 type
                         );
-                        notification.sendNotification();
+                        notification.sendNotification(this);
                     } else {
                         Log.e("NotificationError", "Event not found for ID: " + eventId);
                     }

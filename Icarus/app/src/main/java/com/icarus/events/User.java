@@ -1,7 +1,10 @@
 package com.icarus.events;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents a user in the application.
@@ -21,6 +24,7 @@ public class User {
     private ArrayList<String> events;
     private ArrayList<String> organizedEvents;
     private Map<String, Object> settings;
+    private Map<String, String> fcmTokens;
 
     /**
      * Creates a new User object with the provided information.
@@ -32,10 +36,11 @@ public class User {
      * @param isAdmin role assigned to the user (e.g., entrant, organizer, admin)
      * @param events list of event IDs associated with the user
      * @param settings map of user-specific configuration settings
+     * @param fcmTokens map of device tokens
      */
     public User(String id, String name, String email, String phone, String image, Boolean isAdmin,
                 ArrayList<String> events, ArrayList<String> organizedEvents,
-                Map<String, Object> settings) {
+                Map<String, Object> settings, Map<String, String> fcmTokens) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -45,6 +50,7 @@ public class User {
         this.events = events;
         this.organizedEvents = organizedEvents;
         this.settings = settings;
+        this.fcmTokens = (fcmTokens != null) ? fcmTokens : new HashMap<>();
     }
 
     /**
@@ -182,11 +188,43 @@ public class User {
         this.settings = settings;
     }
 
+    /**
+     * Returns the profile image for the user
+     *
+     * @return the user's profile image
+     */
     public String getImage() {
         return image;
     }
 
+    /**
+     * Sets the profile image for the user
+     *
+     * @param image the user's new profile image
+     */
     public void setImage(String image) {
         this.image = image;
     }
+
+    /**
+     * Adds/updates a fcm token for a specific device.
+     *
+     * @param deviceId the device's unique id number
+     * @param token the device's unique fcm token
+     */
+    public void addFCMToken(String deviceId, String token) { if(token != null) this.fcmTokens.put(deviceId, token); }
+
+    /**
+     * Sets the fcm tokens for all the devices for the user
+     *
+     * @param tokens the user's new fcm tokens (one per device)
+     */
+    public void setFCMTokens(HashMap<String, String> tokens) { this.fcmTokens = tokens; }
+
+    /**
+     * Returns the fcm tokens for the user
+     *
+     * @return the user's fcm tokens
+     */
+    public Map<String, String> getFCMTokens() { return fcmTokens; }
 }

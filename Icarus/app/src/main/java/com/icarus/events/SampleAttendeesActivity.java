@@ -192,7 +192,7 @@ public class SampleAttendeesActivity extends HeaderNavBarActivity {
                                                             + event.getString("name") + " on " + event.getDate("date"),
                                                     "selected"
                                             );
-                                            notification.sendNotification();
+                                            notification.sendNotification(this);
                                         });
                             })
                             .addOnFailureListener(e -> {

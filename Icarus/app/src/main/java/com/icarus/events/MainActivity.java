@@ -17,10 +17,19 @@ import androidx.work.WorkManager;
 
 import android.provider.Settings;
 
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.cloudinary.android.MediaManager;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
+import org.json.JSONObject;
+
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -106,17 +115,27 @@ public class MainActivity extends AppCompatActivity {
                                 isAdmin != null ? isAdmin : false,
                                 (ArrayList<String>) snapshot.get("events"),
                                 (ArrayList<String>) snapshot.get("organizedEvents"),
-                                (Map<String, Object>) snapshot.get("settings")
+                                (Map<String, Object>) snapshot.get("settings"),
+                                (Map<String, String>) snapshot.get("fcmTokens")
                         );
-                        UserSession.getInstance().setCurrentUser(user);
-                        startActivity(new Intent(this, EntrantEventListActivity.class));
+
+                        NotificationHelper.getCurrentToken(token -> {
+                            user.addFCMToken(deviceId, token);
+                            db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId)
+                                    .update("fcmTokens", user.getFCMTokens())
+                                    .addOnCompleteListener(task -> {
+                                        UserSession.getInstance().setCurrentUser(user);
+                                        startActivity(new Intent(this, EntrantEventListActivity.class));
+                                        finish();
+                                    });
+                        });
                     } else {
                         // if user doesn't exist, go to sign up page
                         Intent intent = new Intent(this, UserRegistrationActivity.class);
                         intent.putExtra("deviceId", deviceId);
                         startActivity(intent);
+                        finish();
                     }
-                    finish();
                 });
 
     }
@@ -148,4 +167,7 @@ public class MainActivity extends AppCompatActivity {
             throw new RuntimeException("SHA-256 not available", e);
         }
     }
+
+//    ciUGaVOqSnGrELmZXo9Jn6:APA91bEjfpmqG7n5vvN46zlHgbuuLj2FtvQB3Qh3tlEmGx5rr3Uhd2fI26feZXZvVybOOi39Sp6pkQqngW-Jh0toBv6hQNVfouvAnxsKZPOxk9dtRCaCWsw
+
 }

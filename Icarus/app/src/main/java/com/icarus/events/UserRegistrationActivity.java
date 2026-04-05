@@ -133,28 +133,25 @@ public class UserRegistrationActivity extends AppCompatActivity {
             userData.put("settings", settings);
             userData.put("image", profileImageURL);
 
-            db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).set(userData)
-                    .addOnSuccessListener(unused -> {
+            NotificationHelper.getCurrentToken(token -> {
+                Map<String, String> fcmTokens = new HashMap<>();
+                fcmTokens.put(deviceId, token);
+                userData.put("fcmTokens", fcmTokens);
+                db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId).set(userData)
+                        .addOnSuccessListener(unused -> {
 
-                        // Add information into global session and return user to event list
-                        User user = new User(
-                                deviceId,
-                                name,
-                                email,
-                                userPhone,
-                                profileImageURL,
-                                isAdmin,
-                                null,
-                                null,
-                                null);
+                            // Add information into global session and return user to event list
+                            User user = new User(deviceId, name, email, userPhone, profileImageURL,
+                                    isAdmin, null, null, null, fcmTokens);
 
-                        UserSession.getInstance().setCurrentUser(user);
-                        startActivity(new Intent(this, EntrantEventListActivity.class));
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Failed to register", Toast.LENGTH_SHORT).show();
-                    });
+                            UserSession.getInstance().setCurrentUser(user);
+                            startActivity(new Intent(this, EntrantEventListActivity.class));
+                            finish();
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(this, "Failed to register", Toast.LENGTH_SHORT).show();
+                        });
+            });
         });
     }
 

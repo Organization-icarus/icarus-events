@@ -1,5 +1,7 @@
 package com.icarus.events;
 
+import android.content.Context;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -111,7 +113,7 @@ public class NotificationItem {
         this.recipients.remove(userId);
     }
 
-    public void sendNotification() {
+    public void sendNotification(Context context) {
         if (this.message == null || this.message.trim().isEmpty()) {
             throw new IllegalArgumentException("Notification message cannot be null or empty");
         }
@@ -136,5 +138,15 @@ public class NotificationItem {
                 .addOnSuccessListener(docRef -> {
                 })
                 .addOnFailureListener(Throwable::printStackTrace);
+
+        this.recipients.forEach(recipient -> {
+            this.db.collection(FirestoreCollections.USERS_COLLECTION).document(recipient).get()
+                    .addOnSuccessListener(snapshot -> {
+                        Map<String, String> tokens = (Map<String, String>) snapshot.get("fcmTokens");
+                        if (tokens != null) for (String token : tokens.values()) {
+                            NotificationHelper.sendPush(context, token, this.eventName, this.message);
+                        }
+                    });
+        });
     }
 }
