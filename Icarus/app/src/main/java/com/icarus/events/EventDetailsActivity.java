@@ -58,11 +58,16 @@ import java.util.Objects;
 
 
 /**
- * Activity that displays the details of a single Event.
- *
- * Fetches the Event from Firestore using the eventId passed via Intent,
- * then populates a ListView using EventDetailsAdapter to show all fields
- * of the Event in a readable format.
+ * Activity for displaying and managing detailed information about a single event.
+ * <p>
+ * Provides:
+ * <ul>
+ *   <li>Real-time event updates via Firestore listeners</li>
+ *   <li>User interaction flows (join waitlist, register, cancel, etc.)</li>
+ *   <li>Role-based UI behavior (admin, organizer, entrant)</li>
+ *   <li>Ticket generation and sharing via PDF with QR code</li>
+ * </ul>
+ * </p>
  *
  * @author Bradley Bravender
  */
@@ -116,7 +121,20 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST = 1001;
 
-    // Runs every time a user navigates to this intent
+    /**
+     * Initializes the activity, UI components, and Firestore listeners.
+     * <p>
+     * Handles:
+     * <ul>
+     *   <li>Event data retrieval</li>
+     *   <li>User session initialization</li>
+     *   <li>Button setup and click listeners</li>
+     *   <li>Real-time Firestore subscriptions</li>
+     * </ul>
+     * </p>
+     *
+     * @param savedInstanceState previously saved state, if any
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -557,7 +575,21 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
                 });
     }
 
-
+    /**
+     * Configures button visibility based on user role and event status.
+     * <p>
+     * Determines available actions for:
+     * <ul>
+     *   <li>Admins</li>
+     *   <li>Organizers</li>
+     *   <li>Regular users (entrant lifecycle)</li>
+     * </ul>
+     * </p>
+     *
+     * @param isAdmin     whether the current user is an admin
+     * @param isOrganizer whether the current user is an organizer of the event
+     * @param status      current participation status of the user
+     */
     private void setupButtons(Boolean isAdmin, Boolean isOrganizer, String status) {
         // Runs every time the firebase document changes
 
@@ -614,7 +646,11 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
         }
     }
 
-
+    /**
+     * Rebuilds and binds the event details adapter with updated data.
+     *
+     * @param finalEventId Firestore document ID of the event
+     */
     private void refreshAdapter(String finalEventId) {
         if (eventName == null) return;
 
@@ -629,7 +665,9 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
         recyclerView.setAdapter(new EventDetailsAdapter(this, event));
     }
 
-
+    /**
+     * Removes Firestore listeners to prevent memory leaks.
+     */
     @Override
     protected void onStop() {
         super.onStop();
@@ -640,14 +678,15 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
     }
 
     /**
-     * Fires when the user allows location permissions for the app.
-     * Adds the user to the events 'entrants' sub-collection and stores their location.
+     * Handles the result of a location permission request.
+     * <p>
+     * If granted, retrieves the user's location and adds them to the event waitlist.
+     * If denied, displays an error message.
+     * </p>
      *
-     * @param requestCode The request code passed in {@link #requestPermissions}.
-     * @param permissions The requested permissions. Never null.
-     * @param grantResults The grant results for the corresponding permissions which is either
-     *                     {@link android.content.pm.PackageManager#PERMISSION_GRANTED} or
-     *                     {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     * @param requestCode  request code identifying the permission request
+     * @param permissions  requested permissions
+     * @param grantResults results for each permission request
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -691,12 +730,15 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
     }
 
     /**
-     * Adds user to the events 'entrants' subcollection with the status "waiting".
-     * If geolocation is enabled, it adds the location of where the user joined the waitlist from.
+     * Adds a user to the event's entrants subcollection with "waiting" status.
+     * <p>
+     * Optionally validates the user's location against the event's allowed radius
+     * before adding them.
+     * </p>
      *
-     * @param eventId   Firestore document ID of the event
-     * @param userId    Firestore document ID of the user
-     * @param geopoint  Location the user is joining the event from
+     * @param eventId  Firestore document ID of the event
+     * @param userId   Firestore document ID of the user
+     * @param geopoint location of the user (nullable)
      */
     public void addUserToWaitingList(String eventId, String userId, GeoPoint geopoint) {
         currentStatus = "waiting";
@@ -754,13 +796,16 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
                     .update("events", com.google.firebase.firestore.FieldValue.arrayUnion(eventId));
         }
     }
+
     // Created  and adapted with generation help fromChatGPT April 4th 2026,
     // "Create or reuse a Firestore confirmation ticket using auto-ID and export a PDF ticket with QR code."
     /**
-     * Creates or reuses a Firestore confirmation ticket, then exports the PDF ticket.
-     *
-     * Uses the Firestore document auto-ID as the confirmation ticket ID and encodes
-     * that ID into the ticket QR code.
+     * Retrieves or creates a confirmation ticket for the current user,
+     * then exports it as a PDF.
+     * <p>
+     * Uses a Firestore document auto-ID as the ticket identifier,
+     * which is encoded into a QR code.
+     * </p>
      */
     private void printTicket() {
         User currentUser = UserSession.getInstance().getCurrentUser();
