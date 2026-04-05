@@ -1,6 +1,8 @@
 package com.icarus.events;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,18 +19,17 @@ import java.util.List;
 
 /**
  * Activity for viewing all notifications sent for a specific event.
- * <p>
- * Organizers and admins can use this page to review notification history
- * related to an event.
- *
- * @author Ben Salmon
+ * Organizers and admins can use this page to review notification history related to an event.
  */
 public class EventNotificationsActivity extends AppCompatActivity {
+
+    private static final String TAG = "EventNotifications";
 
     private FirebaseFirestore db;
     private String eventId;
     private TextView titleText;
     private ListView notificationsList;
+    private ImageButton backButton;
 
     private final ArrayList<NotificationItem> notifications = new ArrayList<>();
     private NotificationListAdapter adapter;
@@ -42,13 +43,27 @@ public class EventNotificationsActivity extends AppCompatActivity {
 
         titleText = findViewById(R.id.notifications_page_title);
         notificationsList = findViewById(R.id.notifications_list_view);
+        backButton = findViewById(R.id.notifications_back_button);
+
+        if (titleText == null || notificationsList == null || backButton == null) {
+            Toast.makeText(this, "Notification layout failed to load", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         adapter = new NotificationListAdapter(this, notifications);
         notificationsList.setAdapter(adapter);
 
-        eventId = getIntent().getStringExtra("eventId");
+        backButton.setOnClickListener(v -> finish());
 
-        titleText.setText("Event Notifications");
+        eventId = getIntent().getStringExtra("eventId");
+        String eventName = getIntent().getStringExtra("eventName");
+
+        if (eventName != null && !eventName.isEmpty()) {
+            titleText.setText(eventName + " Notifications");
+        } else {
+            titleText.setText("Event Notifications");
+        }
 
         if (eventId != null && !eventId.isEmpty()) {
             loadNotifications();
@@ -101,8 +116,8 @@ public class EventNotificationsActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to load notifications", e);
                     Toast.makeText(this, "Failed to load notifications", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
                 });
     }
 }

@@ -55,7 +55,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-
+import java.util.List;
 
 /**
  * Activity that displays the details of a single Event.
@@ -360,10 +360,12 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
 
             if (Boolean.TRUE.equals(isAdmin) || Boolean.TRUE.equals(isOrganizer)) {
                 intent = new Intent(EventDetailsActivity.this, EventNotificationsActivity.class);
-                intent.putExtra("eventId", finalEventId);
             } else {
                 intent = new Intent(EventDetailsActivity.this, UserNotificationsActivity.class);
             }
+
+            intent.putExtra("eventId", finalEventId);
+            intent.putExtra("eventName", eventName);
 
             startActivity(intent);
         });
@@ -486,7 +488,11 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
                         locationEnabled = doc.getBoolean("geolocation");
                         eventLocation = doc.getString("location");
                         eventImage = doc.getString("image");
-                        eventOrganizers = (ArrayList<String>) doc.get("organizers");
+                        List<String> organizersFromDb = (List<String>) doc.get("organizers");
+                        eventOrganizers = organizersFromDb == null
+                                ? new ArrayList<>()
+                                : new ArrayList<>(organizersFromDb);
+
                         isOrganizer = eventOrganizers.contains(userId);
                         setupButtons(isAdmin, isOrganizer, currentStatus);
 
