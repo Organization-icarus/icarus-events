@@ -122,7 +122,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
 
 
             if (screenName.equals("Entrant Search")) {
-                addUsersToEvent(selectedIds, "waiting");
+                addUsersToEvent(selectedIds, "selected");
 
                 ArrayList<String> privateRecipients = new ArrayList<>(selectedIds);
 
