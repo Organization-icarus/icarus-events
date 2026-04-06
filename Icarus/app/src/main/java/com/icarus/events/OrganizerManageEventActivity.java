@@ -60,7 +60,7 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
     private String eventName;
     private String posterURL;
     private Boolean locationEnabled;
-    private Boolean isPrivate;
+    private Boolean isPrivate = false;
 
     private FirebaseFirestore db;
 
