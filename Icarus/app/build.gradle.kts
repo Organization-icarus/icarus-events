@@ -50,7 +50,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     //implementation(libs.play.services.maps) // For location services
     implementation("org.osmdroid:osmdroid-android:6.1.20")
-    implementation(libs.espresso.intents) // For maps
+    androidTestImplementation(libs.espresso.intents)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

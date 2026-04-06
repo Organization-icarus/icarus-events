@@ -4,27 +4,25 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
-import android.widget.ListView;
-
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.ViewAssertion;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +37,10 @@ import java.util.concurrent.CountDownLatch;
  *      US 01.01.04 – As an entrant, I want to filter events based on
  *      my interests and availability.
  * <p>
- * Tests use a temporary Firestore collection ({@code events_test}) to avoid
- * interfering with production data.
+ * Tests use temporary Firestore test collections and test-only category
+ * documents to avoid interfering with production event and user data.
  *
- * @author Kito Lee Son
+ * @author Kito Lee Son, Updated by Alex Alves for project pt 4
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -50,119 +48,285 @@ public class EntrantEventListTest {
 
     private ActivityScenario<EntrantEventListActivity> scenario;
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private List<String> insertedIds = new ArrayList<>();
-    private String organizerId;
-    private List<String> categories = new ArrayList<String>();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final List<String> insertedEventIds = new ArrayList<>();
+    private final List<String> insertedUserIds = new ArrayList<>();
+    private final List<String> insertedCategoryDocIds = new ArrayList<>();
+    private final List<String> categories = new ArrayList<>();
+    private final List<String> insertedEventNames = new ArrayList<>();
+    private final List<Date> insertedStartDates = new ArrayList<>();
+    private final List<Double> insertedCapacities = new ArrayList<>();
+    private String sportsCategory;
+    private String artCategory;
+    private String musicCategory;
 
     /**
      * Prepares test data in Firestore before each test runs.
      * <p>
-     * This method inserts a test organizer and several events into the
-     * {@code events_test} collection, then launches
-     * {@link EntrantEventListActivity}.
+     * This method inserts test category documents and several future public events
+     * into the Firestore test collections, sets a valid current user in the app
+     * session, then launches {@link EntrantEventListActivity}.
      *
      * @throws InterruptedException if the Firestore insertion wait is interrupted
      */
     @Before
     public void setupFirestoreData() throws InterruptedException {
-
         FirestoreCollections.startTest();
+        String runId = String.valueOf(System.currentTimeMillis());
+        sportsCategory = "Sports Test " + runId;
+        artCategory = "Art Test " + runId;
+        musicCategory = "Music Test " + runId;
 
-        // insert organizer into the database
+        categories.add(sportsCategory);
+        categories.add(artCategory);
+        categories.add(musicCategory);
+
+        UserSession.getInstance().setCurrentUser(
+                new User(
+                        "entrant-test-user",
+                        "Test Entrant",
+                        "entrant@test.com",
+                        "7800000000",
+                        null,
+                        false,
+                        new ArrayList<>(),
+                        new ArrayList<>(),
+                        new HashMap<>())) ;
+
+        CountDownLatch categoryLatch = new CountDownLatch(categories.size());
+        for (String category : categories) {
+            Map<String, Object> categoryDoc = new HashMap<>();
+            categoryDoc.put("category", category);
+            categoryDoc.put("color", "#3366CC");
+            db.collection(FirestoreCollections.EVENT_CATEGORIES_COLLECTION)
+                    .add(categoryDoc)
+                    .addOnSuccessListener(doc -> {
+                        insertedCategoryDocIds.add(doc.getId());
+                        categoryLatch.countDown();
+                    });
+        }
+        categoryLatch.await();
+
         CountDownLatch organizerLatch = new CountDownLatch(1);
-        Map<String, String> organizer = new HashMap<String, String>();
+        Map<String, Object> organizer = new HashMap<>();
         organizer.put("name", "Test Organizer");
-        organizer.put("role", "organizer");
-        db.collection("users_test")
+        organizer.put("isAdmin", false);
+        organizer.put("events", new ArrayList<String>());
+        organizer.put("organizedEvents", new ArrayList<String>());
+        organizer.put("settings", new HashMap<String, Object>());
+        db.collection(FirestoreCollections.USERS_COLLECTION)
                 .add(organizer)
-                .addOnSuccessListener((doc) -> {
-                    organizerId = doc.getId();
+                .addOnSuccessListener(doc -> {
+                    insertedUserIds.add(doc.getId());
                     organizerLatch.countDown();
                 });
-        organizerLatch.await(); // wait until organizer is inserted
+        organizerLatch.await();
 
-        // insert events into the database
-        int numEvents = 3;
-        categories.add("Sports");
-        categories.add("Art");
-        categories.add("Music");
-        CountDownLatch eventLatch = new CountDownLatch(numEvents);
-        for (int i = 1; i <= numEvents; i++) {
+        String organizerId = insertedUserIds.get(0);
 
+        CountDownLatch eventLatch = new CountDownLatch(3);
+        for (int i = 0; i < 3; i++) {
             Map<String, Object> event = new HashMap<>();
-            event.put("capacity", 20 + (20 * i));
-            event.put("name", "Test Event " + i);
-            event.put("organizer", organizerId);
-            event.put("category", categories.get(i % numEvents));
+            String eventName = "Test Event " + (i + 1) + " - " + System.currentTimeMillis();
 
-            db.collection("events_test")
+            double capacity = 20.0 + i;
+            Date regOpen = new Date(System.currentTimeMillis() - 60_000);
+            Date regClose = new Date(System.currentTimeMillis() + 86_400_000);
+            Date startDate = new Date(System.currentTimeMillis() + ((long) (i + 1) * 86_400_000));
+            Date endDate = new Date(System.currentTimeMillis() + ((long) (i + 2) * 86_400_000));
+
+            event.put("category", categories.get(i));
+            event.put("capacity", capacity);
+            event.put("open", regOpen);
+            event.put("close", regClose);
+            event.put("startDate", startDate);
+            event.put("endDate", endDate);
+            event.put("name", eventName);
+            event.put("location", "Test Location " + (i + 1));
+            event.put("image", "");
+            event.put("isPrivate", false);
+
+            ArrayList<String> organizers = new ArrayList<>();
+            organizers.add(organizerId);
+            event.put("organizers", organizers);
+
+            insertedEventNames.add(eventName);
+            insertedStartDates.add(startDate);
+            insertedCapacities.add(capacity);
+
+            db.collection(FirestoreCollections.EVENTS_COLLECTION)
                     .add(event)
                     .addOnSuccessListener(doc -> {
-                        insertedIds.add(doc.getId());
+                        insertedEventIds.add(doc.getId());
                         eventLatch.countDown();
                     });
         }
-        eventLatch.await(); // wait until events are inserted
+        eventLatch.await();
 
         scenario = ActivityScenario.launch(EntrantEventListActivity.class);
+        waitForRecyclerViewItems(3, 5000);
     }
 
     /**
-     * Waits until the event {@link ListView} is populated with a minimum number
+     * Waits until the event RecyclerView is populated with a minimum number
      * of items or until a timeout occurs.
-     * <p>
-     * This is necessary because Firestore snapshot listeners update the UI
-     * asynchronously. The method repeatedly checks the ListView adapter until
-     * the expected number of events are displayed.
      *
-     * @param minCount minimum number of list items expected
+     * @param minCount minimum number of displayed items expected
      * @param timeoutMs maximum time to wait in milliseconds
      * @throws InterruptedException if the wait loop is interrupted
-     * @throws AssertionError if the list is not populated before timeout
      */
-    private void waitForListViewItems(int minCount, long timeoutMs) throws InterruptedException {
+    private void waitForRecyclerViewItems(int minCount, long timeoutMs) throws InterruptedException {
         long start = System.currentTimeMillis();
         while (System.currentTimeMillis() - start < timeoutMs) {
             final int[] count = {0};
             onView(withId(R.id.entrant_event_list_view)).check((view, e) -> {
-                ListView listView = (ListView) view;
-                if(listView.getAdapter() == null) throw new AssertionError("ListView adapter was null");
-                count[0] = listView.getAdapter().getCount();
+                RecyclerView recyclerView = (RecyclerView) view;
+                if (recyclerView.getAdapter() == null) {
+                    throw new AssertionError("RecyclerView adapter was null");
+                }
+                count[0] = recyclerView.getAdapter().getItemCount();
             });
-            if (count[0] >= minCount) return;
+            if (count[0] >= minCount) {
+                return;
+            }
             Thread.sleep(50);
         }
 
-        throw new AssertionError("ListView never populated with at least " + minCount + " items");
+        throw new AssertionError("RecyclerView never populated with at least " + minCount + " items");
+    }
+
+    /**
+     * Waits until the event RecyclerView contains exactly the expected number
+     * of items or until a timeout occurs.
+     *
+     * @param expectedSize exact number of displayed items expected
+     * @param timeoutMs maximum time to wait in milliseconds
+     * @throws InterruptedException if the wait loop is interrupted
+     */
+    private void waitForRecyclerViewExactSize(int expectedSize, long timeoutMs) throws InterruptedException {
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < timeoutMs) {
+            final int[] count = {0};
+            onView(withId(R.id.entrant_event_list_view)).check((view, e) -> {
+                RecyclerView recyclerView = (RecyclerView) view;
+                if (recyclerView.getAdapter() == null) {
+                    throw new AssertionError("RecyclerView adapter was null");
+                }
+                count[0] = recyclerView.getAdapter().getItemCount();
+            });
+            if (count[0] == expectedSize) {
+                return;
+            }
+            Thread.sleep(50);
+        }
+
+        throw new AssertionError("RecyclerView never reached size " + expectedSize);
     }
 
     /**
      * Returns a {@link ViewAssertion} that verifies the number of items
-     * displayed in a {@link ListView}.
-     * <p>
-     * This helper method simplifies UI assertions by allowing tests to
-     * confirm that the ListView contains an expected number of events.
+     * displayed in a {@link RecyclerView}.
      *
-     * @param expectedSize expected number of items in the ListView
-     * @return a {@link ViewAssertion} that checks the ListView item count
+     * @param expectedSize expected number of items in the RecyclerView
+     * @return a {@link ViewAssertion} that checks the RecyclerView item count
      */
-    public static ViewAssertion withListSize(int expectedSize) {
+    public static ViewAssertion withRecyclerViewSize(int expectedSize) {
         return (view, noViewFoundException) -> {
             if (noViewFoundException != null) {
                 throw noViewFoundException;
             }
 
-            ListView listView = (ListView) view;
-            assertEquals(expectedSize, listView.getAdapter().getCount());
+            RecyclerView recyclerView = (RecyclerView) view;
+            if (recyclerView.getAdapter() == null) {
+                throw new AssertionError("RecyclerView adapter was null");
+            }
+            assertEquals(expectedSize, recyclerView.getAdapter().getItemCount());
         };
     }
 
     /**
+     * Returns a {@link ViewAssertion} that verifies a {@link RecyclerView}
+     * contains at least the given number of items.
+     *
+     * @param minSize minimum number of items expected in the RecyclerView
+     * @return a {@link ViewAssertion} that checks the RecyclerView item count
+     */
+    public static ViewAssertion withRecyclerViewMinSize(int minSize) {
+        return (view, noViewFoundException) -> {
+            if (noViewFoundException != null) {
+                throw noViewFoundException;
+            }
+
+            RecyclerView recyclerView = (RecyclerView) view;
+            if (recyclerView.getAdapter() == null) {
+                throw new AssertionError("RecyclerView adapter was null");
+            }
+            int actualSize = recyclerView.getAdapter().getItemCount();
+            if (actualSize < minSize) {
+                throw new AssertionError("expected at least <" + minSize + "> but was <" + actualSize + ">");
+            }
+        };
+    }
+
+    /**
+     * Invokes the activity's private applyFilters method using reflection.
+     *
+     * @param activity the activity instance whose filters should be applied
+     */
+    private void invokeApplyFilters(EntrantEventListActivity activity) {
+        try {
+            Method applyFiltersMethod = EntrantEventListActivity.class.getDeclaredMethod("applyFilters");
+            applyFiltersMethod.setAccessible(true);
+            applyFiltersMethod.invoke(activity);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Sets the activity's private maxCapacityFilter field and reapplies filters.
+     *
+     * @param maxCapacity the maximum capacity value to apply
+     */
+    private void applyMaxCapacityFilter(Integer maxCapacity) {
+        scenario.onActivity(activity -> {
+            try {
+                Field field = EntrantEventListActivity.class.getDeclaredField("maxCapacityFilter");
+                field.setAccessible(true);
+                field.set(activity, maxCapacity);
+                invokeApplyFilters(activity);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /**
+     * Sets the activity's private start and end date filter fields and reapplies filters.
+     *
+     * @param startDate the start date filter to apply
+     * @param endDate the end date filter to apply
+     */
+    private void applyDateRangeFilter(Date startDate, Date endDate) {
+        scenario.onActivity(activity -> {
+            try {
+                Field startField = EntrantEventListActivity.class.getDeclaredField("startDateFilter");
+                startField.setAccessible(true);
+                startField.set(activity, startDate);
+
+                Field endField = EntrantEventListActivity.class.getDeclaredField("endDateFilter");
+                endField.setAccessible(true);
+                endField.set(activity, endDate);
+
+                invokeApplyFilters(activity);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    /**
      * Verifies that events inserted into Firestore appear in the entrant event list.
-     * <p>
-     * The test waits for the ListView to populate and then checks that all events
-     * in the database are displayed to the user.
      * <p>
      * User Story Tested:
      *     US 01.01.03 – As an entrant, I want to be able to see a list
@@ -172,70 +336,117 @@ public class EntrantEventListTest {
      */
     @Test
     public void testDisplayedEventsMatchDatabase() throws InterruptedException {
-        waitForListViewItems(3, 5000);
-        onView(withId(R.id.entrant_event_list_view)).check(withListSize(3));
+        waitForRecyclerViewItems(3, 5000);
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewMinSize(3));
     }
 
     /**
      * Tests that category filtering updates the displayed event list correctly.
      * <p>
-     * The test opens the category filter dialog, selects categories, and
-     * verifies that only events matching those categories remain visible.
+     * User Story Tested:
+     *     US 01.01.04 – As an entrant, I want to filter events based
+     *     on my interests and availability.
+     *
+     * @throws InterruptedException if waiting for asynchronous UI updates is interrupted
+     */
+    @Test
+    public void testCategoryFiltering() throws InterruptedException {
+        waitForRecyclerViewItems(3, 5000);
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewMinSize(3));
+
+        onView(withId(R.id.entrant_event_list_filter_button)).perform(click());
+        Thread.sleep(300);
+        onView(withText("Categories: Any")).perform(click());
+
+        Thread.sleep(300);
+        onView(withText(sportsCategory)).perform(click());
+        onView(withText("Apply")).perform(click());
+        onView(withText("Apply")).perform(click());
+        Thread.sleep(800);
+
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewSize(1));
+
+        onView(withId(R.id.entrant_event_list_filter_button)).perform(click());
+        Thread.sleep(300);
+        onView(withText(org.hamcrest.CoreMatchers.startsWith("Categories:"))).perform(click());
+
+        Thread.sleep(300);
+        onView(withText(artCategory)).perform(click());
+        onView(withText("Apply")).perform(click());
+        onView(withText("Apply")).perform(click());
+        Thread.sleep(800);
+
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewSize(2));
+    }
+
+    /**
+     * Tests that maximum capacity filtering reduces the displayed event list correctly.
      * <p>
      * User Story Tested:
      *     US 01.01.04 – As an entrant, I want to filter events based
      *     on my interests and availability.
+     *
+     * @throws InterruptedException if waiting for asynchronous UI updates is interrupted
      */
     @Test
-    public void testCategoryFiltering() {
-        // Initially 3 events
-        onView(withId(R.id.entrant_event_list_view))
-                .check(withListSize(3));
+    public void testCapacityFiltering() throws InterruptedException {
+        waitForRecyclerViewItems(3, 5000);
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewMinSize(3));
 
-        // Open filter popup
-        onView(withId(R.id.entrant_event_list_filter_button))
-                .perform(click());
+        applyMaxCapacityFilter(insertedCapacities.get(0).intValue());
+        waitForRecyclerViewExactSize(1, 5000);
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewSize(1));
+    }
 
-        // Select "Sports"
-        onView(withText("Sports"))
-                .perform(click());
+    /**
+     * Tests that date range filtering reduces the displayed event list correctly.
+     * <p>
+     * User Story Tested:
+     *     US 01.01.04 – As an entrant, I want to filter events based
+     *     on my interests and availability.
+     *
+     * @throws InterruptedException if waiting for asynchronous UI updates is interrupted
+     */
+    @Test
+    public void testDateRangeFiltering() throws InterruptedException {
+        waitForRecyclerViewItems(3, 5000);
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewMinSize(3));
 
-        // Click Apply again
-        onView(withText("Apply"))
-                .perform(click());
+        Date secondEventStart = insertedStartDates.get(1);
+        Date secondEventWindowStart = new Date(secondEventStart.getTime() - 60_000);
+        Date secondEventWindowEnd = new Date(secondEventStart.getTime() + 60_000);
 
-        // Verify filtered list
-        onView(withId(R.id.entrant_event_list_view))
-                .check(withListSize(1));
-
-        // Open filter again
-        onView(withId(R.id.entrant_event_list_filter_button))
-                .perform(click());
-
-        // Add "Art"
-        onView(withText("Art"))
-                .perform(click());
-
-        // Click Apply again
-        onView(withText("Apply"))
-                .perform(click());
-
-        // Now should show 2 events
-        onView(withId(R.id.entrant_event_list_view))
-                .check(withListSize(2));
+        applyDateRangeFilter(secondEventWindowStart, secondEventWindowEnd);
+        waitForRecyclerViewExactSize(1, 5000);
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewSize(1));
     }
 
     /**
      * Removes all test data from Firestore after each test.
-     * <p>
-     * This method deletes documents from {@code events_test} and
-     * {@code users_test} collections to ensure tests do not affect each other
-     * or pollute the production database.
      *
      * @throws InterruptedException if the cleanup wait operation is interrupted
      */
     @After
     public void cleanupFirestoreData() throws InterruptedException {
+        if (scenario != null) {
+            scenario.close();
+        }
+
+        UserSession.getInstance().clear();
+
+        CountDownLatch categoryDeleteLatch = new CountDownLatch(insertedCategoryDocIds.size());
+        if (insertedCategoryDocIds.isEmpty()) {
+            categoryDeleteLatch.countDown();
+        } else {
+            for (String docId : insertedCategoryDocIds) {
+                db.collection(FirestoreCollections.EVENT_CATEGORIES_COLLECTION)
+                        .document(docId)
+                        .delete()
+                        .addOnCompleteListener(task -> categoryDeleteLatch.countDown());
+            }
+        }
+        categoryDeleteLatch.await();
+
         FirestoreCollections.endTest();
     }
 }
