@@ -50,7 +50,6 @@ import java.security.NoSuchAlgorithmException;
  * @author Alex Alves
  */
 public class MainActivity extends AppCompatActivity {
-    private static boolean isCloudinaryInitialized = false;
     /**
      * Initializes the main activity and determines the appropriate screen
      * to display based on whether the device is associated with an existing
@@ -69,13 +68,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Setup MediaManager for Cloudinary image storage (ONLY DO ONCE)
-        if (!isCloudinaryInitialized) {
-            Map config = new HashMap();
+        try {
+            MediaManager.get();
+        } catch (IllegalStateException e) {
+            Map<String, String> config = new HashMap<>();
             config.put("cloud_name", "icarus-images");
             config.put("api_key", "291231889216385");
             config.put("api_secret", "ToWWi626oI0M7Ou1pmPQx_vd5x8");
             MediaManager.init(this, config);
-            isCloudinaryInitialized = true;
         }
 
         //Create Background Worker thread that checks Event date (DO THIS ONCE)
