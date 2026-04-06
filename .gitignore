@@ -21,3 +21,6 @@ local.properties
 
 # macOS
 .DS_Store
+
+# Service account credentials
+app/assets/service_account.json
