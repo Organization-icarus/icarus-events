@@ -76,7 +76,7 @@ public class OrganizerViewEntrantsTest {
      * <p>
      * Overrides Firestore collections to test versions, adds
      * a sample event with ID {@code createdEventId}, adds entrants
-     * with different statuses ("selected", "rejected", "registered"),
+     * with different statuses ("waiting", "selected", "rejected", "registered"),
      * creates user documents to hold entrant names.
      *
      * @throws InterruptedException if Firestore operations are interrupted
