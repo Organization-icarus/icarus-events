@@ -618,6 +618,9 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
         organizers. */
 
         // Shared: admin + organizer
+
+        notificationBtn.setVisibility(View.VISIBLE);
+
         if (isAdmin || isOrganizer) {
             notificationBtn.setVisibility(View.VISIBLE);
             deleteBtn.setVisibility(View.VISIBLE);
