@@ -8,4 +8,7 @@
     <cache-path
         name="shared_tickets"
         path="shared_tickets/" />
+    <cache-path
+        name="shared_files"
+        path="." />
 </paths>

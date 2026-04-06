@@ -1,6 +1,7 @@
 package com.icarus.events;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -290,7 +291,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
      * Creates and exports a CSV file of the currently displayed entrant list
      * into the device's Downloads directory.
      */
-    private void createCSV(){
+    private void createCSV() {
         //CSV file
         //row seperated by '\n', columns seperated by ','
         if (entrantList.isEmpty()) {
@@ -307,18 +308,29 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
             newCSV.append(user.getPhone() != null ? user.getPhone() : "").append("\n");
         }
 
-        String filename = "entrant_final_list_for_" + eventName.getText().toString() + ".csv";
-        filename = filename.replace(" ", "_");
+        // Write to cache first so we have a shareable URI
+        String filename = "entrant_final_list_for_" + eventName.getText().toString().replace(" ", "_") + ".csv";
+        try {
+            java.io.File cachefile = new java.io.File(getCacheDir(), filename);
+            try (java.io.FileWriter writer = new java.io.FileWriter(cachefile)) {
+                writer.write(newCSV.toString());
+            }
 
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Downloads.DISPLAY_NAME, filename);
-        values.put(MediaStore.Downloads.MIME_TYPE, "text/csv");
+            // Use FileProvider to get a shareable URI
+            Uri fileUri = androidx.core.content.FileProvider.getUriForFile(
+                    this,
+                    getPackageName() + ".fileprovider",  // match your manifest
+                    cachefile
+            );
 
-        Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            // Launch the share sheet
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/csv");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, filename);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(shareIntent, filename));
 
-        try (OutputStream outputStream = getContentResolver().openOutputStream(uri)) {
-            outputStream.write(newCSV.toString().getBytes());
-            Toast.makeText(this, "CSV file Exported to Downloads/" + filename, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(this, "Export failed", Toast.LENGTH_SHORT).show();
         }

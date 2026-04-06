@@ -57,6 +57,20 @@ public class FirestoreCollections {
                 .get()
                 .addOnSuccessListener(snapshot -> {
                     for (DocumentSnapshot doc : snapshot) {
+                        // Delete entrants subcollection
+                        doc.getReference().collection("entrants").get()
+                                .addOnSuccessListener(entrants -> {
+                                    for (DocumentSnapshot entrant : entrants) {
+                                        entrant.getReference().delete();
+                                    }
+                                });
+                        // Delete comments subcollection
+                        doc.getReference().collection("comments").get()
+                                .addOnSuccessListener(comments -> {
+                                    for (DocumentSnapshot comment : comments) {
+                                        comment.getReference().delete();
+                                    }
+                                });
                         doc.getReference().delete();
                     }
                     latch.countDown();
