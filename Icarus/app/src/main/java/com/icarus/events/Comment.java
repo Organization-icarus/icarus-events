@@ -96,7 +96,7 @@ public class Comment {
      *
      * @return creation date
      */
-    public Date getCreatedAt()    { return createdAt; }
+    public Date getCreatedAt() { return createdAt; }
 
     /**
      * Indicates whether the comment is marked as deleted.
@@ -117,5 +117,5 @@ public class Comment {
      *
      * @return author image URL or identifier
      */
-    public String getAuthorImage() {return this.authorImage;}
+    public String getAuthorImage() { return this.authorImage; }
 }

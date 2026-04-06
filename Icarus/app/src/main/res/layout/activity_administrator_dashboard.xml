@@ -64,6 +64,17 @@
                 android:textColor="@color/white"
                 android:backgroundTint="@color/toggle_button_color"
                 android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/admin_dashboard_show_notification_list_button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Notifications"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/toggle_button_color"
+                android:textSize="12sp" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <FrameLayout
@@ -94,6 +105,12 @@
 
             <ListView
                 android:id="@+id/admin_dashboard_image_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+            <ListView
+                android:id="@+id/admin_dashboard_notification_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone" />

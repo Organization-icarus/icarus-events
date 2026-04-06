@@ -374,11 +374,17 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
 
 
         notificationBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(
-                    EventDetailsActivity.this,
-                    EventNotificationsActivity.class
-            );
+            Intent intent;
+
+            if (Boolean.TRUE.equals(isAdmin) || Boolean.TRUE.equals(isOrganizer)) {
+                intent = new Intent(EventDetailsActivity.this, EventNotificationsActivity.class);
+            } else {
+                intent = new Intent(EventDetailsActivity.this, UserNotificationsActivity.class);
+            }
+
             intent.putExtra("eventId", finalEventId);
+            intent.putExtra("eventName", eventName);
+
             startActivity(intent);
         });
 
@@ -612,6 +618,9 @@ public class EventDetailsActivity extends HeaderNavBarActivity {
         organizers. */
 
         // Shared: admin + organizer
+
+        notificationBtn.setVisibility(View.VISIBLE);
+
         if (isAdmin || isOrganizer) {
             notificationBtn.setVisibility(View.VISIBLE);
             deleteBtn.setVisibility(View.VISIBLE);

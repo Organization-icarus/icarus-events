@@ -1,25 +1,38 @@
 package com.icarus.events;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity for viewing all notifications sent for a specific event.
+ * Organizers and admins can use this page to review notification history related to an event.
+ */
 public class EventNotificationsActivity extends HeaderNavBarActivity {
+
+    private static final String TAG = "EventNotifications";
 
     private FirebaseFirestore db;
     private String eventId;
     private TextView titleText;
     private ListView notificationsList;
+    private ImageButton backButton;
 
-    private final List<String> messages = new ArrayList<>();
+    private final ArrayList<NotificationItem> notifications = new ArrayList<>();
+    private NotificationListAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,34 +43,81 @@ public class EventNotificationsActivity extends HeaderNavBarActivity {
 
         titleText = findViewById(R.id.notifications_page_title);
         notificationsList = findViewById(R.id.notifications_list_view);
+        backButton = findViewById(R.id.notifications_back_button);
+
+        if (titleText == null || notificationsList == null || backButton == null) {
+            Toast.makeText(this, "Notification layout failed to load", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        adapter = new NotificationListAdapter(this, notifications);
+        notificationsList.setAdapter(adapter);
+
+        backButton.setOnClickListener(v -> finish());
 
         eventId = getIntent().getStringExtra("eventId");
+        String eventName = getIntent().getStringExtra("eventName");
 
-        titleText.setText("Notifications");
+        if (eventName != null && !eventName.isEmpty()) {
+            titleText.setText(eventName + " Notifications");
+        } else {
+            titleText.setText("Event Notifications");
+        }
 
         if (eventId != null && !eventId.isEmpty()) {
             loadNotifications();
+        } else {
+            Toast.makeText(this, "Event ID missing", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
+    /**
+     * Loads all notifications sent for this event.
+     */
     private void loadNotifications() {
-        db.collection(FirestoreCollections.EVENTS_COLLECTION)
-                .document(eventId)
-                .collection("notifications")
+        notifications.clear();
+
+        db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
+                .whereEqualTo("eventId", eventId)
+                .orderBy("date", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    messages.clear();
-
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        String message = doc.getString("message");
-                        if (message != null) {
-                            messages.add(message);
+                        List<String> rawRecipients = (List<String>) doc.get("recipients");
+                        ArrayList<String> recipients = rawRecipients == null
+                                ? new ArrayList<>()
+                                : new ArrayList<>(rawRecipients);
+
+                        Boolean isEvent = doc.getBoolean("isEvent");
+                        if (isEvent == null) {
+                            isEvent = true;
                         }
+
+                        NotificationItem notification = new NotificationItem(
+                                doc.getString("eventId"),
+                                doc.getString("eventName"),
+                                doc.getString("eventImage"),
+                                doc.getString("sender"),
+                                isEvent,
+                                recipients,
+                                doc.getString("message") != null ? doc.getString("message") : "",
+                                doc.getString("type") != null ? doc.getString("type") : "general"
+                        );
+
+                        notifications.add(notification);
                     }
 
-                    NotificationListAdapter adapter =
-                            new NotificationListAdapter(this, messages);
-                    notificationsList.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+
+                    if (notifications.isEmpty()) {
+                        Toast.makeText(this, "No notifications found for this event", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to load notifications", e);
+                    Toast.makeText(this, "Failed to load notifications", Toast.LENGTH_SHORT).show();
                 });
     }
 }

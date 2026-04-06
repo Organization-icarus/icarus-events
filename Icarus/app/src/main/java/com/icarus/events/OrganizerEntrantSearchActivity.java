@@ -113,34 +113,76 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
             loadList();
         }
 
-        /*TODO:  A NOTIFICATION MUST BE SENT INSTEAD
-         * AWAITING NOTIFICATION SET UP FROM KITO AND YIFAN
-         * March 25,2026 @ 4:23pm
-         */
         confirmationButton.setOnClickListener(v -> {
             Set<String> selectedIds = eventListArrayAdapter.getSelectedIds();
             if (selectedIds.isEmpty()) {
                 Toast.makeText(this, "No users selected", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if(screenName.equals("Entrant Search")){
-                addUsersToEvent(selectedIds, "selected");
-                //Add to event array
-                for (String selectedUserId : selectedIds) {
-                    db.collection(FirestoreCollections.USERS_COLLECTION)
-                            .document(selectedUserId)
-                            .update("events", com.google.firebase.firestore.FieldValue.arrayUnion(eventId));
-                }
 
-                createNotification(selectedIds,"invite_entrant",
-                        "You have been invited to the private event:  " + eventName.getText().toString());
-            } else if(screenName.equals("Find Co-Organizers")){
+
+            if (screenName.equals("Entrant Search")) {
+                addUsersToEvent(selectedIds, "waiting");
+
+                ArrayList<String> privateRecipients = new ArrayList<>(selectedIds);
+
+                db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                        .document(eventId)
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                String eventName = documentSnapshot.getString("name");
+                                String eventImage = documentSnapshot.getString("image");
+
+                                NotificationItem privateNotification = new NotificationItem(
+                                        eventId,
+                                        eventName,
+                                        eventImage,
+                                        userId,
+                                        true,
+                                        privateRecipients,
+                                        "You have been invited to join a private event waiting list.",
+                                        "private_waitlist_invite"
+                                );
+                                privateNotification.sendNotification(this);
+                            } else {
+                                Log.e("NotificationError", "Event not found for ID: " + eventId);
+                            }
+                        });
+
+            } else if (screenName.equals("Find Co-Organizers")) {
                 addUserstoOrganizersArray(selectedIds);
-                createNotification(selectedIds,"add_co-organizer",
-                        "You have invited as a Co-organizer for the event: " + eventName.getText().toString());
+
+                ArrayList<String> coOrganizerRecipients = new ArrayList<>(selectedIds);
+
+                db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                        .document(eventId)
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                String eventName = documentSnapshot.getString("name");
+                                String eventImage = documentSnapshot.getString("image");
+
+                                NotificationItem coOrganizerNotification = new NotificationItem(
+                                        eventId,
+                                        eventName,
+                                        eventImage,
+                                        userId,
+                                        true,
+                                        coOrganizerRecipients,
+                                        "You have been invited to be a co-organizer.",
+                                        "co_organizer_invite"
+                                );
+                                coOrganizerNotification.sendNotification(this);
+                            } else {
+                                Log.e("NotificationError", "Event not found for ID: " + eventId);
+                            }
+                        });
+
             } else if (screenName.equals("Replace Declined")) {
-                // Check waiting list BEFORE marking anyone as replaced
-                db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants")
+                db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                        .document(eventId)
+                        .collection("entrants")
                         .get()
                         .addOnSuccessListener(document -> {
                             ArrayList<String> waitingIds = new ArrayList<>();
@@ -155,9 +197,11 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                 Toast.makeText(this, "Waiting list is Empty, Cannot Replace", Toast.LENGTH_SHORT).show();
                                 return;
                             }
-                            if(waitingIds.size() < selectedIds.size()){
-                                Toast.makeText(this, "More Entrants Selected than in " +
-                                        "Waiting List, Cannot Replace", Toast.LENGTH_SHORT).show();
+
+                            if (waitingIds.size() < selectedIds.size()) {
+                                Toast.makeText(this,
+                                        "More Entrants Selected than in Waiting List, Cannot Replace",
+                                        Toast.LENGTH_SHORT).show();
                                 return;
                             }
 
@@ -230,7 +274,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                                 boolean isOrganizer = organizerSet.contains(deviceId);
 
                                                 if (notInEntrants && !userIsAdmin && !isCurrentUser && !isOrganizer) {
-                                                    entrantUserList.add(new User(deviceId, name, email, phone, image,
+                                                    entrantUserList.add(new User(deviceId, name, email, phone, image, null,
                                                             null, null, null, null));
                                                 }
                                             }
@@ -354,7 +398,7 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                         String email = userSnapshot.getString("email");
                                         String phone = userSnapshot.getString("phone");
                                         String image = userSnapshot.getString("image");
-                                        entrantUserList.add(new User(deviceId, name, email, phone, image,
+                                        entrantUserList.add(new User(deviceId, name, email, phone, image, null,
                                                 null, null, null, null));
                                         eventListArrayAdapter.notifyDataSetChanged();
                                     });

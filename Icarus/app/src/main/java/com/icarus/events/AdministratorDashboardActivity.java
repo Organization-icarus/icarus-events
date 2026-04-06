@@ -39,19 +39,24 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
     private RecyclerView eventListView;
     private ListView userListView;
     private ListView imageListView;
+    private ListView notificationListView;
     private Button showEventListButton;
     private Button showUserListButton;
     private Button showImageListButton;
+    private Button showNotificationListButton;
     private FirebaseFirestore db;
     private CollectionReference eventsRef;
     private CollectionReference usersRef;
     private CollectionReference imagesRef;
+    private CollectionReference notificationsRef;
     private ArrayList<Event> eventArrayList;
     private RecyclerView.Adapter eventArrayAdapter;
     private ArrayList<User> userArrayList;
     private ArrayAdapter<User> userArrayAdapter;
     private ArrayList<Image> imageArrayList;
     private ArrayAdapter<Image> imageArrayAdapter;
+    private ArrayList<NotificationItem> notificationArrayList;
+    private ArrayAdapter<NotificationItem> notificationArrayAdapter;
     private Map<String, String> categoryColors;
 
     /**
@@ -76,11 +81,14 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
         eventsRef = db.collection(FirestoreCollections.EVENTS_COLLECTION);
         usersRef = db.collection(FirestoreCollections.USERS_COLLECTION);
         imagesRef = db.collection(FirestoreCollections.IMAGES_COLLECTION);
+        notificationsRef = db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION);
 
         // Set views
         eventListView = findViewById(R.id.admin_dashboard_event_list);
         userListView = findViewById(R.id.admin_dashboard_user_list);
         imageListView = findViewById(R.id.admin_dashboard_image_list);
+        notificationListView = findViewById(R.id.admin_dashboard_notification_list);
+
 
         // Initialize current colors
         categoryColors = new HashMap<>();
@@ -101,7 +109,7 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
                     Toast.makeText(this, "Failed to load categories: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
 
-        // create event, user, and image array
+        // create event, user, image, and notification array
         eventArrayList = new ArrayList<>();
         eventArrayAdapter = new AdministratorDashboardEventArrayAdapter(this,
                 eventArrayList, categoryColors);
@@ -109,17 +117,21 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
         userArrayAdapter = new AdministratorDashboardUserArrayAdapter(this, userArrayList);
         imageArrayList = new ArrayList<>();
         imageArrayAdapter = new AdministratorDashboardImageArrayAdapter(this, imageArrayList);
+        notificationArrayList = new ArrayList<>();
+        notificationArrayAdapter = new AdministratorDashboardNotificationArrayAdapter(this, notificationArrayList);
 
         // Initialize buttons
         showEventListButton = findViewById(R.id.admin_dashboard_show_event_list_button);
         showUserListButton = findViewById(R.id.admin_dashboard_show_user_list_button);
         showImageListButton = findViewById(R.id.admin_dashboard_show_image_list_button);
+        showNotificationListButton = findViewById(R.id.admin_dashboard_show_notification_list_button);
 
         MaterialButtonToggleGroup toggleGroup = findViewById(R.id.admin_dashboard_list_buttons);
         toggleGroup.check(R.id.admin_dashboard_show_event_list_button);
         eventListView.setVisibility(VISIBLE);
         userListView.setVisibility(GONE);
         imageListView.setVisibility(GONE);
+        notificationListView.setVisibility(GONE);
 
         // Get all items in the collection
         eventsRef.addSnapshotListener((value,error) -> {
@@ -152,8 +164,8 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
                     String name = snapshot.getString("name");
                     String image = snapshot.getString("image");
 
-                    userArrayList.add(new User(id, name, null, null,
-                            image, null, null, null, null));
+                    userArrayList.add(new User(id, name, null, null, image,
+                            null, null, null, null, null));
                 }
                 userArrayAdapter.notifyDataSetChanged();
             }
@@ -175,27 +187,54 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
             }
         });
 
+        notificationsRef.addSnapshotListener((value, error) -> {
+            if (error != null) {
+                Log.e("Firestore", error.toString());
+            }
+            if (value != null) {
+                notificationArrayList.clear();
+                for (QueryDocumentSnapshot snapshot : value) {
+                    String id = snapshot.getId();
+                    String eventName = snapshot.getString("eventName");
+                    String eventImage = snapshot.getString("eventImage");
+                    String message = snapshot.getString("message");
+
+                    notificationArrayList.add(new NotificationItem(id, eventName, eventImage, message));
+                }
+            }
+        });
+
         // Set ListView adapters
         eventListView.setLayoutManager(new LinearLayoutManager(this));
         eventListView.setAdapter(eventArrayAdapter);
         userListView.setAdapter(userArrayAdapter);
         imageListView.setAdapter(imageArrayAdapter);
+        notificationListView.setAdapter(notificationArrayAdapter);
 
         // Setup buttons on click listeners
         showEventListButton.setOnClickListener(v -> {
             eventListView.setVisibility(VISIBLE);
             userListView.setVisibility(GONE);
             imageListView.setVisibility(GONE);
+            notificationListView.setVisibility(GONE);
         });
         showUserListButton.setOnClickListener(v -> {
             eventListView.setVisibility(GONE);
             userListView.setVisibility(VISIBLE);
             imageListView.setVisibility(GONE);
+            notificationListView.setVisibility(GONE);
         });
         showImageListButton.setOnClickListener(v -> {
             eventListView.setVisibility(GONE);
             userListView.setVisibility(GONE);
             imageListView.setVisibility(VISIBLE);
+            notificationListView.setVisibility(GONE);
+        });
+        showNotificationListButton.setOnClickListener(v -> {
+            eventListView.setVisibility(GONE);
+            userListView.setVisibility(GONE);
+            imageListView.setVisibility(GONE);
+            notificationListView.setVisibility(VISIBLE);
         });
     }
 }
