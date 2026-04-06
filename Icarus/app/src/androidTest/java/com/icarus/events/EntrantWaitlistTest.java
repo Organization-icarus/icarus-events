@@ -117,7 +117,7 @@ public class EntrantWaitlistTest {
                     testUser = new User(doc.getId(), "Test Entrant",
                             "entrant@email.com", "123012312", "No Image",
                             false, new ArrayList<String>(),
-                            new ArrayList<String>(), new HashMap<String, Object>());
+                            new ArrayList<String>(), new HashMap<String, Object>(), null);
                     UserSession.getInstance().setCurrentUser(testUser);
                     userLatch.countDown();
                 });

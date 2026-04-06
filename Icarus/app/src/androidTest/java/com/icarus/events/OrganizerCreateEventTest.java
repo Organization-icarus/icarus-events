@@ -214,7 +214,8 @@ public class OrganizerCreateEventTest {
                 false,
                 new ArrayList<>(),
                 new ArrayList<>(),
-                new HashMap<>()
+                new HashMap<>(),
+                null
         );
         UserSession.getInstance().setCurrentUser(testUser);
     }
