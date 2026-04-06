@@ -24,8 +24,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import androidx.test.rule.GrantPermissionRule;
+import org.junit.Rule;
+
 @RunWith(AndroidJUnit4.class)
 public class QRCodeScanTest {
+
+    @Rule
+    public GrantPermissionRule grantCameraPermission =
+            GrantPermissionRule.grant(android.Manifest.permission.CAMERA);
 
     /**
      * Minimal test to verify that pressing the QR scan button
