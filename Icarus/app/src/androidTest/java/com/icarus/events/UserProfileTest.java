@@ -36,7 +36,7 @@ import java.util.concurrent.CountDownLatch;
  * Tests use a temporary Firestore collection ({@code events_test}) to avoid
  * interfering with production data.
  *
- * @author Kito Lee Son
+ * @author Kito Lee Son, Updated by Alex Alves for project pt 4
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -65,7 +65,7 @@ public class UserProfileTest {
         entrant.put("isAdmin", false);
         entrant.put("phone", "123456789");
 
-        db.collection("users_test")
+        db.collection(FirestoreCollections.USERS_COLLECTION)
                 .add(entrant)
                 .addOnSuccessListener((doc) -> {
                     testUser = new User(
@@ -119,24 +119,70 @@ public class UserProfileTest {
                 .perform(click());
 
         // Verify Firestore updated
-        CountDownLatch latch = new CountDownLatch(1);
         final boolean[] updated = {false};
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < 5000 && !updated[0]) {
+            CountDownLatch latch = new CountDownLatch(1);
 
-        db.collection("users_test")
-                .document(testUser.getId())
-                .get()
-                .addOnSuccessListener(doc -> {
-                    if(doc.exists()){
-                        assertEquals("Updated Name", doc.getString("name"));
-                        assertEquals("updated@email.com", doc.getString("email"));
-                        assertEquals("987654321", doc.getString("phone"));
-                        updated[0] = true;
-                    }
-                    latch.countDown();
-                });
+            db.collection(FirestoreCollections.USERS_COLLECTION)
+                    .document(testUser.getId())
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        if (doc.exists()
+                                && "Updated Name".equals(doc.getString("name"))
+                                && "updated@email.com".equals(doc.getString("email"))
+                                && "987654321".equals(doc.getString("phone"))) {
+                            updated[0] = true;
+                        }
+                        latch.countDown();
+                    })
+                    .addOnFailureListener(e -> latch.countDown());
 
-        latch.await();
+            latch.await();
+            if (!updated[0]) {
+                Thread.sleep(100);
+            }
+        }
         assertTrue("User profile was not updated correctly", updated[0]);
+    }
+
+    /**
+     * Tests that invalid email input does not overwrite the existing valid email.
+     *
+     * User Story Tested:
+     *     US 01.02.02 – Validation for email input.
+     */
+    @Test
+    public void testUpdateProfileInvalidEmail() throws InterruptedException {
+        onView(withId(R.id.user_profile_edit_confirm_button)).perform(click());
+
+        onView(withId(R.id.user_profile_email_edit))
+                .perform(clearText(), replaceText("invalid-email"));
+
+        onView(withId(R.id.user_profile_edit_confirm_button)).perform(click());
+
+        final String[] email = {null};
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < 5000 && email[0] == null) {
+            CountDownLatch latch = new CountDownLatch(1);
+
+            db.collection(FirestoreCollections.USERS_COLLECTION)
+                    .document(testUser.getId())
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        if (doc.exists()) {
+                            email[0] = doc.getString("email");
+                        }
+                        latch.countDown();
+                    })
+                    .addOnFailureListener(e -> latch.countDown());
+
+            latch.await();
+            if (email[0] == null) Thread.sleep(100);
+        }
+
+        // Should remain unchanged from original valid email
+        assertEquals("entrant@email.com", email[0]);
     }
 
     /**
