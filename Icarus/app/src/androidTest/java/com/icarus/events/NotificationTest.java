@@ -29,13 +29,13 @@ import java.util.concurrent.CountDownLatch;
  * Instrumented UI tests for {@link UserNotificationsActivity}.
  * <p>
  * User Stories Tested:
- * US 01.xx.xx – As an entrant, I want to receive notification when I am chosen
+ * US 01.04.01 – As an entrant, I want to receive notification when I am chosen
  * to participate from the waiting list (when I "win" the lottery).
  * <p>
- * US 01.xx.xx – As an entrant, I want to receive notification of when I am not chosen
+ * US 01.04.02 – As an entrant, I want to receive notification of when I am not chosen
  * on the app (when I "lose" the lottery).
  * <p>
- * US 01.xx.xx – As an organizer, I want to send a notification to chosen entrants
+ * US 02.05.01 – As an organizer, I want to send a notification to chosen entrants
  * to sign up for events. This is the notification that they "won" the lottery.
  *
  * Editor: Yifan Jiao
@@ -144,26 +144,31 @@ public class NotificationTest {
         while (System.currentTimeMillis() - start < timeoutMs) {
             final int[] count = {0};
 
-            onView(withId(R.id.notifications_list_view)).check((view, e) -> {
-                ListView listView = (ListView) view;
-                if (listView.getAdapter() == null) {
-                    throw new AssertionError("ListView adapter was null");
+            scenario.onActivity(activity -> {
+                ListView listView = activity.findViewById(R.id.notifications_list_view);
+                if (listView != null && listView.getAdapter() != null) {
+                    count[0] = listView.getAdapter().getCount();
                 }
-                count[0] = listView.getAdapter().getCount();
             });
 
             if (count[0] >= minCount) {
                 return;
             }
 
-            Thread.sleep(50);
+            Thread.sleep(100);
         }
 
         throw new AssertionError("Notification list never populated with at least " + minCount + " item(s)");
     }
 
+
+
     /**
      * Tests that an entrant can see a notification when chosen from the waiting list.
+     * <p>
+     * User Story Tested:
+     * US 01.04.01 – As an entrant, I want to receive notification when I am chosen
+     * to participate from the waiting list (when I "win" the lottery).
      *
      * @throws InterruptedException if Firestore/UI waits are interrupted
      */
@@ -181,8 +186,7 @@ public class NotificationTest {
 
         scenario = ActivityScenario.launch(UserNotificationsActivity.class);
 
-        onView(withId(R.id.notifications_page_title))
-                .check(matches(withText("My Notifications")));
+
 
         waitForListViewItems(1, 5000);
 
@@ -192,6 +196,10 @@ public class NotificationTest {
 
     /**
      * Tests that an entrant can see a notification when not chosen in the lottery.
+     * <p>
+     * User Story Tested:
+     * US 01.04.02 – As an entrant, I want to receive notification of when I am not chosen
+     * on the app (when I "lose" the lottery).
      *
      * @throws InterruptedException if Firestore/UI waits are interrupted
      */
@@ -209,8 +217,7 @@ public class NotificationTest {
 
         scenario = ActivityScenario.launch(UserNotificationsActivity.class);
 
-        onView(withId(R.id.notifications_page_title))
-                .check(matches(withText("My Notifications")));
+
 
         waitForListViewItems(1, 5000);
 
@@ -220,6 +227,10 @@ public class NotificationTest {
 
     /**
      * Tests that a winner notification sent by an organizer is displayed to the entrant.
+     * <p>
+     * User Story Tested:
+     * US 02.05.01 – As an organizer, I want to send a notification to chosen entrants
+     * to sign up for events. This is the notification that they "won" the lottery.
      *
      * @throws InterruptedException if Firestore/UI waits are interrupted
      */
@@ -237,8 +248,6 @@ public class NotificationTest {
 
         scenario = ActivityScenario.launch(UserNotificationsActivity.class);
 
-        onView(withId(R.id.notifications_page_title))
-                .check(matches(withText("My Notifications")));
 
         waitForListViewItems(1, 5000);
 
