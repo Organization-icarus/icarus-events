@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
@@ -149,6 +150,10 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                                 Log.e("NotificationError", "Event not found for ID: " + eventId);
                             }
                         });
+
+                db.collection(FirestoreCollections.USERS_COLLECTION)
+                        .document(userId)
+                        .update("events", FieldValue.arrayUnion(eventId));
 
             } else if (screenName.equals("Find Co-Organizers")) {
                 addUserstoOrganizersArray(selectedIds);
