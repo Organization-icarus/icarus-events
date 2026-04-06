@@ -572,7 +572,18 @@ public class OrganizerViewEntrantsTest {
         latch.await(5, TimeUnit.SECONDS);
         assertTrue("Notification should exist in Firestore", notificationFound.get());
     }
-
+    /**
+     * Removes test data created during the test run from Firestore.
+     * <p>
+     * Deletes the test entrants from the event's {@code entrants} subcollection,
+     * removes the corresponding user documents, deletes any notifications associated
+     * with the created event, and finally deletes the event document itself.
+     * <p>
+     * This method is executed after each test to ensure the database is cleaned up
+     * and does not contain leftover test data.
+     *
+     * @throws InterruptedException if the cleanup wait is interrupted
+     */
     @After
     public void cleanup() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
