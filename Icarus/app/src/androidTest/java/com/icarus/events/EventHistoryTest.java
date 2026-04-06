@@ -112,7 +112,8 @@ public class EventHistoryTest {
                                         "1234567890", "No Image", false,
                                         new ArrayList<>(List.of(eventId)),
                                         new ArrayList<>(),
-                                        new HashMap<>());
+                                        new HashMap<>(),
+                                        null);
                                 UserSession.getInstance().setCurrentUser(testUser);
                                 entrantLatch.countDown();
                             });

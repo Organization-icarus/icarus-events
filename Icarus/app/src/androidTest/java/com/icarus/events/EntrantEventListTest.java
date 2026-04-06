@@ -102,7 +102,8 @@ public class EntrantEventListTest {
                         false,
                         new ArrayList<>(),
                         new ArrayList<>(),
-                        new HashMap<>())) ;
+                        new HashMap<>(),
+                        null)) ;
 
         CountDownLatch categoryLatch = new CountDownLatch(categories.size());
         for (String category : categories) {

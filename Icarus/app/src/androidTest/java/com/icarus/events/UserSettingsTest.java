@@ -68,7 +68,8 @@ public class UserSettingsTest {
                     testUser = new User(doc.getId(), "Test Entrant",
                             "testentrant@email.com", "1234567890", "No Image",
                             false, new ArrayList<>(), new ArrayList<>(),
-                            Map.of("adminNotifications", true, "organizerNotifications", true));
+                            Map.of("adminNotifications", true, "organizerNotifications", true),
+                            null);
                     UserSession.getInstance().setCurrentUser(testUser);
                     latch.countDown();
                 });

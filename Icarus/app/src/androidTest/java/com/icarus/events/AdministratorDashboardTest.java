@@ -84,7 +84,7 @@ public class AdministratorDashboardTest {
 
         // Create and register admin user in session
         adminUser = new User("admin1", "Admin User", null,
-                null, "No Image", null, null, null, null);
+                null, "No Image", null, null, null, null, null);
         UserSession.getInstance().setCurrentUser(adminUser);
 
         CountDownLatch latch = new CountDownLatch(3);

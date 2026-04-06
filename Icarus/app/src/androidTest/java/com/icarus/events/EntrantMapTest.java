@@ -84,7 +84,7 @@ public class EntrantMapTest {
         User organizerUser = new User(
                 "organizer1", "Organizer User", null,
                 null, "No Image", false,
-                new ArrayList<>(), new ArrayList<>(), null
+                new ArrayList<>(), new ArrayList<>(), null, null
         );
         UserSession.getInstance().setCurrentUser(organizerUser);
 

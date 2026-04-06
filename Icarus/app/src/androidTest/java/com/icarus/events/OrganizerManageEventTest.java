@@ -102,7 +102,7 @@ public class OrganizerManageEventTest {
     public void setup() throws InterruptedException {
         // Set up a test user in UserSession so sendMessage doesn't crash
         User testUser = new User("testOrganizerId", "Test Organizer", null, null, null,
-                null, null, null, null);
+                null, null, null, null, null);
         UserSession.getInstance().setCurrentUser(testUser);
 
         Context context = ApplicationProvider.getApplicationContext();

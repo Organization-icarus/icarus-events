@@ -106,7 +106,8 @@ public class EventDetailsTest {
                             false,
                             new java.util.ArrayList<>(),
                             new java.util.ArrayList<>(),
-                            new HashMap<>());
+                            new HashMap<>(),
+                            null);
 
                     UserSession.getInstance().setCurrentUser(testUser);
 
