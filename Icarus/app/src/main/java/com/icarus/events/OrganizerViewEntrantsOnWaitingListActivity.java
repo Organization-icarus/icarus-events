@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,16 +69,19 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
         setupNavBar(TAB_NONE);
         db = FirebaseFirestore.getInstance();
 
-        //Create TextView
+        // Create TextView
         eventName = findViewById(R.id.OrganizerEntrantOnWaitingListEventText);
-        //Create Buttons
+
+        // Create Buttons
         filterButtons = findViewById(R.id.OrganizerEntrantOnWaitingListFilterBar);
         backButton = findViewById(R.id.OrganizerEntrantOnWaitingListBackButton);
         messageButton = findViewById(R.id.OrganizerEntrantOnWaitingListSendNotificationButton);
         selectAllButton = findViewById(R.id.OrganizerEntrantOnWaitingListSelectAllButton);
-        //Create ListView
+
+        // Create ListView
         entrantsOnWaitingList = findViewById(R.id.OrganizerEntrantOnWaitingList);
-        //Initialize ArrayList and ArrayAdapter
+
+        // Initialize ArrayList and ArrayAdapter
         entrantList = new ArrayList<>();
         eventListArrayAdapter = new OraganizerEntrantViewListArrayAdapter(this, entrantList);
         entrantsOnWaitingList.setAdapter(eventListArrayAdapter);
@@ -117,8 +121,8 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                     });
                 });
 
-        filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) ->{
-            if (!isChecked) return; // ← ignore uncheck events entirely
+        filterButtons.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (!isChecked) return;
 
             for (int i = 0; i < group.getChildCount(); i++) {
                 View view = group.getChildAt(i);
@@ -134,25 +138,23 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
             selectAllButton.setText("Select All");
             status.set(null);
 
-            if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_waiting)){
+            if (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_waiting) {
                 status.set("waiting");
-                backButton.setEnabled(true);
-            }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_chosen)){
+            } else if (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_chosen) {
                 status.set("selected");
-                backButton.setEnabled(true);
-            }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_cancelled)){
+            } else if (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_cancelled) {
                 status.set("rejected");
-                backButton.setEnabled(false);
-            }else if(isChecked && (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_final)){
+            } else if (checkedId == R.id.OrganizerEntrantOnWaitingListFilterBar_final) {
                 status.set("registered");
                 backButton.setText("Export CSV");
                 backButton.setEnabled(true);
             }
+
             loadList(status.get());
         });
 
         backButton.setOnClickListener(v -> {
-            if(backButton.getText().toString().equals("Export CSV")){
+            if (backButton.getText().toString().equals("Export CSV")) {
                 createCSV();
             }
             else{
@@ -197,8 +199,8 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                     messageView.setTextColor(getColor(R.color.lightText));
                 }
             }
-
         });
+
         messageButton.setOnClickListener(v -> {
             if (selectedIds.isEmpty()) {
                 Toast.makeText(this, "No users selected", Toast.LENGTH_SHORT).show();
@@ -226,11 +228,11 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                             return;
                         }
                         sendMessage(message, status.get(), new ArrayList<>(selectedIds));
-
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                     .show();
         });
+
         selectAllButton.setOnClickListener(v -> {
             //Select all users from the list
             if (selectedIds.size() == entrantList.size() && !entrantList.isEmpty()) {
@@ -254,7 +256,10 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
         //events -> eventID -> entrants -> entrantId -> status
         entrantList.clear();
         eventListArrayAdapter.notifyDataSetChanged();
-        db.collection(FirestoreCollections.EVENTS_COLLECTION).document(eventId).collection("entrants")
+
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .document(eventId)
+                .collection("entrants")
                 .get()
                 .addOnSuccessListener(value -> {
                     entrantList.clear();
@@ -264,15 +269,16 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
 
                         if (Objects.equals(status, listStatus)) {
                             //If user has waiting role look for name in user collection
-                            db.collection(FirestoreCollections.USERS_COLLECTION).document(deviceId)
+                            db.collection(FirestoreCollections.USERS_COLLECTION)
+                                    .document(deviceId)
                                     .get()
                                     .addOnSuccessListener(userSnapshot -> {
                                         String name = userSnapshot.getString("name");
                                         String email = userSnapshot.getString("email");
                                         String phone = userSnapshot.getString("phone");
                                         String image = userSnapshot.getString("image");
-                                        entrantList.add(new User(deviceId, name, email, phone, image,
-                                                null, null, null, null));
+                                        entrantList.add(new User(deviceId, name, email, phone, image, null, null,
+                                                null, null, null));
                                         eventListArrayAdapter.notifyDataSetChanged();
                                     });
                         }
@@ -287,23 +293,27 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
     private void createCSV(){
         //CSV file
         //row seperated by '\n', columns seperated by ','
-        if(entrantList.size() == 0){
+        if (entrantList.isEmpty()) {
             Toast.makeText(this, "List is Empty. Wait for Users to Accept Invite", Toast.LENGTH_SHORT).show();
             return;
         }
+
         StringBuilder newCSV = new StringBuilder();
         newCSV.append("Name, Email, Phone\n");
-        //list is already filtered
-        for(User user : entrantList){
+
+        for (User user : entrantList) {
             newCSV.append(user.getName()).append(",");
             newCSV.append(user.getEmail() != null ? user.getEmail() : "").append(",");
             newCSV.append(user.getPhone() != null ? user.getPhone() : "").append("\n");
         }
-        String filename = "entrant_final_list_for_" + eventName.getText().toString()+ ".csv";
+
+        String filename = "entrant_final_list_for_" + eventName.getText().toString() + ".csv";
         filename = filename.replace(" ", "_");
+
         ContentValues values = new ContentValues();
         values.put(MediaStore.Downloads.DISPLAY_NAME, filename);
         values.put(MediaStore.Downloads.MIME_TYPE, "text/csv");
+
         Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
 
         try (OutputStream outputStream = getContentResolver().openOutputStream(uri)) {
@@ -323,26 +333,33 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
      */
     private void sendMessage(String message, String type, ArrayList<String> recipients) {
         User user = UserSession.getInstance().getCurrentUser();
-        String userId = user.getId();
-        Date now = new Date();
+        if (user == null) {
+            Toast.makeText(this, "No user logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        Map<String, Object> notification = new HashMap<>();
-        notification.put("date", now);
-        notification.put("eventID", eventId);
-        notification.put("isEvent", true);
-        notification.put("isSystem", false);
-        notification.put("message", message);
-        notification.put("recipients", recipients);
-        notification.put("sender", userId);
-        notification.put("type", type);
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .document(eventId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String eventName = documentSnapshot.getString("name");
+                        String eventImage = documentSnapshot.getString("image");
 
-        db.collection("notifications")
-                .add(notification)
-                .addOnSuccessListener(dummy -> {
-                    Toast.makeText(this, "Message sent", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to send message", Toast.LENGTH_SHORT).show();
+                        NotificationItem notification = new NotificationItem(
+                                eventId,
+                                eventName,
+                                eventImage,
+                                user.getId(),
+                                true,
+                                recipients,
+                                message,
+                                type
+                        );
+                        notification.sendNotification(this);
+                    } else {
+                        Log.e("NotificationError", "Event not found for ID: " + eventId);
+                    }
                 });
     }
 }

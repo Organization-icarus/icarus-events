@@ -54,6 +54,9 @@ public class UserProfileActivity extends HeaderNavBarActivity {
     private Button editProfileButton;
     private Button adminDeleteButton;
     private ImageButton userSettingsButton;
+
+    private Button myNotificationsButton;
+
     private String profileImageURL;
     private ActivityResultLauncher<String> imagePickerLauncher;
     private User user;
@@ -81,6 +84,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
         editProfileButton = findViewById(R.id.user_profile_edit_confirm_button);
         userSettingsButton = findViewById(R.id.user_profile_settings_button);
         adminDeleteButton = findViewById(R.id.user_profile_admin_delete_button);
+        myNotificationsButton = findViewById(R.id.user_profile_my_notifications_button);
 
         // Initialize User Image View
         profileImage = findViewById(R.id.user_profile_image);
@@ -103,6 +107,7 @@ public class UserProfileActivity extends HeaderNavBarActivity {
             userSettingsButton.setVisibility(View.GONE);
             editProfileButton.setVisibility(View.GONE);
             adminDeleteButton.setVisibility(View.VISIBLE);
+            myNotificationsButton.setVisibility(View.GONE);
 
             nameEditText.setHint("Not provided");
             emailEditText.setHint("Not provided");
@@ -134,9 +139,19 @@ public class UserProfileActivity extends HeaderNavBarActivity {
         } else {
             // Retrieve device Id/User object
             user = UserSession.getInstance().getCurrentUser();
+
+            if (user == null || user.getId() == null) {
+                Toast.makeText(this, "User session not found", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+
             deviceId = user.getId();
 
-            //Pre-fill text fields if user is logged in and information exists
+
+            myNotificationsButton.setVisibility(View.VISIBLE);
+
+            // Pre-fill text fields if user is logged in and information exists
             nameEditText.setText(user.getName());
             if (user.getEmail() != null) emailEditText.setText(user.getEmail());
             if (user.getPhone() != null) phoneEditText.setText(user.getPhone());
@@ -167,6 +182,11 @@ public class UserProfileActivity extends HeaderNavBarActivity {
         // Set buttons on click listeners
         userSettingsButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, UserSettingsActivity.class);
+            startActivity(intent);
+        });
+
+        myNotificationsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, UserNotificationsActivity.class);
             startActivity(intent);
         });
 

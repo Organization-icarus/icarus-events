@@ -103,8 +103,8 @@ public class OrganizerManageEventActivity extends HeaderNavBarActivity {
                     eventTitle.setText(eventName);
                     isPrivate = document.getBoolean("isPrivate");
                     locationEnabled = document.getBoolean("geolocation");
-                    if(isPrivate == null){isPrivate = false;}
-                    if(locationEnabled == null){locationEnabled = false;}
+                    if(isPrivate == null) isPrivate = false;
+                    if(locationEnabled == null) locationEnabled = false;
                     if(isPrivate){
                         inviteEntrant.setText("Invite Specific Entrant");
                     } else {
