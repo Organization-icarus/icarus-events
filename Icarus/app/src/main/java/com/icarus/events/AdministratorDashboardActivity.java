@@ -195,11 +195,12 @@ public class AdministratorDashboardActivity extends HeaderNavBarActivity {
                 notificationArrayList.clear();
                 for (QueryDocumentSnapshot snapshot : value) {
                     String id = snapshot.getId();
+                    String eventId = snapshot.getString("eventId");
                     String eventName = snapshot.getString("eventName");
                     String eventImage = snapshot.getString("eventImage");
                     String message = snapshot.getString("message");
 
-                    notificationArrayList.add(new NotificationItem(id, eventName, eventImage, message));
+                    notificationArrayList.add(new NotificationItem(id, eventId, eventName, eventImage, message));
                 }
             }
         });
