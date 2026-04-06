@@ -457,7 +457,7 @@ public class OrganizerViewEntrantsTest {
 
         FirebaseFirestore.getInstance()
                 .collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
-                .whereEqualTo("eventID", createdEventId)
+                .whereEqualTo("eventId", createdEventId)
                 .whereEqualTo("message", "Test notification message")
                 .get()
                 .addOnSuccessListener(query -> {
@@ -508,7 +508,7 @@ public class OrganizerViewEntrantsTest {
 
         FirebaseFirestore.getInstance()
                 .collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
-                .whereEqualTo("eventID", createdEventId)
+                .whereEqualTo("eventId", createdEventId)
                 .whereEqualTo("message", "Test notification message")
                 .get()
                 .addOnSuccessListener(query -> {
@@ -560,7 +560,7 @@ public class OrganizerViewEntrantsTest {
 
         FirebaseFirestore.getInstance()
                 .collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
-                .whereEqualTo("eventID", createdEventId)
+                .whereEqualTo("eventId", createdEventId)
                 .whereEqualTo("message", "Test notification message")
                 .get()
                 .addOnSuccessListener(query -> {
@@ -603,7 +603,7 @@ public class OrganizerViewEntrantsTest {
 
             // Delete any notifications created for this event
             db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
-                    .whereEqualTo("eventID", createdEventId)
+                    .whereEqualTo("eventId", createdEventId)
                     .get()
                     .addOnSuccessListener(snapshot -> {
                         for (com.google.firebase.firestore.DocumentSnapshot doc : snapshot) {
