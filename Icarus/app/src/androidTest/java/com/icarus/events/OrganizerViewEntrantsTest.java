@@ -456,7 +456,7 @@ public class OrganizerViewEntrantsTest {
         AtomicReference<Boolean> notificationFound = new AtomicReference<>(false);
 
         FirebaseFirestore.getInstance()
-                .collection("notifications")
+                .collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
                 .whereEqualTo("eventID", createdEventId)
                 .whereEqualTo("message", "Test notification message")
                 .get()
@@ -507,7 +507,7 @@ public class OrganizerViewEntrantsTest {
         AtomicReference<Boolean> notificationFound = new AtomicReference<>(false);
 
         FirebaseFirestore.getInstance()
-                .collection("notifications")
+                .collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
                 .whereEqualTo("eventID", createdEventId)
                 .whereEqualTo("message", "Test notification message")
                 .get()
@@ -559,7 +559,7 @@ public class OrganizerViewEntrantsTest {
         AtomicReference<Boolean> notificationFound = new AtomicReference<>(false);
 
         FirebaseFirestore.getInstance()
-                .collection("notifications")
+                .collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
                 .whereEqualTo("eventID", createdEventId)
                 .whereEqualTo("message", "Test notification message")
                 .get()

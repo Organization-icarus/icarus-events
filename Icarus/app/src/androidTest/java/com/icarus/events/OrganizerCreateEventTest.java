@@ -190,6 +190,7 @@ public class OrganizerCreateEventTest {
      */
     @Before
     public void setup() {
+        FirestoreCollections.startTest();
         Context context = ApplicationProvider.getApplicationContext();
 
         try {
