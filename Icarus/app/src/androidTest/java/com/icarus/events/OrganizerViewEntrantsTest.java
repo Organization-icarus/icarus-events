@@ -83,6 +83,11 @@ public class OrganizerViewEntrantsTest {
      */
     @Before
     public void setup() throws InterruptedException {
+        // Set up a test user in UserSession so sendMessage doesn't crash
+        User testUser = new User("testOrganizerId", "Test Organizer", null, null, null,
+                null, null, null, null);
+        UserSession.getInstance().setCurrentUser(testUser);
+
         // Use test collection
         FirestoreCollections.startTest();
 
@@ -429,26 +434,18 @@ public class OrganizerViewEntrantsTest {
     @Test
     public void testSendMessageToWaitingEntrants() throws InterruptedException {
         // Launch activity with test eventId
-        Intent intent = new Intent(
-                ApplicationProvider.getApplicationContext(),
-                OrganizerViewEntrantsOnWaitingListActivity.class
-        );
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(),
+                OrganizerViewEntrantsOnWaitingListActivity.class);
         intent.putExtra("eventId", createdEventId);
         scenario = ActivityScenario.launch(intent);
 
-        // Click "Chosen" filter button
-        onView(withId(R.id.OrganizerEntrantOnWaitingListFilterBar_final)).perform(click());
-
+        onView(withId(R.id.OrganizerEntrantOnWaitingListFilterBar_waiting)).perform(click());
         Thread.sleep(2000);
-        // Verify that "Entrant One" (chosen) appears in the ListView
         onView(withId(R.id.OrganizerEntrantOnWaitingList))
-                .check(matches(hasDescendant(withText("Entrant Three"))));
+                .check(matches(hasDescendant(withText("Entrant Zero"))));
 
         onView(withId(R.id.OrganizerEntrantOnWaitingListSelectAllButton)).perform(click());
-
         onView(withId(R.id.OrganizerEntrantOnWaitingListSendNotificationButton)).perform(click());
-
-        // Type message into the AlertDialog EditText
         onView(withHint("The Message you wish to send"))
                 .perform(typeText("Test notification message"), closeSoftKeyboard());
         onView(withText("Send Message")).perform(click());
@@ -488,26 +485,18 @@ public class OrganizerViewEntrantsTest {
     @Test
     public void testSendMessageToSelectedEntrants() throws InterruptedException {
         // Launch activity with test eventId
-        Intent intent = new Intent(
-                ApplicationProvider.getApplicationContext(),
-                OrganizerViewEntrantsOnWaitingListActivity.class
-        );
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(),
+                OrganizerViewEntrantsOnWaitingListActivity.class);
         intent.putExtra("eventId", createdEventId);
         scenario = ActivityScenario.launch(intent);
 
-        // Click "Chosen" filter button
-        onView(withId(R.id.OrganizerEntrantOnWaitingListFilterBar_final)).perform(click());
-
+        onView(withId(R.id.OrganizerEntrantOnWaitingListFilterBar_chosen)).perform(click());
         Thread.sleep(2000);
-        // Verify that "Entrant One" (chosen) appears in the ListView
         onView(withId(R.id.OrganizerEntrantOnWaitingList))
-                .check(matches(hasDescendant(withText("Entrant Three"))));
+                .check(matches(hasDescendant(withText("Entrant One"))));
 
         onView(withId(R.id.OrganizerEntrantOnWaitingListSelectAllButton)).perform(click());
-
         onView(withId(R.id.OrganizerEntrantOnWaitingListSendNotificationButton)).perform(click());
-
-        // Type message into the AlertDialog EditText
         onView(withHint("The Message you wish to send"))
                 .perform(typeText("Test notification message"), closeSoftKeyboard());
         onView(withText("Send Message")).perform(click());
@@ -548,26 +537,18 @@ public class OrganizerViewEntrantsTest {
     @Test
     public void testSendMessageToCancelledEntrants() throws InterruptedException {
         // Launch activity with test eventId
-        Intent intent = new Intent(
-                ApplicationProvider.getApplicationContext(),
-                OrganizerViewEntrantsOnWaitingListActivity.class
-        );
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(),
+                OrganizerViewEntrantsOnWaitingListActivity.class);
         intent.putExtra("eventId", createdEventId);
         scenario = ActivityScenario.launch(intent);
 
-        // Click "Chosen" filter button
-        onView(withId(R.id.OrganizerEntrantOnWaitingListFilterBar_final)).perform(click());
-
+        onView(withId(R.id.OrganizerEntrantOnWaitingListFilterBar_cancelled)).perform(click());
         Thread.sleep(2000);
-        // Verify that "Entrant One" (chosen) appears in the ListView
         onView(withId(R.id.OrganizerEntrantOnWaitingList))
-                .check(matches(hasDescendant(withText("Entrant Three"))));
+                .check(matches(hasDescendant(withText("Entrant Two"))));
 
         onView(withId(R.id.OrganizerEntrantOnWaitingListSelectAllButton)).perform(click());
-
         onView(withId(R.id.OrganizerEntrantOnWaitingListSendNotificationButton)).perform(click());
-
-        // Type message into the AlertDialog EditText
         onView(withHint("The Message you wish to send"))
                 .perform(typeText("Test notification message"), closeSoftKeyboard());
         onView(withText("Send Message")).perform(click());
@@ -597,7 +578,6 @@ public class OrganizerViewEntrantsTest {
         CountDownLatch latch = new CountDownLatch(1);
 
         if (createdEventId != null) {
-            // Delete entrant subcollection documents
             String[] entrantIds = {"entrant0", "entrant1", "entrant2", "entrant3"};
             for (String id : entrantIds) {
                 db.collection(FirestoreCollections.EVENTS_COLLECTION)
@@ -610,7 +590,16 @@ public class OrganizerViewEntrantsTest {
                         .delete();
             }
 
-            // Delete the event document itself
+            // Delete any notifications created for this event
+            db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
+                    .whereEqualTo("eventID", createdEventId)
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+                        for (com.google.firebase.firestore.DocumentSnapshot doc : snapshot) {
+                            doc.getReference().delete();
+                        }
+                    });
+
             db.collection(FirestoreCollections.EVENTS_COLLECTION)
                     .document(createdEventId)
                     .delete()
