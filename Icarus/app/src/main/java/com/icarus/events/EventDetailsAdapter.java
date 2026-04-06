@@ -158,4 +158,13 @@ public class EventDetailsAdapter extends RecyclerView.Adapter<EventDetailsAdapte
     @Override
     public int getItemCount() { return fields.size(); }
 
+    /**
+     * Returns the EventField at the specified position.
+     *
+     * @param position the position of the field
+     * @return the EventField at the given position
+     */
+    public EventField getItem(int position) {
+        return fields.get(position);
+    }
 }
