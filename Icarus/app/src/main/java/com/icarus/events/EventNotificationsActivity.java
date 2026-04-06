@@ -27,10 +27,7 @@ public class EventNotificationsActivity extends HeaderNavBarActivity {
 
     private FirebaseFirestore db;
     private String eventId;
-    private TextView titleText;
     private ListView notificationsList;
-    private ImageButton backButton;
-
     private final ArrayList<NotificationItem> notifications = new ArrayList<>();
     private NotificationListAdapter adapter;
 
@@ -41,29 +38,14 @@ public class EventNotificationsActivity extends HeaderNavBarActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        titleText = findViewById(R.id.notifications_page_title);
         notificationsList = findViewById(R.id.notifications_list_view);
-        backButton = findViewById(R.id.notifications_back_button);
-
-        if (titleText == null || notificationsList == null || backButton == null) {
-            Toast.makeText(this, "Notification layout failed to load", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
 
         adapter = new NotificationListAdapter(this, notifications);
         notificationsList.setAdapter(adapter);
 
-        backButton.setOnClickListener(v -> finish());
-
         eventId = getIntent().getStringExtra("eventId");
         String eventName = getIntent().getStringExtra("eventName");
-
-        if (eventName != null && !eventName.isEmpty()) {
-            titleText.setText(eventName + " Notifications");
-        } else {
-            titleText.setText("Event Notifications");
-        }
+        setupHeaderBar("Notifications");
 
         if (eventId != null && !eventId.isEmpty()) {
             loadNotifications();

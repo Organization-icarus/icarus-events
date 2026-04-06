@@ -9,39 +9,11 @@
     android:paddingTop="20dp"
     android:paddingBottom="12dp">
 
-    <LinearLayout
+    <!-- The Header -->
+    <include
+        layout="@layout/header_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="16dp"
-        android:clickable="false"
-        android:focusable="false"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageButton
-            android:id="@+id/notifications_back_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@android:color/transparent"
-            android:clickable="true"
-            android:contentDescription="Back"
-            android:focusable="true"
-            android:padding="8dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_back_arrow"
-            app:tint="@android:color/white" />
-
-        <TextView
-            android:id="@+id/notifications_page_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="Notifications"
-            android:textColor="@android:color/white"
-            android:textSize="30sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+        android:layout_height="wrap_content"/>
 
     <ListView
         android:id="@+id/notifications_list_view"
@@ -51,6 +23,7 @@
         android:divider="@android:color/transparent"
         android:dividerHeight="4dp"
         android:listSelector="@android:color/transparent"
-        android:scrollbars="none" />
+        android:scrollbars="none"
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>

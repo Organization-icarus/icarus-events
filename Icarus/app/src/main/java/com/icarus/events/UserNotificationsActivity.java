@@ -24,14 +24,12 @@ import java.util.List;
  *
  * @author Yifan Jiao
  */
-public class UserNotificationsActivity extends AppCompatActivity {
+public class UserNotificationsActivity extends HeaderNavBarActivity {
 
     private static final String TAG = "UserNotifications";
 
     private FirebaseFirestore db;
     private ListView notificationsList;
-    private TextView titleText;
-
     private final ArrayList<NotificationItem> notifications = new ArrayList<>();
     private NotificationListAdapter adapter;
 
@@ -57,27 +55,14 @@ public class UserNotificationsActivity extends AppCompatActivity {
         currentEventId = getIntent().getStringExtra("eventId");
         currentEventName = getIntent().getStringExtra("eventName");
 
-        titleText = findViewById(R.id.notifications_page_title);
         notificationsList = findViewById(R.id.notifications_list_view);
-        ImageButton backButton = findViewById(R.id.notifications_back_button);
 
-        if (titleText == null || notificationsList == null || backButton == null) {
+        if (notificationsList == null) {
             Toast.makeText(this, "Notification layout failed to load", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-
-        if (currentEventId != null && !currentEventId.isEmpty()) {
-            if (currentEventName != null && !currentEventName.isEmpty()) {
-                titleText.setText(currentEventName + " Notifications");
-            } else {
-                titleText.setText("Event Notifications");
-            }
-        } else {
-            titleText.setText("My Notifications");
-        }
-
-        backButton.setOnClickListener(v -> finish());
+        setupHeaderBar("Notifications");
 
         adapter = new NotificationListAdapter(this, notifications);
         notificationsList.setAdapter(adapter);
