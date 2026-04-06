@@ -71,6 +71,12 @@ public class NotificationListAdapter extends ArrayAdapter<NotificationItem> {
 
         NotificationItem item = notifications.get(position);
 
+        view.setOnClickListener(v -> {
+            Intent intent = new Intent(context, EventDetailsActivity.class);
+            intent.putExtra("eventId", item.getEventId());
+            context.startActivity(intent);
+        });
+
         messageText.setText(item.getMessage());
         senderNameText.setText("Unknown User");
         senderImage.setImageResource(R.drawable.poster);
@@ -82,12 +88,6 @@ public class NotificationListAdapter extends ArrayAdapter<NotificationItem> {
             senderImage.setImageResource(R.drawable.poster);
             return view;
         }
-
-        senderNameText.setOnClickListener(v -> {
-            Intent intent = new Intent(context, EventDetailsActivity.class);
-            intent.putExtra("eventId", item.getEventId());
-            context.startActivity(intent);
-        });
 
         db.collection(FirestoreCollections.USERS_COLLECTION)
                 .document(senderId)
