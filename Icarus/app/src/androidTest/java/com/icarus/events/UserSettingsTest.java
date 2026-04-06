@@ -27,12 +27,13 @@ import java.util.concurrent.CountDownLatch;
  * Instrumented UI tests for {@link UserSettingsActivity}.
  * <p>
  * User Stories Tested:
- *     US 01.02.04 As an entrant, I want to delete my profile if I no longer wish to use the app.
+ *     US 01.02.04 – As an entrant, I want to delete my profile if I no longer wish to use the app.
+ *     US 01.04.03 – As an entrant, I want to opt out of receiving notifications from organizers and admins.
  * <p>
- * Tests use a temporary Firestore collection ({@code events_test}) to avoid
- * interfering with production data.
+ * Tests use temporary Firestore test collections to avoid interfering with
+ * production data.
  *
- * @author Kito Lee Son
+ * @author Kito Lee Son,  Updated by Alex Alves for project pt 4
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -61,7 +62,7 @@ public class UserSettingsTest {
         userMap.put("email", "testentrant@email.com");
         userMap.put("phone", "1234567890");
 
-        db.collection("users_test")
+        db.collection(FirestoreCollections.USERS_COLLECTION)
                 .add(userMap)
                 .addOnSuccessListener(doc -> {
                     testUser = new User(doc.getId(), "Test Entrant",
@@ -96,19 +97,26 @@ public class UserSettingsTest {
                 .perform(click());
 
         // Wait for Firestore update
-        CountDownLatch adminLatch = new CountDownLatch(1);
         final boolean[] adminNotifications = {true};
+        long adminStart = System.currentTimeMillis();
+        while (System.currentTimeMillis() - adminStart < 5000 && adminNotifications[0]) {
+            CountDownLatch adminLatch = new CountDownLatch(1);
 
-        db.collection("users_test")
-                .document(testUser.getId())
-                .get()
-                .addOnSuccessListener(doc -> {
-                    Boolean value = doc.getBoolean("adminNotifications");
-                    adminNotifications[0] = value != null && value;
-                    adminLatch.countDown();
-                });
+            db.collection(FirestoreCollections.USERS_COLLECTION)
+                    .document(testUser.getId())
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        Boolean value = doc.getBoolean("adminNotifications");
+                        adminNotifications[0] = value != null && value;
+                        adminLatch.countDown();
+                    })
+                    .addOnFailureListener(e -> adminLatch.countDown());
 
-        adminLatch.await();
+            adminLatch.await();
+            if (adminNotifications[0]) {
+                Thread.sleep(100);
+            }
+        }
         assertFalse("Admin notifications were not turned off", adminNotifications[0]);
 
         // Click organizer notifications toggle
@@ -116,19 +124,26 @@ public class UserSettingsTest {
                 .perform(click());
 
         // Wait for Firestore update
-        CountDownLatch organizerLatch = new CountDownLatch(1);
         final boolean[] organizerNotifications = {true};
+        long organizerStart = System.currentTimeMillis();
+        while (System.currentTimeMillis() - organizerStart < 5000 && organizerNotifications[0]) {
+            CountDownLatch organizerLatch = new CountDownLatch(1);
 
-        db.collection("users_test")
-                .document(testUser.getId())
-                .get()
-                .addOnSuccessListener(doc -> {
-                    Boolean value = doc.getBoolean("organizerNotifications");
-                    organizerNotifications[0] = value != null && value;
-                    organizerLatch.countDown();
-                });
+            db.collection(FirestoreCollections.USERS_COLLECTION)
+                    .document(testUser.getId())
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        Boolean value = doc.getBoolean("organizerNotifications");
+                        organizerNotifications[0] = value != null && value;
+                        organizerLatch.countDown();
+                    })
+                    .addOnFailureListener(e -> organizerLatch.countDown());
 
-        organizerLatch.await();
+            organizerLatch.await();
+            if (organizerNotifications[0]) {
+                Thread.sleep(100);
+            }
+        }
         assertFalse("Organizer notifications were not turned off", organizerNotifications[0]);
     }
 
@@ -150,18 +165,25 @@ public class UserSettingsTest {
                 .perform(click());
 
         // Wait for Firestore deletion
-        CountDownLatch latch = new CountDownLatch(1);
         final boolean[] userExists = {true};
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start < 5000 && userExists[0]) {
+            CountDownLatch latch = new CountDownLatch(1);
 
-        db.collection("users_test")
-                .document(testUser.getId())
-                .get()
-                .addOnSuccessListener(doc -> {
-                    userExists[0] = doc.exists();
-                    latch.countDown();
-                });
+            db.collection(FirestoreCollections.USERS_COLLECTION)
+                    .document(testUser.getId())
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        userExists[0] = doc.exists();
+                        latch.countDown();
+                    })
+                    .addOnFailureListener(e -> latch.countDown());
 
-        latch.await();
+            latch.await();
+            if (userExists[0]) {
+                Thread.sleep(100);
+            }
+        }
 
         // Assert that the user document no longer exists
         assertFalse("User was not deleted from Firestore", userExists[0]);

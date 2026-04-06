@@ -132,7 +132,7 @@ public class EntrantEventListActivity extends HeaderNavBarActivity {
 
         // Retrieve current user role
         User currentUser = UserSession.getInstance().getCurrentUser();
-        Boolean isAdmin = (currentUser != null) ? currentUser.getIsAdmin() : false;
+        Boolean isAdmin = currentUser != null && Boolean.TRUE.equals(currentUser.getIsAdmin());
 
         // Show/hide buttons based on users role
         if (isAdmin) {
