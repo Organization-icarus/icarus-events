@@ -277,9 +277,12 @@ public class NotificationItem {
         this.recipients.forEach(recipient -> {
             this.db.collection(FirestoreCollections.USERS_COLLECTION).document(recipient).get()
                     .addOnSuccessListener(snapshot -> {
-                        Map<String, String> tokens = (Map<String, String>) snapshot.get("fcmTokens");
-                        if (tokens != null) for (String token : tokens.values()) {
-                            NotificationHelper.sendPush(context, token, this.eventName, this.message);
+                        Map<String, Boolean> settings = (Map<String, Boolean>) snapshot.get("settings");
+                        if (settings.get("organizerNotifications")) {
+                            Map<String, String> tokens = (Map<String, String>) snapshot.get("fcmTokens");
+                            if (tokens != null) for (String token : tokens.values()) {
+                                NotificationHelper.sendPush(context, token, this.eventName, this.message);
+                            }
                         }
                     });
         });
