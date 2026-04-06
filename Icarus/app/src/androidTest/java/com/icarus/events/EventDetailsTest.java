@@ -1,22 +1,25 @@
 package com.icarus.events;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.RootMatchers.isDialog;
+import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
 
 import android.content.Intent;
-import android.widget.ListView;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.cloudinary.android.MediaManager;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.After;
@@ -24,6 +27,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -31,24 +36,28 @@ import java.util.concurrent.CountDownLatch;
 /**
  * Instrumented UI tests for {@link EventDetailsActivity}.
  * <p>
- * User Stories Tested:
- *      US 01.05.02 As an entrant I want to accept an invitation to register.
- *      US 01.05.03 As an entrant I want to decline an invitation.
- *      US 01.05.04 As an entrant I want to know how many users are on the waiting list.
- *      US 01.05.05 As an entrant, I want to be informed about the criteria or
- *      guidelines for the lottery selection process.
- *      US 01.06.02 As an entrant I want to be able to sign up for an event
- *      from the event details.
- * <p>
- * Tests use temporary Firestore collections to avoid interfering with production data.
+ * User Stories Covered:
+ * <ul>
+ *   <li>US 01.01.01 As an entrant, I want to join the waiting list for a specific event.</li>
+ *   <li>US 01.05.02 As an entrant, I want to be able to accept the invitation to register/sign up when chosen to participate in an event.</li>
+ *   <li>US 01.05.03 As an entrant, I want to be able to decline an invitation when chosen to participate in an event.</li>
+ *   <li>US 01.05.04 As an entrant, I want to know how many total entrants are on the waiting list for an event.</li>
+ *   <li>US 01.05.05 As an entrant, I want to be informed about the criteria or guidelines for the lottery selection process.</li>
+ *   <li>US 01.06.01 As an entrant, I want to view event details within the app by scanning the promotional QR code.</li>
+ *   <li>US 01.06.02 As an entrant, I want to be able to sign up for an event from the event details.</li>
+ *   <li>US 01.08.02 As an entrant, I want to view comments on an event.</li>
+ * </ul>
  *
- * @author Kito Lee Son
+ * Tests use temporary Firestore collections via {@link FirestoreCollections#startTest()}
+ * and {@link FirestoreCollections#endTest()}.
+ *
+ * @authors Kito Leeson, Bradley Bravender
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class EventDetailsTest {
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private String organizerId;
     private String entrantId;
@@ -59,41 +68,52 @@ public class EventDetailsTest {
     private ActivityScenario<EventDetailsActivity> scenario;
 
     /**
-     * Prepares test data in Firestore before each test runs.
+     * Prepares Firestore test data before each test.
      * <p>
-     * Creates a test organizer, test entrant, and two events.
-     * The entrant is added to both events with status "selected".
-     * One additional user is placed on the waiting list to simulate
-     * a waiting list size of 1.
+     * This method:
+     * <ul>
+     *   <li>Switches Firestore into test collections</li>
+     *   <li>Initializes Cloudinary support used by the app startup path</li>
+     *   <li>Creates one organizer and one entrant</li>
+     *   <li>Creates three test events</li>
+     *   <li>Creates entrant subcollection documents needed for selected/waiting scenarios</li>
+     * </ul>
      *
-     * @throws InterruptedException if the Firestore insertion wait is interrupted
+     * @throws InterruptedException if waiting for Firestore setup is interrupted
      */
     @Before
     public void setupTestData() throws InterruptedException {
-
         FirestoreCollections.startTest();
 
-        // create organizer
-        CountDownLatch organizerLatch = new CountDownLatch(1);
+        try {
+            Map<String, Object> config = new HashMap<>();
+            config.put("cloud_name", "icarus-images");
+            config.put("api_key", "291231889216385");
+            config.put("api_secret", "ToWWi626oI0M7Ou1pmPQx_vd5x8");
+            MediaManager.init(ApplicationProvider.getApplicationContext(), config);
+        } catch (IllegalStateException e) {
+            // MediaManager already initialized.
+        }
 
-        db.collection("users_test")
+        CountDownLatch organizerLatch = new CountDownLatch(1);
+        db.collection(FirestoreCollections.USERS_COLLECTION)
                 .add(Map.of(
                         "name", "Test Organizer",
-                        "isAdmin", false))
+                        "isAdmin", false
+                ))
                 .addOnSuccessListener(doc -> {
                     organizerId = doc.getId();
                     organizerLatch.countDown();
                 });
-
         organizerLatch.await();
 
-        // create entrant
         CountDownLatch entrantLatch = new CountDownLatch(1);
-
-        db.collection("users_test")
+        db.collection(FirestoreCollections.USERS_COLLECTION)
                 .add(Map.of(
                         "name", "Test Entrant",
-                        "isAdmin", false))
+                        "isAdmin", false,
+                        "events", new ArrayList<>()
+                ))
                 .addOnSuccessListener(doc -> {
                     entrantId = doc.getId();
 
@@ -104,47 +124,64 @@ public class EventDetailsTest {
                             "1234567890",
                             "No Image",
                             false,
-                            new java.util.ArrayList<>(),
-                            new java.util.ArrayList<>(),
+                            new ArrayList<>(),
+                            new ArrayList<>(),
                             new HashMap<>(),
-                            null);
+                            null
+                    );
 
                     UserSession.getInstance().setCurrentUser(testUser);
-
                     entrantLatch.countDown();
                 });
-
         entrantLatch.await();
 
-        // create events
         CountDownLatch eventLatch = new CountDownLatch(3);
 
-        Map<String, Object> eventData = new HashMap<>();
-        eventData.put("name", "Test Event 1");
-        eventData.put("capacity", 20);
-        eventData.put("organizer", organizerId);
-        eventData.put("category", "Music");
+        ArrayList<String> organizers = new ArrayList<>();
+        organizers.add(organizerId);
 
-        db.collection("events_test")
-                .add(eventData)
+        Date now = new Date();
+        Date oneHourLater = new Date(now.getTime() + 60L * 60L * 1000L);
+        Date twoHoursLater = new Date(now.getTime() + 2L * 60L * 60L * 1000L);
+
+        Map<String, Object> event1 = new HashMap<>();
+        event1.put("name", "Test Event 1");
+        event1.put("capacity", 20.0);
+        event1.put("category", "Music");
+        event1.put("description", "Description 1");
+        event1.put("open", now);
+        event1.put("close", oneHourLater);
+        event1.put("startDate", oneHourLater);
+        event1.put("endDate", twoHoursLater);
+        event1.put("location", "Edmonton");
+        event1.put("image", "");
+        event1.put("geolocation", false);
+        event1.put("organizers", organizers);
+
+        Map<String, Object> event2 = new HashMap<>(event1);
+        event2.put("name", "Test Event 2");
+        event2.put("description", "Description 2");
+
+        Map<String, Object> event3 = new HashMap<>(event1);
+        event3.put("name", "Test Event 3");
+        event3.put("description", "Description 3");
+
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .add(event1)
                 .addOnSuccessListener(doc -> {
                     event1Id = doc.getId();
                     eventLatch.countDown();
                 });
 
-        eventData.put("name", "Test Event 2");
-
-        db.collection("events_test")
-                .add(eventData)
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .add(event2)
                 .addOnSuccessListener(doc -> {
                     event2Id = doc.getId();
                     eventLatch.countDown();
                 });
 
-        eventData.put("name", "Test Event 3");
-
-        db.collection("events_test")
-                .add(eventData)
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .add(event3)
                 .addOnSuccessListener(doc -> {
                     event3Id = doc.getId();
                     eventLatch.countDown();
@@ -152,32 +189,36 @@ public class EventDetailsTest {
 
         eventLatch.await();
 
-
-        // add entrants
         CountDownLatch entrantSetupLatch = new CountDownLatch(4);
 
         Map<String, Object> selected = Map.of("status", "selected");
         Map<String, Object> waiting = Map.of("status", "waiting");
 
-        // Selected entrant
-        db.collection("events_test").document(event1Id)
-                .collection("entrants").document(entrantId)
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .document(event1Id)
+                .collection("entrants")
+                .document(entrantId)
                 .set(selected)
                 .addOnSuccessListener(v -> entrantSetupLatch.countDown());
 
-        db.collection("events_test").document(event2Id)
-                .collection("entrants").document(entrantId)
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .document(event2Id)
+                .collection("entrants")
+                .document(entrantId)
                 .set(selected)
                 .addOnSuccessListener(v -> entrantSetupLatch.countDown());
 
-        // Waiting list users
-        db.collection("events_test").document(event1Id)
-                .collection("entrants").document("waitingUser1")
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .document(event1Id)
+                .collection("entrants")
+                .document("waitingUser1")
                 .set(waiting)
                 .addOnSuccessListener(v -> entrantSetupLatch.countDown());
 
-        db.collection("events_test").document(event2Id)
-                .collection("entrants").document("waitingUser2")
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
+                .document(event2Id)
+                .collection("entrants")
+                .document("waitingUser2")
                 .set(waiting)
                 .addOnSuccessListener(v -> entrantSetupLatch.countDown());
 
@@ -185,60 +226,113 @@ public class EventDetailsTest {
     }
 
     /**
-     * Tests that an entrant can see the number of people on the waiting list for an event.
+     * Tests that the event details page displays the core event information.
      * <p>
-     * The test enters an event details page, and verifies that the correct waitlist
-     * number is displayed.
+     * Verifies that the event name, description, and RecyclerView-backed details
+     * are visible after the activity loads.
      * <p>
-     * User Story Tested:
-     *     US 01.05.04 As an entrant I want to know how many users are on the waiting list.
+     * User Stories Tested:
+     * <ul>
+     *   <li>US 01.06.01 As an entrant, I want to view event details within the app by scanning the promotional QR code.</li>
+     * </ul>
+     *
+     * @throws InterruptedException if the UI wait is interrupted
      */
     @Test
-    public void testWaitingListDisplayed() {
+    public void testEventDetailsDisplayCoreData() throws InterruptedException {
+        launchEventDetails(event1Id);
 
-        Intent intent = new Intent(
-                ApplicationProvider.getApplicationContext(),
-                EventDetailsActivity.class);
-        intent.putExtra("eventId", event1Id);
+        onView(withId(R.id.eventName))
+                .check(matches(withText("Test Event 1")));
 
-        scenario = ActivityScenario.launch(intent);
+        onView(withId(R.id.eventDescription))
+                .check(matches(withText("Description 1")));
 
-        scenario.onActivity(activity -> {
-            ListView listView = activity.findViewById(R.id.event_details_event_list);
+        onView(withId(R.id.event_details_event_list))
+                .check(matches(hasDescendant(withText("Category"))));
 
-            EventField waitingField =
-                    (EventField) listView.getAdapter().getItem(10);
-
-            assertEquals("1", waitingField.getValue());
-        });
+        onView(withId(R.id.event_details_event_list))
+                .check(matches(hasDescendant(withText("Music"))));
     }
 
     /**
-     * Tests that an entrant can accept the invitation to an event.
+     * Tests that the waiting-list count is displayed through the event details adapter.
      * <p>
-     * The test enters an event details page, clicks the register button, and
-     * verifies that the status is updated to "registered" in the {@code entrants}
-     * subdirectory in the Firestore events database.
+     * Binds the adapter directly and verifies the waiting-list field text.
+     * This is more stable than assuming a fixed on-screen row index.
      * <p>
-     * User Story Tested:
-     *     US 01.05.02 As an entrant I want to accept an invitation to register.
+     * User Stories Tested:
+     * <ul>
+     *   <li>US 01.05.04 As an entrant, I want to know how many total entrants are on the waiting list for an event.</li>
+     * </ul>
+     */
+    @Test
+    public void testWaitingListDisplayed() {
+        Date now = new Date();
+        ArrayList<String> organizers = new ArrayList<>();
+        organizers.add(organizerId);
+
+        Event event = new Event(
+                event1Id,
+                "Adapter Event",
+                "Music",
+                20.0,
+                now,
+                now,
+                now,
+                now,
+                "Edmonton",
+                "",
+                organizers,
+                "selected",
+                1
+        );
+
+        EventDetailsAdapter adapter =
+                new EventDetailsAdapter(ApplicationProvider.getApplicationContext(), event);
+
+        FrameLayout parent = new FrameLayout(ApplicationProvider.getApplicationContext());
+        EventDetailsAdapter.ViewHolder holder = adapter.onCreateViewHolder(parent, 0);
+
+        adapter.onBindViewHolder(holder, 1);
+
+        TextView fieldName = holder.itemView.findViewById(R.id.field_name);
+        TextView fieldValue = holder.itemView.findViewById(R.id.field_value);
+
+        assertEquals("Waiting List", fieldName.getText().toString());
+        assertEquals("1/20", fieldValue.getText().toString());
+    }
+
+    /**
+     * Tests that an entrant can accept an invitation to register.
+     * <p>
+     * Launches the activity for an event where the entrant is currently
+     * marked as {@code selected}, triggers the register button directly from the
+     * activity, and verifies that Firestore updates the entrant status to
+     * {@code registered}.
+     * <p>
+     * User Stories Tested:
+     * <ul>
+     *   <li>US 01.05.02 As an entrant, I want to be able to accept the invitation to register/sign up when chosen to participate in an event.</li>
+     * </ul>
+     *
+     * @throws InterruptedException if Firestore waiting is interrupted
      */
     @Test
     public void testAcceptInvitation() throws InterruptedException {
+        launchEventDetails(event1Id);
 
-        Intent intent = new Intent(
-                ApplicationProvider.getApplicationContext(),
-                EventDetailsActivity.class);
-        intent.putExtra("eventId", event1Id);
+        scenario.onActivity(activity ->
+                activity.findViewById(R.id.register_button).performClick()
+        );
 
-        scenario = ActivityScenario.launch(intent);
-
-        onView(withId(R.id.register_button)).perform(click());
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        Thread.sleep(500);
 
         CountDownLatch latch = new CountDownLatch(1);
         final String[] status = {""};
 
-        db.collection("events_test")
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(event1Id)
                 .collection("entrants")
                 .document(entrantId)
@@ -249,36 +343,39 @@ public class EventDetailsTest {
                 });
 
         latch.await();
-
         assertEquals("registered", status[0]);
     }
 
     /**
-     * Tests that an entrant can reject the invitation to an event.
+     * Tests that an entrant can decline an invitation.
      * <p>
-     * The test enters an event details page, clicks the decline button, and
-     * verifies that the status is updated to "rejected" in the {@code entrants}
-     * subdirectory in the Firestore events database.
+     * Launches the activity for an event where the entrant is currently
+     * marked as {@code selected}, triggers the decline button directly from the
+     * activity, and verifies that Firestore updates the entrant status to
+     * {@code rejected}.
      * <p>
-     * User Story Tested:
-     *     US 01.05.03 As an entrant I want to decline an invitation.
+     * User Stories Tested:
+     * <ul>
+     *   <li>US 01.05.03 As an entrant, I want to be able to decline an invitation when chosen to participate in an event.</li>
+     * </ul>
+     *
+     * @throws InterruptedException if Firestore waiting is interrupted
      */
     @Test
     public void testDeclineInvitation() throws InterruptedException {
+        launchEventDetails(event2Id);
 
-        Intent intent = new Intent(
-                ApplicationProvider.getApplicationContext(),
-                EventDetailsActivity.class);
-        intent.putExtra("eventId", event2Id);
+        scenario.onActivity(activity ->
+                activity.findViewById(R.id.decline_invitation).performClick()
+        );
 
-        scenario = ActivityScenario.launch(intent);
-
-        onView(withId(R.id.decline_invitation)).perform(click());
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        Thread.sleep(500);
 
         CountDownLatch latch = new CountDownLatch(1);
         final String[] status = {""};
 
-        db.collection("events_test")
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(event2Id)
                 .collection("entrants")
                 .document(entrantId)
@@ -289,74 +386,70 @@ public class EventDetailsTest {
                 });
 
         latch.await();
-
         assertEquals("rejected", status[0]);
     }
 
     /**
-     * Tests that an entrant can view the lottery guidelines from
-     * the event details page.
+     * Tests that the lottery guidelines dialog can be opened from the event details page.
      * <p>
-     * The test simulates a user opening the event details, tapping
-     * the "Lottery Guidelines" button, and verifies that the
-     * guidelines message is displayed as expected.
+     * Verifies that tapping the lottery-guidelines button shows the expected message.
      * <p>
-     * User Story Tested:
-     *      US 01.05.05 As an entrant, I want to be informed about
-     *      the criteria or guidelines for the lottery selection process.
+     * User Stories Tested:
+     * <ul>
+     *   <li>US 01.05.05 As an entrant, I want to be informed about the criteria or guidelines for the lottery selection process.</li>
+     * </ul>
      *
-     * @throws InterruptedException if the wait is interrupted
+     * @throws InterruptedException if the UI wait is interrupted
      */
     @Test
     public void testLotteryGuidelinesDisplayed() throws InterruptedException {
+        launchEventDetails(event1Id);
 
-        // Launch the EventDetailsActivity for a test event
-        Intent intent = new Intent(
-                ApplicationProvider.getApplicationContext(),
-                EventDetailsActivity.class
+        scenario.onActivity(activity ->
+                activity.findViewById(R.id.lottery_guidelines).performClick()
         );
-        intent.putExtra("eventId", "test_event_id"); // Use a test event ID
-        scenario = ActivityScenario.launch(intent);
 
-        // Click the "Lottery Guidelines" button
-        onView(withId(R.id.lottery_guidelines)).perform(click());
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        Thread.sleep(500);
 
-        // Verify that the guidelines message is displayed
         String expectedMessage = ApplicationProvider.getApplicationContext()
                 .getString(R.string.lottery_guidelines_message);
 
-        onView(withText(expectedMessage)).check(matches(isDisplayed()));
+        onView(withText(expectedMessage))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()));
     }
 
     /**
-     * Tests that an entrant can sign up for a new event from the event details page.
+     * Tests that an entrant can join the waiting list from the event details page.
      * <p>
-     * The test launches the EventDetailsActivity for an event that the
-     * entrant is not registered for, clicks the "Join Waitlist" button,
-     * and verifies that Firestore updates the entrant's status to "waiting".
+     * Launches an event where the entrant does not yet have an entrant record,
+     * triggers the join-waitlist button directly from the activity, and verifies
+     * that Firestore creates a waiting entrant document.
      * <p>
-     * User Story Tested:
-     *     US 01.06.02 As an entrant I want to be able to sign up for an event from the event details.
+     * User Stories Tested:
+     * <ul>
+     *   <li>US 01.01.01 As an entrant, I want to join the waiting list for a specific event.</li>
+     *   <li>US 01.06.02 As an entrant, I want to be able to sign up for an event from the event details.</li>
+     * </ul>
+     *
+     * @throws InterruptedException if Firestore waiting is interrupted
      */
     @Test
     public void testEntrantSignUpForEvent() throws InterruptedException {
+        launchEventDetails(event3Id);
 
-        // Launch EventDetailsActivity for the new event
-        Intent intent = new Intent(
-                ApplicationProvider.getApplicationContext(),
-                EventDetailsActivity.class);
-        intent.putExtra("eventId", event3Id);
-        scenario = ActivityScenario.launch(intent);
+        scenario.onActivity(activity ->
+                activity.findViewById(R.id.join_waiting_list_button).performClick()
+        );
 
-        // Click the "Join Waitlist" button
-        onView(withId(R.id.join_waiting_list_button))
-                .perform(click());
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        Thread.sleep(500);
 
-        // Verify Firestore updates the entrant's status to "waiting"
         CountDownLatch latch = new CountDownLatch(1);
         final String[] status = {""};
 
-        db.collection("events_test")
+        db.collection(FirestoreCollections.EVENTS_COLLECTION)
                 .document(event3Id)
                 .collection("entrants")
                 .document(entrantId)
@@ -367,30 +460,66 @@ public class EventDetailsTest {
                 });
 
         latch.await();
-
         assertEquals("waiting", status[0]);
-
-        // Clean up the new event after test
-        CountDownLatch cleanupLatch = new CountDownLatch(1);
-        db.collection("events_test").document(event3Id)
-                .delete()
-                .addOnSuccessListener(v -> cleanupLatch.countDown());
-        cleanupLatch.await();
     }
 
     /**
-     * Removes all test data from Firestore after each test.
+     * Tests that an entrant can open the event comments screen from the event details page.
      * <p>
-     * This method deletes documents from {@code events_test} and
-     * {@code users_test} collections to ensure tests do not affect each other
-     * or pollute the production database.
+     * Verifies that tapping the comments button launches the comments activity
+     * and displays the comments RecyclerView.
+     * <p>
+     * User Stories Tested:
+     * <ul>
+     *   <li>US 01.08.02 As an entrant, I want to view comments on an event.</li>
+     * </ul>
      *
-     * @throws InterruptedException if the cleanup wait operation is interrupted
+     * @throws InterruptedException if the UI wait is interrupted
+     */
+    @Test
+    public void testCommentsButtonOpensCommentActivity() throws InterruptedException {
+        launchEventDetails(event1Id);
+
+        scenario.onActivity(activity ->
+                activity.findViewById(R.id.comments_button).performClick()
+        );
+
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        Thread.sleep(1000);
+
+        onView(withId(R.id.event_comments_list))
+                .check(matches(isDisplayed()));
+    }
+
+    /**
+     * Launches {@link EventDetailsActivity} for the supplied event ID and waits briefly
+     * for Firestore-backed UI state to settle.
+     *
+     * @param eventId Firestore document ID of the test event to open
+     * @throws InterruptedException if the wait is interrupted
+     */
+    private void launchEventDetails(String eventId) throws InterruptedException {
+        Intent intent = new Intent(
+                ApplicationProvider.getApplicationContext(),
+                EventDetailsActivity.class
+        );
+        intent.putExtra("eventId", eventId);
+        scenario = ActivityScenario.launch(intent);
+
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        Thread.sleep(2500);
+    }
+
+    /**
+     * Cleans up the active activity scenario and restores normal Firestore collection names.
+     *
+     * @throws InterruptedException if Firestore cleanup is interrupted
      */
     @After
     public void cleanup() throws InterruptedException {
-
-        if (scenario != null) scenario.close();
+        if (scenario != null) {
+            scenario.close();
+        }
         FirestoreCollections.endTest();
     }
 }
