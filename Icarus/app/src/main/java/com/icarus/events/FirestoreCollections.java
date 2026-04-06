@@ -3,6 +3,9 @@ package com.icarus.events;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -47,11 +50,6 @@ public class FirestoreCollections {
      * for the cleanup tasks to finish.
      */
     public static void endTest() throws InterruptedException {
-        EVENTS_COLLECTION = "events";
-        USERS_COLLECTION = "users";
-        IMAGES_COLLECTION = "images";
-        NOTIFICATIONS_COLLECTION = "notifications";
-
         CountDownLatch latch = new CountDownLatch(4);
         db.collection("events_test")
                 .get()
@@ -100,5 +98,28 @@ public class FirestoreCollections {
                     latch.countDown();
                 });
         latch.await();
+
+        EVENTS_COLLECTION = "events";
+        USERS_COLLECTION = "users";
+        IMAGES_COLLECTION = "images";
+        NOTIFICATIONS_COLLECTION = "notifications";
+    }
+
+    public static String hashDeviceId(String rawDeviceId) {
+        if (rawDeviceId == null) return "";
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(rawDeviceId.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+
+            for (byte b : hashBytes) {
+                hexString.append(String.format("%02x", b));
+            }
+
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 not available", e);
+        }
     }
 }

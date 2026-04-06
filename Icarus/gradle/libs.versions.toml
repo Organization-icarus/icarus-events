@@ -12,6 +12,7 @@ constraintlayout = "2.2.1"
 firebaseFirestore = "26.1.1"
 playServicesMaps = "19.0.0"
 espressoIntents = "3.7.0"
+espressoContrib = "3.7.0"
 
 [libraries]
 espresso-core-v351 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
@@ -26,6 +27,7 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
+espresso-contrib = { group = "androidx.test.espresso", name = "espresso-contrib", version.ref = "espressoContrib" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

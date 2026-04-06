@@ -42,6 +42,10 @@ android {
     }
 }
 
+configurations.all {
+    exclude(group = "com.google.protobuf", module = "protobuf-lite")
+}
+
 dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -58,10 +62,12 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     //implementation(libs.play.services.maps) // For location services
     implementation("org.osmdroid:osmdroid-android:6.1.20")
+    implementation(libs.espresso.contrib)
     androidTestImplementation(libs.espresso.intents)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1")
     implementation("androidx.work:work-runtime:2.9.0")
     implementation("com.google.guava:guava:31.1-android")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")

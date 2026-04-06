@@ -2,7 +2,10 @@ package com.icarus.events;
 
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.CoreMatchers.anything;
 import static org.junit.Assert.assertEquals;
@@ -10,9 +13,11 @@ import static org.junit.Assert.assertTrue;
 
 import android.widget.ListView;
 
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.filters.SmallTest;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -136,27 +141,27 @@ public class EventHistoryTest {
      * @throws InterruptedException if the wait loop is interrupted
      * @throws AssertionError if the list is not populated before timeout
      */
-    private void waitForListViewItems(int minCount, long timeoutMs) throws InterruptedException {
+    private void waitForRecyclerViewItems(int minCount, long timeoutMs) throws InterruptedException {
         long start = System.currentTimeMillis();
         while (System.currentTimeMillis() - start < timeoutMs) {
             final int[] count = {0};
             onView(withId(R.id.event_history_list_view)).check((view, e) -> {
-                ListView listView = (ListView) view;
-                if(listView.getAdapter() == null) throw new AssertionError("ListView adapter was null");
-                count[0] = listView.getAdapter().getCount();
+                RecyclerView recyclerView = (RecyclerView) view;
+                if(recyclerView.getAdapter() == null) throw new AssertionError("RecyclerView adapter was null");
+                count[0] = recyclerView.getAdapter().getItemCount();
             });
             if (count[0] >= minCount) return;
             Thread.sleep(50);
         }
 
-        throw new AssertionError("ListView never populated with at least " + minCount + " items");
+        throw new AssertionError("RecyclerView never populated with at least " + minCount + " items");
     }
 
     /**
      * Verifies that the EventHistoryActivity displays the test event
      * for the registered entrant.
      * <p>
-     * The test waits for the ListView to populate and then checks that all events
+     * The test waits for the RecyclerView to populate and then checks that all events
      * in the database are displayed to the user.
      * <p>
      * User Story Tested:
@@ -167,14 +172,10 @@ public class EventHistoryTest {
      */
     @Test
     public void testEventHistoryDisplayed() throws InterruptedException {
-        // Wait for at least one item to populate the ListView
-        waitForListViewItems(1, 5000);
+        // Wait for at least one item to populate the RecyclerView
+        waitForRecyclerViewItems(1, 5000);
 
-        scenario.onActivity(activity -> {
-            ListView listView = activity.findViewById(R.id.event_history_list_view);
-            Event event = (Event) listView.getAdapter().getItem(0);
-            assertEquals("Test Event", event.getName());
-        });
+        onView(withText("Test Event")).check(matches(isDisplayed()));
     }
 
     /**

@@ -2,6 +2,7 @@ package com.icarus.events;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -11,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import android.content.Intent;
 import android.widget.ListView;
 
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -24,6 +26,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -122,7 +126,7 @@ public class EventDetailsTest {
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("name", "Test Event 1");
         eventData.put("capacity", 20);
-        eventData.put("organizer", organizerId);
+        eventData.put("organizers", new ArrayList<String>(Collections.singleton(organizerId)));
         eventData.put("category", "Music");
 
         db.collection("events_test")
@@ -204,12 +208,12 @@ public class EventDetailsTest {
         scenario = ActivityScenario.launch(intent);
 
         scenario.onActivity(activity -> {
-            ListView listView = activity.findViewById(R.id.event_details_event_list);
+            RecyclerView recyclerView = activity.findViewById(R.id.event_details_event_list);
 
             EventField waitingField =
-                    (EventField) listView.getAdapter().getItem(10);
+                    ((EventDetailsAdapter) recyclerView.getAdapter()).getItem(1);
 
-            assertEquals("1", waitingField.getValue());
+            assertEquals("1/20", waitingField.getValue());
         });
     }
 
@@ -226,20 +230,48 @@ public class EventDetailsTest {
     @Test
     public void testAcceptInvitation() throws InterruptedException {
 
-        Intent intent = new Intent(
-                ApplicationProvider.getApplicationContext(),
+        CountDownLatch privateEventLatch = new CountDownLatch(1);
+        Map<String, Object> privateEventData = new HashMap<>();
+        privateEventData.put("name", "Private Test Event");
+        privateEventData.put("capacity", 10);
+        privateEventData.put("organizers", Collections.singletonList(organizerId));
+        privateEventData.put("category", "Music");
+        privateEventData.put("isPrivate", true);
+
+        db.collection("events_test")
+                .add(privateEventData)
+                .addOnSuccessListener(doc -> {
+                    event3Id = doc.getId();  // use event3Id for this private event
+                    privateEventLatch.countDown();
+                });
+
+        privateEventLatch.await();
+
+        CountDownLatch entrantLatch = new CountDownLatch(1);
+        Map<String, Object> selected = Map.of("status", "selected");
+
+        db.collection("events_test")
+                .document(event3Id)
+                .collection("entrants")
+                .document(entrantId)
+                .set(selected)
+                .addOnSuccessListener(v -> entrantLatch.countDown());
+
+        entrantLatch.await();
+
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(),
                 EventDetailsActivity.class);
-        intent.putExtra("eventId", event1Id);
+        intent.putExtra("eventId", event3Id);
 
         scenario = ActivityScenario.launch(intent);
 
-        onView(withId(R.id.register_button)).perform(click());
+        onView(withId(R.id.register_button)).perform(scrollTo(), click());
 
         CountDownLatch latch = new CountDownLatch(1);
         final String[] status = {""};
 
         db.collection("events_test")
-                .document(event1Id)
+                .document(event3Id)
                 .collection("entrants")
                 .document(entrantId)
                 .get()
@@ -273,7 +305,7 @@ public class EventDetailsTest {
 
         scenario = ActivityScenario.launch(intent);
 
-        onView(withId(R.id.decline_invitation)).perform(click());
+        onView(withId(R.id.decline_invitation)).perform(scrollTo(), click());
 
         CountDownLatch latch = new CountDownLatch(1);
         final String[] status = {""};
@@ -319,7 +351,7 @@ public class EventDetailsTest {
         scenario = ActivityScenario.launch(intent);
 
         // Click the "Lottery Guidelines" button
-        onView(withId(R.id.lottery_guidelines)).perform(click());
+        onView(withId(R.id.lottery_guidelines)).perform(scrollTo(), click());
 
         // Verify that the guidelines message is displayed
         String expectedMessage = ApplicationProvider.getApplicationContext()
@@ -350,7 +382,7 @@ public class EventDetailsTest {
 
         // Click the "Join Waitlist" button
         onView(withId(R.id.join_waiting_list_button))
-                .perform(click());
+                .perform(scrollTo(), click());
 
         // Verify Firestore updates the entrant's status to "waiting"
         CountDownLatch latch = new CountDownLatch(1);
