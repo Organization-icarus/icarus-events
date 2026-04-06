@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -43,6 +44,8 @@ import java.util.concurrent.CountDownLatch;
  *      US 03.05.01 As an administrator, I want to be able to browse profiles.
  *      US 03.06.01 As an administrator, I want to be able to browse images that
  *                  are uploaded so I can remove them if necessary.
+ *      US 03.08.01 As an administrator, I want to review logs of all notifications
+ *                  sent to entrants by organizers.
  * <p>
  * Tests use temporary Firestore collections to avoid affecting production data.
  *
@@ -57,6 +60,7 @@ public class AdministratorDashboardTest {
     private String testEventId;
     private String testUserId;
     private String testImageId;
+    private String testNotificationId;
     private User adminUser;
 
     /**
@@ -87,7 +91,7 @@ public class AdministratorDashboardTest {
                 null, "No Image", null, null, null, null, null);
         UserSession.getInstance().setCurrentUser(adminUser);
 
-        CountDownLatch latch = new CountDownLatch(3);
+        CountDownLatch latch = new CountDownLatch(4);
 
         // Add admin to Firestore
         db.collection(FirestoreCollections.USERS_COLLECTION)
@@ -108,6 +112,19 @@ public class AdministratorDashboardTest {
                 .document(testImageId)
                 .set(Map.of("URL", "https://example.com/test.jpg"))
                 .addOnSuccessListener(v -> latch.countDown());
+
+        // Add a sample notification
+        Map<String, Object> notificationData = new HashMap<>();
+        notificationData.put("eventId", "event123");
+        notificationData.put("eventName", "Log Test Event");
+        notificationData.put("message", "Sample Notification Message");
+
+        db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
+                .add(notificationData)
+                .addOnSuccessListener(doc -> {
+                    testNotificationId = doc.getId();
+                    latch.countDown();
+                });
 
         latch.await();
 
@@ -333,6 +350,34 @@ public class AdministratorDashboardTest {
                 });
         verifyLatch.await();
         assert !exists[0] : "Image should have been deleted from Firestore";
+    }
+
+    /**
+     * Tests that an administrator can browse the notification logs.
+     * <p>
+     * Launches the dashboard, switches to the notification list, and verifies
+     * that the sample notification's message and event name are visible.
+     * <p>
+     * User Stories Tested:
+     * US 03.08.01 As an administrator, I want to review logs of all notifications.
+     *
+     * @throws InterruptedException if the thread sleep is interrupted
+     */
+    @Test
+    public void testBrowseNotifications() throws InterruptedException {
+        launchDashboard();
+        Thread.sleep(1500);
+
+        // Switch to the Notification List tab
+        onView(withId(R.id.admin_dashboard_show_notification_list_button)).perform(click());
+        Thread.sleep(1000);
+
+        // Check if the ListView displays the notification content
+        onView(withId(R.id.admin_dashboard_notification_list))
+                .check(matches(hasDescendant(withText("Sample Notification Message"))));
+
+        onView(withId(R.id.admin_dashboard_notification_list))
+                .check(matches(hasDescendant(withText("Log Test Event"))));
     }
 
     /**
