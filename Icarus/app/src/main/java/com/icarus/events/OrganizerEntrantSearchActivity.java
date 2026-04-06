@@ -151,9 +151,12 @@ public class OrganizerEntrantSearchActivity extends HeaderNavBarActivity {
                             }
                         });
 
-                db.collection(FirestoreCollections.USERS_COLLECTION)
-                        .document(userId)
-                        .update("events", FieldValue.arrayUnion(eventId));
+                for (String selectedUserId : selectedIds) {
+                    db.collection(FirestoreCollections.USERS_COLLECTION)
+                            .document(selectedUserId)
+                            .set(Map.of("events", FieldValue.arrayUnion(eventId)),
+                                    com.google.firebase.firestore.SetOptions.merge());
+                }
 
             } else if (screenName.equals("Find Co-Organizers")) {
                 addUserstoOrganizersArray(selectedIds);
