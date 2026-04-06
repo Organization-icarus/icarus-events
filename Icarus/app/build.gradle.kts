@@ -32,6 +32,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/DEPENDENCIES"
+            excludes += "/META-INF/LICENSE"
+            excludes += "/META-INF/NOTICE"
+            excludes += "/META-INF/INDEX.LIST"
+        }
+    }
 }
 
 dependencies {
@@ -58,6 +66,10 @@ dependencies {
     implementation("com.google.guava:guava:31.1-android")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation("com.google.zxing:core:3.5.1")
+
+    implementation("com.google.firebase:firebase-messaging:23.4.1")
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
+    implementation("com.android.volley:volley:1.2.1")
 }
 
 tasks.register<Javadoc>("javadoc") {

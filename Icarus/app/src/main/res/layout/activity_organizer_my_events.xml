@@ -20,7 +20,7 @@
         android:orientation="horizontal">
 
         <ImageButton
-            android:id="@+id/notifications_back_button"
+            android:id="@+id/organizer_my_events_back_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@android:color/transparent"
@@ -33,24 +33,20 @@
             app:tint="@android:color/white" />
 
         <TextView
-            android:id="@+id/notifications_page_title"
+            android:id="@+id/organizer_my_events_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="Notifications"
+            android:text="My Organized Events"
             android:textColor="@android:color/white"
             android:textSize="30sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/notifications_list_view"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/organizer_my_events_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="4dp"
-        android:listSelector="@android:color/transparent"
-        android:scrollbars="none" />
+        android:layout_weight="1" />
 
 </LinearLayout>

@@ -268,7 +268,7 @@ public class OrganizerViewEntrantsOnWaitingListActivity extends HeaderNavBarActi
                         String status = snapshot.getString("status");
 
                         if (Objects.equals(status, listStatus)) {
-                            //If user has waiting role look for name in user collection
+                            // If user has waiting role look for name in user collection
                             db.collection(FirestoreCollections.USERS_COLLECTION)
                                     .document(deviceId)
                                     .get()
