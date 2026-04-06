@@ -1,6 +1,7 @@
 package com.icarus.events;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -81,6 +82,12 @@ public class NotificationListAdapter extends ArrayAdapter<NotificationItem> {
             senderImage.setImageResource(R.drawable.poster);
             return view;
         }
+
+        senderNameText.setOnClickListener(v -> {
+            Intent intent = new Intent(context, EventDetailsActivity.class);
+            intent.putExtra("eventId", item.getEventId());
+            context.startActivity(intent);
+        });
 
         db.collection(FirestoreCollections.USERS_COLLECTION)
                 .document(senderId)

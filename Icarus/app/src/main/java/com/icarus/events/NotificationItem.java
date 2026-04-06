@@ -65,8 +65,9 @@ public class NotificationItem {
      * @param eventImage the image associated with the notification
      * @param message the content of the message
      */
-    public NotificationItem(String id, String eventName, String eventImage, String message) {
+    public NotificationItem(String id, String eventId, String eventName, String eventImage, String message) {
         this.id = id;
+        this.eventId = eventId;
         this.eventName = eventName;
         this.eventImage = eventImage;
         this.message = message;
