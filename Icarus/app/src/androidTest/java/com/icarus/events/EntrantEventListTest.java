@@ -2,6 +2,8 @@ package com.icarus.events;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
@@ -36,6 +38,11 @@ import java.util.concurrent.CountDownLatch;
  *      of events that I can join the waiting list for.
  *      US 01.01.04 – As an entrant, I want to filter events based on
  *      my interests and availability.
+ *      US 01.01.05 – Provide search bar. Search open events by words in
+ *      search bar. Update displayed event list.
+ *      US 01.01.06 – Provide search bar, provide filtering options.
+ *      Filter event list based on applied filters and words in the
+ *      search bar. Update displayed event list.
  * <p>
  * Tests use temporary Firestore test collections and test-only category
  * documents to avoid interfering with production event and user data.
@@ -56,6 +63,8 @@ public class EntrantEventListTest {
     private final List<String> insertedEventNames = new ArrayList<>();
     private final List<Date> insertedStartDates = new ArrayList<>();
     private final List<Double> insertedCapacities = new ArrayList<>();
+    private String sharedSearchTerm;
+    private String uniqueSearchTerm;
     private String sportsCategory;
     private String artCategory;
     private String musicCategory;
@@ -73,6 +82,8 @@ public class EntrantEventListTest {
     public void setupFirestoreData() throws InterruptedException {
         FirestoreCollections.startTest();
         String runId = String.valueOf(System.currentTimeMillis());
+        sharedSearchTerm = "sharedsearch" + runId;
+        uniqueSearchTerm = "uniquesearch" + runId;
         sportsCategory = "Sports Test " + runId;
         artCategory = "Art Test " + runId;
         musicCategory = "Music Test " + runId;
@@ -127,7 +138,14 @@ public class EntrantEventListTest {
         CountDownLatch eventLatch = new CountDownLatch(3);
         for (int i = 0; i < 3; i++) {
             Map<String, Object> event = new HashMap<>();
-            String eventName = "Test Event " + (i + 1) + " - " + System.currentTimeMillis();
+            String eventName;
+            if (i == 0) {
+                eventName = "Shared Sports Event " + sharedSearchTerm + " - " + System.currentTimeMillis();
+            } else if (i == 1) {
+                eventName = "Shared Art Event " + sharedSearchTerm + " - " + System.currentTimeMillis();
+            } else {
+                eventName = "Unique Music Event " + uniqueSearchTerm + " - " + System.currentTimeMillis();
+            }
 
             double capacity = 20.0 + i;
             Date regOpen = new Date(System.currentTimeMillis() - 60_000);
@@ -417,6 +435,63 @@ public class EntrantEventListTest {
         Date secondEventWindowEnd = new Date(secondEventStart.getTime() + 60_000);
 
         applyDateRangeFilter(secondEventWindowStart, secondEventWindowEnd);
+        waitForRecyclerViewExactSize(1, 5000);
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewSize(1));
+    }
+
+    /**
+     * Tests that typing words into the search bar updates the displayed event list.
+     * <p>
+     * User Story Tested:
+     *     US 01.01.05 – Provide search bar. Search open events by words in
+     *     search bar. Update displayed event list.
+     *
+     * @throws InterruptedException if waiting for asynchronous UI updates is interrupted
+     */
+    @Test
+    public void testSearchBarFiltering() throws InterruptedException {
+        waitForRecyclerViewItems(3, 5000);
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewMinSize(3));
+
+        onView(withId(R.id.entrant_event_list_search_filter))
+                .perform(replaceText(uniqueSearchTerm), closeSoftKeyboard());
+
+        waitForRecyclerViewExactSize(1, 5000);
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewSize(1));
+    }
+
+    /**
+     * Tests that the displayed event list updates when both search text and filters
+     * are applied together.
+     * <p>
+     * User Story Tested:
+     *     US 01.01.06 – Provide search bar, provide filtering options.
+     *     Filter event list based on applied filters and words in the
+     *     search bar. Update displayed event list.
+     *
+     * @throws InterruptedException if waiting for asynchronous UI updates is interrupted
+     */
+    @Test
+    public void testSearchBarWithCategoryFiltering() throws InterruptedException {
+        waitForRecyclerViewItems(3, 5000);
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewMinSize(3));
+
+        onView(withId(R.id.entrant_event_list_search_filter))
+                .perform(replaceText(sharedSearchTerm), closeSoftKeyboard());
+
+        waitForRecyclerViewExactSize(2, 5000);
+        onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewSize(2));
+
+        onView(withId(R.id.entrant_event_list_filter_button)).perform(click());
+        Thread.sleep(300);
+        onView(withText("Categories: Any")).perform(click());
+
+        Thread.sleep(300);
+        onView(withText(artCategory)).perform(click());
+        onView(withText("Apply")).perform(click());
+        onView(withText("Apply")).perform(click());
+        Thread.sleep(800);
+
         waitForRecyclerViewExactSize(1, 5000);
         onView(withId(R.id.entrant_event_list_view)).check(withRecyclerViewSize(1));
     }
