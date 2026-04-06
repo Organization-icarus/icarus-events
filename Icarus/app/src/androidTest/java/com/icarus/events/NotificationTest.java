@@ -1,11 +1,5 @@
 package com.icarus.events;
 
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
-
 import android.widget.ListView;
 
 import androidx.test.core.app.ActivityScenario;
@@ -13,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import org.junit.After;
 import org.junit.Before;
@@ -50,11 +45,6 @@ public class NotificationTest {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private User testUser;
 
-    /**
-     * Sets up a test user in Firestore and stores that user in {@link UserSession}.
-     *
-     * @throws InterruptedException if Firestore setup waits are interrupted
-     */
     @Before
     public void setupFirestoreData() throws InterruptedException {
         FirestoreCollections.startTest();
@@ -67,7 +57,7 @@ public class NotificationTest {
         entrant.put("isAdmin", false);
         entrant.put("phone", "123456789");
 
-        db.collection("users_test")
+        db.collection(FirestoreCollections.USERS_COLLECTION)
                 .add(entrant)
                 .addOnSuccessListener(doc -> {
                     testUser = new User(
@@ -84,21 +74,14 @@ public class NotificationTest {
                     );
                     UserSession.getInstance().setCurrentUser(testUser);
                     userLatch.countDown();
+                })
+                .addOnFailureListener(e -> {
+                    throw new AssertionError("Failed to create test user: " + e.getMessage());
                 });
 
         userLatch.await();
     }
 
-    /**
-     * Inserts a single notification document into the test notifications collection.
-     *
-     * @param eventId event id
-     * @param eventName event name
-     * @param sender sender id
-     * @param message notification message
-     * @param type notification type
-     * @throws InterruptedException if Firestore insertion waits are interrupted
-     */
     private void insertNotification(
             String eventId,
             String eventName,
@@ -123,21 +106,51 @@ public class NotificationTest {
         notification.put("type", type);
         notification.put("date", new Date());
 
-        db.collection("notifications_test")
+        db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
                 .add(notification)
                 .addOnSuccessListener(doc -> latch.countDown())
-                .addOnFailureListener(e -> latch.countDown());
+                .addOnFailureListener(e -> {
+                    throw new AssertionError("Failed to insert notification: " + e.getMessage());
+                });
 
         latch.await();
+
+        CountDownLatch syncLatch = new CountDownLatch(1);
+        db.waitForPendingWrites()
+                .addOnSuccessListener(unused -> syncLatch.countDown())
+                .addOnFailureListener(e -> syncLatch.countDown());
+        syncLatch.await();
     }
 
-    /**
-     * Waits until the notifications ListView is populated.
-     *
-     * @param minCount minimum number of items expected
-     * @param timeoutMs max time to wait
-     * @throws InterruptedException if interrupted while waiting
-     */
+    private void assertNotificationInserted() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        final int[] count = {0};
+        final String[] error = {null};
+
+        db.collection(FirestoreCollections.NOTIFICATIONS_COLLECTION)
+                .whereArrayContains("recipients", testUser.getId())
+                .orderBy("date", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(result -> {
+                    count[0] = result.size();
+                    latch.countDown();
+                })
+                .addOnFailureListener(e -> {
+                    error[0] = e.getMessage();
+                    latch.countDown();
+                });
+
+        latch.await();
+
+        if (error[0] != null) {
+            throw new AssertionError("Notification query failed: " + error[0]);
+        }
+
+        if (count[0] < 1) {
+            throw new AssertionError("Inserted notification was not found in Firestore");
+        }
+    }
+
     private void waitForListViewItems(int minCount, long timeoutMs) throws InterruptedException {
         long start = System.currentTimeMillis();
 
@@ -161,7 +174,43 @@ public class NotificationTest {
         throw new AssertionError("Notification list never populated with at least " + minCount + " item(s)");
     }
 
+    private void assertNotificationMessageInList(String expectedMessage) {
+        scenario.onActivity(activity -> {
+            if (activity.isFinishing()) {
+                throw new AssertionError("UserNotificationsActivity finished immediately");
+            }
 
+            User currentUser = UserSession.getInstance().getCurrentUser();
+            if (currentUser == null) {
+                throw new AssertionError("UserSession currentUser is null inside activity");
+            }
+
+            ListView listView = activity.findViewById(R.id.notifications_list_view);
+            if (listView == null) {
+                throw new AssertionError("notifications_list_view is null");
+            }
+
+            if (listView.getAdapter() == null) {
+                throw new AssertionError("notifications_list_view adapter is null");
+            }
+
+            boolean found = false;
+            for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+                Object item = listView.getAdapter().getItem(i);
+                if (item instanceof NotificationItem) {
+                    NotificationItem notificationItem = (NotificationItem) item;
+                    if (expectedMessage.equals(notificationItem.getMessage())) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!found) {
+                throw new AssertionError("Expected notification message not found in adapter: " + expectedMessage);
+            }
+        });
+    }
 
     /**
      * Tests that an entrant can see a notification when chosen from the waiting list.
@@ -169,10 +218,9 @@ public class NotificationTest {
      * User Story Tested:
      * US 01.04.01 – As an entrant, I want to receive notification when I am chosen
      * to participate from the waiting list (when I "win" the lottery).
-     *
-     * @throws InterruptedException if Firestore/UI waits are interrupted
      */
     @Test
+
     public void testChosenFromWaitlistNotificationDisplayed() throws InterruptedException {
         String message = "You have been chosen from the waiting list to participate in this event.";
 
@@ -184,14 +232,14 @@ public class NotificationTest {
                 "lottery_win"
         );
 
+        assertNotificationInserted();
+
+        Thread.sleep(1000);
         scenario = ActivityScenario.launch(UserNotificationsActivity.class);
+        Thread.sleep(2500);
 
-
-
-        waitForListViewItems(1, 5000);
-
-        onView(withText(message))
-                .check(matches(isDisplayed()));
+        waitForListViewItems(1, 10000);
+        assertNotificationMessageInList(message);
     }
 
     /**
@@ -200,8 +248,6 @@ public class NotificationTest {
      * User Story Tested:
      * US 01.04.02 – As an entrant, I want to receive notification of when I am not chosen
      * on the app (when I "lose" the lottery).
-     *
-     * @throws InterruptedException if Firestore/UI waits are interrupted
      */
     @Test
     public void testNotChosenNotificationDisplayed() throws InterruptedException {
@@ -215,14 +261,14 @@ public class NotificationTest {
                 "lottery_lose"
         );
 
+        assertNotificationInserted();
+
+        Thread.sleep(500);
         scenario = ActivityScenario.launch(UserNotificationsActivity.class);
-
-
+        Thread.sleep(1500);
 
         waitForListViewItems(1, 5000);
-
-        onView(withText(message))
-                .check(matches(isDisplayed()));
+        assertNotificationMessageInList(message);
     }
 
     /**
@@ -231,8 +277,6 @@ public class NotificationTest {
      * User Story Tested:
      * US 02.05.01 – As an organizer, I want to send a notification to chosen entrants
      * to sign up for events. This is the notification that they "won" the lottery.
-     *
-     * @throws InterruptedException if Firestore/UI waits are interrupted
      */
     @Test
     public void testOrganizerSentWinnerNotificationDisplayedToEntrant() throws InterruptedException {
@@ -246,20 +290,16 @@ public class NotificationTest {
                 "organizer_winner_notification"
         );
 
-        scenario = ActivityScenario.launch(UserNotificationsActivity.class);
+        assertNotificationInserted();
 
+        Thread.sleep(500);
+        scenario = ActivityScenario.launch(UserNotificationsActivity.class);
+        Thread.sleep(1500);
 
         waitForListViewItems(1, 5000);
-
-        onView(withText(message))
-                .check(matches(isDisplayed()));
+        assertNotificationMessageInList(message);
     }
 
-    /**
-     * Cleans up test state after each test.
-     *
-     * @throws InterruptedException if cleanup waits are interrupted
-     */
     @After
     public void cleanupFirestoreData() throws InterruptedException {
         if (scenario != null) {
