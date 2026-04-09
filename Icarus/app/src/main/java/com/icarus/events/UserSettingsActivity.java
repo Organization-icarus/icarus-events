@@ -337,7 +337,48 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             bday.put("open", toTimestamp(2026, 04, 01));
             bday.put("organizers", Arrays.asList("d1e25fd5419c4e04f37a24829d6ad8892b22ecd7df5dfb9f0563f6d79fcd39c1"));
             bday.put("startDate", toTimestamp(2026, 05, 01));
-            db.collection(FirestoreCollections.EVENTS_COLLECTION).document("birthday-demo-id").set(bday);
+            DocumentReference bdayRef = db.collection(FirestoreCollections.EVENTS_COLLECTION).document("birthday-demo-id");
+            bdayRef.set(bday);
+
+            Map<String, Object> merryComment = new HashMap<>();
+            merryComment.put("authorId", "merry-demo-id");
+            merryComment.put("authorImage", "https://res.cloudinary.com/icarus-images/image/upload/v1775679847/merry_fxgnmf.jpg");
+            merryComment.put("authorName", "Merry Brandybuck");
+            merryComment.put("createdAt", Timestamp.now());
+            merryComment.put("deleted", false);
+            merryComment.put("documentId", null);
+            merryComment.put("text", "I can't wait for the fireworks!");
+            bdayRef.collection("comments").add(merryComment);
+
+            Map<String, Object> pippinComment = new HashMap<>();
+            pippinComment.put("authorId", "pippin-demo-id");
+            pippinComment.put("authorImage", "https://res.cloudinary.com/icarus-images/image/upload/v1775679848/pippin_fmnuvo.jpg");
+            pippinComment.put("authorName", "Pippin Took");
+            pippinComment.put("createdAt", Timestamp.now());
+            pippinComment.put("deleted", false);
+            pippinComment.put("documentId", null);
+            pippinComment.put("text", "I hope there are at least three dinners.");
+            bdayRef.collection("comments").add(pippinComment);
+
+            Map<String, Object> bilboComment = new HashMap<>();
+            bilboComment.put("authorId", "bilbo-demo-id");
+            bilboComment.put("authorImage", "https://res.cloudinary.com/icarus-images/image/upload/v1775769958/bilbo_ef64j6.webp");
+            bilboComment.put("authorName", "Bilbo Baggins");
+            bilboComment.put("createdAt", Timestamp.now());
+            bilboComment.put("deleted", false);
+            bilboComment.put("documentId", null);
+            bilboComment.put("text", "I don't know half of you half as well as I should like; and I like less than half of you half as well as you deserve");
+            bdayRef.collection("comments").add(bilboComment);
+
+            Map<String, Object> gollumComment = new HashMap<>();
+            gollumComment.put("authorId", "gollum-demo-id");
+            gollumComment.put("authorImage", "https://res.cloudinary.com/icarus-images/image/upload/v1775679847/gollum_qui1wv.jpg");
+            gollumComment.put("authorName", "Gollum");
+            gollumComment.put("createdAt", Timestamp.now());
+            gollumComment.put("deleted", false);
+            gollumComment.put("documentId", null);
+            gollumComment.put("text", "GIVE ME BACK MY RING YO.");
+            bdayRef.collection("comments").add(gollumComment);
         });
 
     }
