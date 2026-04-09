@@ -382,7 +382,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
 
             Map<String, Object> sauronComment = new HashMap<>();
             sauronComment.put("authorId", "sauron-demo-id");
-            sauronComment.put("authorImage", "https://res.cloudinary.com/icarus-images/image/upload/v1775679850/sauron_o88gru.jpg");
+            sauronComment.put("authorImage", "https://res.cloudinary.com/icarus-images/image/upload/v1775771167/sauron_cgc6pu.jpg");
             sauronComment.put("authorName", "Sauron");
             sauronComment.put("createdAt", Timestamp.now());
             sauronComment.put("deleted", false);
