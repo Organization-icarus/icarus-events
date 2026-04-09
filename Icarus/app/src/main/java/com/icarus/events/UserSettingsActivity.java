@@ -357,7 +357,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             pippinComment.put("createdAt", Timestamp.now());
             pippinComment.put("deleted", false);
             pippinComment.put("documentId", null);
-            pippinComment.put("text", "I hope there are at least three dinners.");
+            pippinComment.put("text", "There better be at at least three dinners!");
             bdayRef.collection("comments").add(pippinComment);
 
             Map<String, Object> bilboComment = new HashMap<>();
@@ -377,7 +377,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             gollumComment.put("createdAt", Timestamp.now());
             gollumComment.put("deleted", false);
             gollumComment.put("documentId", null);
-            gollumComment.put("text", "GIVE ME BACK MY RING YO.");
+            gollumComment.put("text", "GIVE ME BACK MY RING YO!");
             bdayRef.collection("comments").add(gollumComment);
         });
 
