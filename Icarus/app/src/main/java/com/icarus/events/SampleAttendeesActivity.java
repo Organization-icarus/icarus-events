@@ -190,7 +190,7 @@ public class SampleAttendeesActivity extends HeaderNavBarActivity {
                                                         true,
                                                         new ArrayList<>(sampledEntrants),
                                                         "Congratulations! You have been selected to attend "
-                                                                + event.getString("name") + " on " + event.getDate("date"),
+                                                                + event.getString("name") + " on " + event.getDate("startDate"),
                                                         "selected"
                                                 );
                                                 winNotification.sendNotification(this);
@@ -205,7 +205,7 @@ public class SampleAttendeesActivity extends HeaderNavBarActivity {
                                                         true,
                                                         rejectedEntrants,
                                                         "Unfortunately, you were not selected to attend "
-                                                                + event.getString("name") + " on " + event.getDate("date")
+                                                                + event.getString("name") + " on " + event.getDate("startDate")
                                                                 + ". More selections may still be made in the future",
                                                         "not_selected"
                                                 );
