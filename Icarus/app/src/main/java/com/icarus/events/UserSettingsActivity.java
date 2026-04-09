@@ -379,6 +379,16 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             gollumComment.put("documentId", null);
             gollumComment.put("text", "GIVE ME BACK MY RING YO!");
             bdayRef.collection("comments").add(gollumComment);
+
+            Map<String, Object> sauronComment = new HashMap<>();
+            sauronComment.put("authorId", "sauron-demo-id");
+            sauronComment.put("authorImage", "https://res.cloudinary.com/icarus-images/image/upload/v1775679850/sauron_o88gru.jpg");
+            sauronComment.put("authorName", "Sauron");
+            sauronComment.put("createdAt", Timestamp.now());
+            sauronComment.put("deleted", false);
+            sauronComment.put("documentId", null);
+            sauronComment.put("text", "Enjoy your celebration while you can...");
+            bdayRef.collection("comments").add(sauronComment);
         });
 
     }
