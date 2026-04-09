@@ -188,7 +188,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             sam.put("phone", null);
             sam.put("settings", Arrays.asList(false, false));
             sam.put("events", Arrays.asList());
-            db.collection(FirestoreCollections.USERS_COLLECTION).add(sam);
+            db.collection(FirestoreCollections.USERS_COLLECTION).document("sam-demo-id").set(sam);
 
             Map<String, Object> legolas = new HashMap<>();
             legolas.put("email", "lego@mirkwood.com");
@@ -199,7 +199,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             legolas.put("phone", null);
             legolas.put("settings", Arrays.asList(false, false));
             legolas.put("events", Arrays.asList());
-            db.collection(FirestoreCollections.USERS_COLLECTION).add(legolas);
+            db.collection(FirestoreCollections.USERS_COLLECTION).document("legolas-demo-id").set(legolas);
 
             Map<String, Object> gollum = new HashMap<>();
             gollum.put("email", "gollum@cave.com");
@@ -210,7 +210,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             gollum.put("phone", null);
             gollum.put("settings", Arrays.asList(false, false));
             gollum.put("events", Arrays.asList());
-            db.collection(FirestoreCollections.USERS_COLLECTION).add(gollum);
+            db.collection(FirestoreCollections.USERS_COLLECTION).document("gollum-demo-id").set(gollum);
 
             Map<String, Object> gimli = new HashMap<>();
             gimli.put("email", "gimli@mines.com");
@@ -221,7 +221,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             gimli.put("phone", null);
             gimli.put("settings", Arrays.asList(false, false));
             gimli.put("events", Arrays.asList());
-            db.collection(FirestoreCollections.USERS_COLLECTION).add(gimli);
+            db.collection(FirestoreCollections.USERS_COLLECTION).document("gimli-demo-id").set(gimli);
 
             Map<String, Object> sauron = new HashMap<>();
             sauron.put("email", "sauron@mordor.com");
@@ -232,7 +232,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             sauron.put("phone", null);
             sauron.put("settings", Arrays.asList(false, false));
             sauron.put("events", Arrays.asList());
-            db.collection(FirestoreCollections.USERS_COLLECTION).add(sauron);
+            db.collection(FirestoreCollections.USERS_COLLECTION).document("sauron-demo-id").set(sauron);
 
             Map<String, Object> merry = new HashMap<>();
             merry.put("email", "merryb@shire.com");
@@ -243,7 +243,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             merry.put("phone", null);
             merry.put("settings", Arrays.asList(false, false));
             merry.put("events", Arrays.asList());
-            db.collection(FirestoreCollections.USERS_COLLECTION).add(merry);
+            db.collection(FirestoreCollections.USERS_COLLECTION).document("merry-demo-id").set(merry);
 
             Map<String, Object> pippin = new HashMap<>();
             pippin.put("email", "pip@shire.com");
@@ -254,7 +254,18 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             pippin.put("phone", null);
             pippin.put("settings", Arrays.asList(false, false));
             pippin.put("events", Arrays.asList());
-            db.collection(FirestoreCollections.USERS_COLLECTION).add(pippin);
+            db.collection(FirestoreCollections.USERS_COLLECTION).document("pippin-demo-id").set(pippin);
+
+            Map<String, Object> bilbo = new HashMap<>();
+            bilbo.put("email", "bilbobag@shire.com");
+            bilbo.put("fcmTokes", null);
+            bilbo.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775769958/bilbo_ef64j6.webp");
+            bilbo.put("isAdmin", false);
+            bilbo.put("name", "Bilbo Baggins");
+            bilbo.put("phone", null);
+            bilbo.put("settings", Arrays.asList(false, false));
+            bilbo.put("events", Arrays.asList());
+            db.collection(FirestoreCollections.USERS_COLLECTION).document("bilbo-demo-id").set(bilbo);
 
             Map<String, Object> secretCouncil = new HashMap<>();
             secretCouncil.put("capacity", 13);
@@ -272,7 +283,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             secretCouncil.put("open", toTimestamp(2026, 04, 01));
             secretCouncil.put("organizers", Arrays.asList("d1e25fd5419c4e04f37a24829d6ad8892b22ecd7df5dfb9f0563f6d79fcd39c1"));
             secretCouncil.put("startDate", toTimestamp(2026, 05, 03));
-            db.collection(FirestoreCollections.EVENTS_COLLECTION).add(secretCouncil);
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document("secretCouncil-demo-id").set(secretCouncil);
 
             Map<String, Object> moria = new HashMap<>();
             moria.put("capacity", 13);
@@ -290,7 +301,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             moria.put("open", toTimestamp(2026, 04, 01));
             moria.put("organizers", Arrays.asList("d1e25fd5419c4e04f37a24829d6ad8892b22ecd7df5dfb9f0563f6d79fcd39c1"));
             moria.put("startDate", toTimestamp(2026, 05, 04));
-            db.collection(FirestoreCollections.EVENTS_COLLECTION).add(moria);
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document("moria-demo-id").set(moria);
 
             Map<String, Object> camp = new HashMap<>();
             camp.put("capacity", 13);
@@ -308,7 +319,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             camp.put("open", toTimestamp(2026, 04, 01));
             camp.put("organizers", Arrays.asList("d1e25fd5419c4e04f37a24829d6ad8892b22ecd7df5dfb9f0563f6d79fcd39c1"));
             camp.put("startDate", toTimestamp(2026, 05, 02));
-            db.collection(FirestoreCollections.EVENTS_COLLECTION).add(camp);
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document("camp-demo-id").set(camp);
 
             Map<String, Object> bday = new HashMap<>();
             bday.put("capacity", 13);
@@ -326,7 +337,7 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             bday.put("open", toTimestamp(2026, 04, 01));
             bday.put("organizers", Arrays.asList("d1e25fd5419c4e04f37a24829d6ad8892b22ecd7df5dfb9f0563f6d79fcd39c1"));
             bday.put("startDate", toTimestamp(2026, 05, 01));
-            db.collection(FirestoreCollections.EVENTS_COLLECTION).add(bday);
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).document("birthday-demo-id").set(bday);
         });
 
     }
