@@ -190,17 +190,6 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             sam.put("events", Arrays.asList());
             db.collection(FirestoreCollections.USERS_COLLECTION).document("sam-demo-id").set(sam);
 
-            Map<String, Object> legolas = new HashMap<>();
-            legolas.put("email", "lego@mirkwood.com");
-            legolas.put("fcmTokes", null);
-            legolas.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775679847/legolas_x5q0za.jpg");
-            legolas.put("isAdmin", false);
-            legolas.put("name", "Legolas");
-            legolas.put("phone", null);
-            legolas.put("settings", Arrays.asList(false, false));
-            legolas.put("events", Arrays.asList());
-            db.collection(FirestoreCollections.USERS_COLLECTION).document("legolas-demo-id").set(legolas);
-
             Map<String, Object> gollum = new HashMap<>();
             gollum.put("email", "gollum@cave.com");
             gollum.put("fcmTokes", null);
