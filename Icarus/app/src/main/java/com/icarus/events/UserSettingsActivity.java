@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -18,6 +19,9 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 import com.squareup.picasso.Picasso;
 
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +39,7 @@ import java.util.Map;
  */
 public class UserSettingsActivity extends HeaderNavBarActivity {
     private Button deleteProfileButton;
+    private Button generateDemoDataButton;
     private ImageView profileImage;
     private Switch adminNotificationsSwitch;
     private Switch organizerNotificationsSwitch;
@@ -172,6 +177,158 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
                 .addOnFailureListener(e ->
                         Log.e("UserSettings", "Failed to load settings: " + e.getMessage()));
 
+        generateDemoDataButton = findViewById(R.id.generate_demo_data_button);
+        generateDemoDataButton.setOnClickListener(v -> {
+            Map<String, Object> sam = new HashMap<>();
+            sam.put("email", "samw@shire.com");
+            sam.put("fcmTokes", null);
+            sam.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775679849/samwise_wijtel.jpg");
+            sam.put("isAdmin", false);
+            sam.put("name", "Samwise Gamgee");
+            sam.put("phone", null);
+            sam.put("settings", Arrays.asList(false, false));
+            sam.put("events", Arrays.asList());
+            db.collection(FirestoreCollections.USERS_COLLECTION).add(sam);
+
+            Map<String, Object> legolas = new HashMap<>();
+            legolas.put("email", "lego@mirkwood.com");
+            legolas.put("fcmTokes", null);
+            legolas.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775679847/legolas_x5q0za.jpg");
+            legolas.put("isAdmin", false);
+            legolas.put("name", "Legolas");
+            legolas.put("phone", null);
+            legolas.put("settings", Arrays.asList(false, false));
+            legolas.put("events", Arrays.asList());
+            db.collection(FirestoreCollections.USERS_COLLECTION).add(legolas);
+
+            Map<String, Object> gollum = new HashMap<>();
+            gollum.put("email", "gollum@cave.com");
+            gollum.put("fcmTokes", null);
+            gollum.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775679847/gollum_qui1wv.jpg");
+            gollum.put("isAdmin", false);
+            gollum.put("name", "Gollum");
+            gollum.put("phone", null);
+            gollum.put("settings", Arrays.asList(false, false));
+            gollum.put("events", Arrays.asList());
+            db.collection(FirestoreCollections.USERS_COLLECTION).add(gollum);
+
+            Map<String, Object> gimli = new HashMap<>();
+            gimli.put("email", "gimli@mines.com");
+            gimli.put("fcmTokes", null);
+            gimli.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775679850/gimli_brvaum.jpg");
+            gimli.put("isAdmin", false);
+            gimli.put("name", "Gimli");
+            gimli.put("phone", null);
+            gimli.put("settings", Arrays.asList(false, false));
+            gimli.put("events", Arrays.asList());
+            db.collection(FirestoreCollections.USERS_COLLECTION).add(gimli);
+
+            Map<String, Object> sauron = new HashMap<>();
+            sauron.put("email", "sauron@mordor.com");
+            sauron.put("fcmTokes", null);
+            sauron.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775679850/sauron_o88gru.jpg");
+            sauron.put("isAdmin", false);
+            sauron.put("name", "Sauron");
+            sauron.put("phone", null);
+            sauron.put("settings", Arrays.asList(false, false));
+            sauron.put("events", Arrays.asList());
+            db.collection(FirestoreCollections.USERS_COLLECTION).add(sauron);
+
+            Map<String, Object> merry = new HashMap<>();
+            merry.put("email", "merryb@shire.com");
+            merry.put("fcmTokes", null);
+            merry.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775679847/merry_fxgnmf.jpg");
+            merry.put("isAdmin", false);
+            merry.put("name", "Merry Brandybuck");
+            merry.put("phone", null);
+            merry.put("settings", Arrays.asList(false, false));
+            merry.put("events", Arrays.asList());
+            db.collection(FirestoreCollections.USERS_COLLECTION).add(merry);
+
+            Map<String, Object> pippin = new HashMap<>();
+            pippin.put("email", "pip@shire.com");
+            pippin.put("fcmTokes", null);
+            pippin.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775679848/pippin_fmnuvo.jpg");
+            pippin.put("isAdmin", false);
+            pippin.put("name", "Pippin Took");
+            pippin.put("phone", null);
+            pippin.put("settings", Arrays.asList(false, false));
+            pippin.put("events", Arrays.asList());
+            db.collection(FirestoreCollections.USERS_COLLECTION).add(pippin);
+
+            Map<String, Object> secretCouncil = new HashMap<>();
+            secretCouncil.put("capacity", 13);
+            secretCouncil.put("category", "Education");
+            secretCouncil.put("close", toTimestamp(2026, 04, 30));
+            secretCouncil.put("coordinates", null);
+            secretCouncil.put("endDate", toTimestamp(2026, 05, 04));
+            secretCouncil.put("entrantRange", null);
+            secretCouncil.put("geolocation", false);
+            secretCouncil.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775680955/rivendell_lrtvfb.png");
+            secretCouncil.put("isPrivate", true);
+            secretCouncil.put("location", "Rivendell");
+            secretCouncil.put("name", "Secret Council");
+            secretCouncil.put("description", "Council of Elrond.");
+            secretCouncil.put("open", toTimestamp(2026, 04, 01));
+            secretCouncil.put("organizers", Arrays.asList("d1e25fd5419c4e04f37a24829d6ad8892b22ecd7df5dfb9f0563f6d79fcd39c1"));
+            secretCouncil.put("startDate", toTimestamp(2026, 05, 03));
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).add(secretCouncil);
+
+            Map<String, Object> moria = new HashMap<>();
+            moria.put("capacity", 13);
+            moria.put("category", "Education");
+            moria.put("close", toTimestamp(2026, 04, 31));
+            moria.put("coordinates", null);
+            moria.put("endDate", toTimestamp(2026, 05, 04));
+            moria.put("entrantRange", null);
+            moria.put("geolocation", false);
+            moria.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775682570/moria_qg8xxx.jpg");
+            moria.put("isPrivate", false);
+            moria.put("location", "Mines of Moria");
+            moria.put("name", "Investigate Mines of Moria");
+            moria.put("description", "Investigating.");
+            moria.put("open", toTimestamp(2026, 04, 01));
+            moria.put("organizers", Arrays.asList("d1e25fd5419c4e04f37a24829d6ad8892b22ecd7df5dfb9f0563f6d79fcd39c1"));
+            moria.put("startDate", toTimestamp(2026, 05, 04));
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).add(moria);
+
+            Map<String, Object> camp = new HashMap<>();
+            camp.put("capacity", 13);
+            camp.put("category", "Sports");
+            camp.put("close", toTimestamp(2026, 04, 30));
+            camp.put("coordinates", null);
+            camp.put("endDate", toTimestamp(2026, 05, 04));
+            camp.put("entrantRange", null);
+            camp.put("geolocation", false);
+            camp.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775682709/camp_ze35x0.webp");
+            camp.put("isPrivate", false);
+            camp.put("location", "Weathertop");
+            camp.put("name", "Camp at Weathertop");
+            camp.put("description", "Lets go camping!");
+            camp.put("open", toTimestamp(2026, 04, 01));
+            camp.put("organizers", Arrays.asList("d1e25fd5419c4e04f37a24829d6ad8892b22ecd7df5dfb9f0563f6d79fcd39c1"));
+            camp.put("startDate", toTimestamp(2026, 05, 02));
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).add(camp);
+
+            Map<String, Object> bday = new HashMap<>();
+            bday.put("capacity", 13);
+            bday.put("category", "Music");
+            bday.put("close", toTimestamp(2026, 04, 30));
+            bday.put("coordinates", null);
+            bday.put("endDate", toTimestamp(2026, 05, 04));
+            bday.put("entrantRange", null);
+            bday.put("geolocation", false);
+            bday.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775682645/shire_ouzrjo.jpg");
+            bday.put("isPrivate", false);
+            bday.put("location", "The Shire");
+            bday.put("name", "Bilbo's 111th Birthday Celebration");
+            bday.put("description", "Join us for Bilbo's 111th birthday!");
+            bday.put("open", toTimestamp(2026, 04, 01));
+            bday.put("organizers", Arrays.asList("d1e25fd5419c4e04f37a24829d6ad8892b22ecd7df5dfb9f0563f6d79fcd39c1"));
+            bday.put("startDate", toTimestamp(2026, 05, 01));
+            db.collection(FirestoreCollections.EVENTS_COLLECTION).add(bday);
+        });
+
     }
 
     /**
@@ -264,4 +421,10 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
 
                 }).addOnFailureListener(e -> Log.e("Firestore", "Error fetching subcollections", e));
     };
+
+    private Timestamp toTimestamp(int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(year, month - 1, day, 0, 0, 0);
+        return new Timestamp(cal.getTime());
+    }
 }
