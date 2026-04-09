@@ -201,6 +201,17 @@ public class UserSettingsActivity extends HeaderNavBarActivity {
             gollum.put("events", Arrays.asList());
             db.collection(FirestoreCollections.USERS_COLLECTION).document("gollum-demo-id").set(gollum);
 
+            Map<String, Object> gandalf = new HashMap<>();
+            gandalf.put("email", "gandalfthegrey@wizard.com");
+            gandalf.put("fcmTokes", null);
+            gandalf.put("image", "https://res.cloudinary.com/icarus-images/image/upload/v1775773563/gandalf_fm0vtb.webp");
+            gandalf.put("isAdmin", false);
+            gandalf.put("name", "Gandalf");
+            gandalf.put("phone", null);
+            gandalf.put("settings", Arrays.asList(false, false));
+            gandalf.put("events", Arrays.asList());
+            db.collection(FirestoreCollections.USERS_COLLECTION).document("d1e25fd5419c4e04f37a24829d6ad8892b22ecd7df5dfb9f0563f6d79fcd39c1").set(gandalf);
+
             Map<String, Object> gimli = new HashMap<>();
             gimli.put("email", "gimli@mines.com");
             gimli.put("fcmTokes", null);
